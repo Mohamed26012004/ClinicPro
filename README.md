@@ -1,7 +1,6 @@
-Projet Clinic Pro : 
+# Projet Clinic Pro
 
-Auteurs :
-
-KHEDIM Mohammed
-DKHILI Mohamed Raslene
-SOUIGPI Maxime
+### Auteurs :
+- **KHEDIM Mohammed**
+- **DKHILI Mohamed Raslene**
+- **SOUIGPI Maxime**
