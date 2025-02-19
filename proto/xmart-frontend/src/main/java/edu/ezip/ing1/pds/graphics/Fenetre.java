@@ -3,48 +3,44 @@ package edu.ezip.ing1.pds.graphics;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Examens;
-import edu.ezip.ing1.pds.client.commons.ConfigLoader;
-import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.ExamenService;
 
 public class Fenetre extends JFrame{
 
 
-        private JPanel contentPane;
+        private static JPanel contentPane;
         private static JPanel panelGauche;
         private static JButton boutonExamem;
         private static JPanel panelExamen;
         private static JPanel panelCentral;
-        
+        //private static JScrollPane scrollPane = new JScrollPane();
         
         public Fenetre(){
             super("Demo");
-            setSize(400, 300);
+            setSize(700, 500);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     
             contentPane = (JPanel)getContentPane();
+            contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
+            //JPanel panel = (JPanel) new PanelMaxime();
+            contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
 
-            
-            try {
-                final String networkConfigFile = "network.yaml";
-                final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-                final ExamenService examenService = new ExamenService(networkConfig);
-                contentPane.add(afficheExamens(examenService.selectExamens()), FlowLayout.CENTER);
-            } catch (Exception e) {
-            }
-           
+//            try {
+//                final String networkConfigFile = "network.yaml";
+//                final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+//                final ExamenService examenService = new ExamenService(networkConfig);
+//                contentPane.add(afficheExamens(examenService.selectExamens()), FlowLayout.CENTER);
+//            } catch (Exception e) {
+//            }
+//
 
         }
         
@@ -54,7 +50,12 @@ public class Fenetre extends JFrame{
             pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
         
             boutonExamem = new JButton("Examens");
-            // boutonExamem.addActionListener((e) -> clickBtnExamen(e));
+            boutonExamem.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
+                }
+            });
             pane.add(boutonExamem);
             pane.add(Box.createRigidArea(new Dimension(0, 5)));
                 
