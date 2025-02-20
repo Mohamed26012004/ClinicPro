@@ -2,24 +2,21 @@ package edu.ezip.ing1.pds.graphics;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
 
 public class Fenetre extends JFrame{
 
 
         private static JPanel contentPane;
-        private static JPanel panelGauche;
         private static JButton boutonExamem;
-        private static JPanel panelExamen;
-        private static JPanel panelCentral;
-        //private static JScrollPane scrollPane = new JScrollPane();
+        private static JButton boutonFacture;
+        private static JButton boutonPerformance;
+
         
         public Fenetre(){
             super("Demo");
@@ -32,15 +29,7 @@ public class Fenetre extends JFrame{
             contentPane.add(PanelGauche(), BorderLayout.WEST);
             //JPanel panel = (JPanel) new PanelMaxime();
             contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
-
-//            try {
-//                final String networkConfigFile = "network.yaml";
-//                final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-//                final ExamenService examenService = new ExamenService(networkConfig);
-//                contentPane.add(afficheExamens(examenService.selectExamens()), FlowLayout.CENTER);
-//            } catch (Exception e) {
-//            }
-//
+            //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
         
@@ -53,39 +42,47 @@ public class Fenetre extends JFrame{
             boutonExamem.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    contentPane.removeAll();
                     contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
+                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
+                    contentPane.repaint();
+                    contentPane.revalidate();
                 }
             });
             pane.add(boutonExamem);
             pane.add(Box.createRigidArea(new Dimension(0, 5)));
-                
+
+            boutonFacture = new JButton("Facture");
+            boutonFacture.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    PanelFacture panel = new PanelFacture();
+                    contentPane.removeAll();
+                    contentPane.add(panel, BorderLayout.CENTER);
+                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
+                    contentPane.repaint();
+                    contentPane.revalidate();
+                }
+            });
+            pane.add(boutonFacture);
+            pane.add(Box.createRigidArea(new Dimension(0, 5)));
+
+            boutonPerformance = new JButton("Performance");
+            boutonPerformance.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    PanelPerformance panel = new PanelPerformance();                   contentPane.removeAll();
+                    contentPane.add(panel, BorderLayout.CENTER);
+                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
+                    contentPane.repaint();
+                    contentPane.revalidate();
+                }
+            });
+            pane.add(boutonPerformance);
                 
             return pane;
         }
-        
-        public static JPanel afficheExamens(Examens examens){
-        
-        
-            JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-            for (Examen examen : examens.getExamens()) {
-                JPanel pane = new JPanel();
-                pane.setLayout(new FlowLayout());
-                JLabel nom = new JLabel(examen.getNom());
-                JLabel cout = new JLabel(String.valueOf(examen.getCout()));
-                JLabel numSalle = new JLabel(examen.getNumeroSalle());
-                JLabel id = new JLabel(String.valueOf(examen.getId()));
-                pane.add(id);
-                pane.add(nom);
-                pane.add(cout);
-                pane.add(numSalle);
-
-                panel.add(pane);
-            }
-
-            return panel;
-        }
 
         
 

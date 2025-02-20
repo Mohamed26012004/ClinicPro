@@ -29,9 +29,9 @@ public class PanelMaxime extends JPanel {
     public PanelMaxime (){
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(500, 300));
+        setPreferredSize(new Dimension(800, 800));
         try {
-            //examens = examenService.selectExamens();
+
             ArrayList<PanelExamen> liste = new ArrayList<>();
             for(Examen exam : examenService.selectExamens().getExamens()){
                 PanelExamen pan = new PanelExamen(exam);
@@ -70,7 +70,7 @@ public class PanelMaxime extends JPanel {
         panneau.add(scrollPane, BorderLayout.CENTER);
 
         JPanel titre = new JPanel(new FlowLayout());
-        titre.add(new JLabel("TOUS LES EXAMENS"));
+        titre.add(new JLabel("TOUS LES EXAMENS : NOM - COÛT - NUMERO DE SALLE"));
         panneau.add(titre, BorderLayout.NORTH);
 
         panneau.add(boutons(), BorderLayout.SOUTH);
