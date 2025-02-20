@@ -34,6 +34,7 @@ public class XMartCityService {
         INSERT_EXAMEN("INSERT into examen (nom, cout, numeroSalle) values (?, ?, ?)"),
         UPDATE_EXAMEN("UPDATE examen SET nom = ?, cout = ?, numeroSalle = ? WHERE id = ?"),
         DELETE_EXAMEN("DELETE FROM examen WHERE id = ?"),
+        SELECT_ONE_EXAMEN("SELECT t.nom, t.cout, t.numeroSalle, t.id FROM examen t WHERE nom = ? AND cout = ? AND numeroSalle = ?"),
         ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND numeroSalle = ?");
 
         private final String query;
@@ -72,6 +73,9 @@ public class XMartCityService {
                 break;
             case DELETE_EXAMEN:
                 response = DeleteExamen(request, connection);
+                break;
+            case SELECT_ONE_EXAMEN:
+                response = selectOneExamen(request, connection);
                 break;
             default:
                 break;
@@ -118,6 +122,28 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examens));
     }
 
+    private Response selectOneExamen(final Request request, final Connection connection) throws SQLException, JsonProcessingException, IOException{
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Examen exam = objectMapper.readValue(request.getRequestBody(), Examen.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ONE_EXAMEN.query);
+
+        stmt.setString(1, exam.getNom());
+        stmt.setDouble(2, exam.getCout());
+        stmt.setString(3, exam.getNumeroSalle());
+
+        final ResultSet res = stmt.executeQuery();
+        Examens examens = new Examens();
+        while (res.next()) {
+            Examen examen = new Examen();
+            examen.setNom(res.getString(1));
+            examen.setCout(res.getDouble(2));
+            examen.setNumeroSalle(res.getString(3));
+            examen.setId(res.getInt(4));
+            examens.add(examen);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(examens));
+    }
+
     private Response UpdateExamen(final Request request, final Connection connection) throws SQLException, IOException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -125,18 +151,18 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_EXAMEN.query);
 
-        final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_EXAMEN.query);
-        stmt2.setString(1, examen.getNom());
-        stmt2.setDouble(2, examen.getCout());
-        stmt2.setString(3, examen.getNumeroSalle());
-
-        final ResultSet res = stmt2.executeQuery();
-        res.next();
+//        final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_EXAMEN.query);
+//        stmt2.setString(1, examen.getNom());
+//        stmt2.setDouble(2, examen.getCout());
+//        stmt2.setString(3, examen.getNumeroSalle());
+//
+//        final ResultSet res = stmt2.executeQuery();
+//        res.next();
 
         stmt.setString(1, examen.getNom());
         stmt.setDouble(2, examen.getCout());
         stmt.setString(3, examen.getNumeroSalle());
-        stmt.setInt(4, res.getInt(1));
+        stmt.setInt(4, examen.getId());
         stmt.executeUpdate();
 
             // final Statement stmt2 = connection.createStatement();

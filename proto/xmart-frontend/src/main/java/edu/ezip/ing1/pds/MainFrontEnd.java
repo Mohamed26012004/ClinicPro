@@ -2,20 +2,15 @@ package edu.ezip.ing1.pds;
 
 import java.io.IOException;
 
-import de.vandermeer.asciitable.AsciiTable;
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
-import edu.ezip.ing1.pds.business.dto.Student;
-import edu.ezip.ing1.pds.business.dto.Students;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.ExamenService;
-import edu.ezip.ing1.pds.services.StudentService;
+
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
@@ -31,17 +26,11 @@ public class MainFrontEnd {
     public static void main(String[] args) throws IOException, InterruptedException {
          final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
          logger.debug("Load Network config file : {}", networkConfig.toString());
-
-         final ExamenService examenService = new ExamenService(networkConfig);
-
-        Examen exam = new Examen("Main", 689.0, "SALLE123");
-        //Examen exam1 = new Examen("Pied", 121.0, "SALLE3");
-        
-        examenService.updateExamen(exam);
-        
-        
-
 //
+//         final ExamenService examenService = new ExamenService(networkConfig);
+
+
+
 //         final StudentService studentService = new StudentService(networkConfig);
 //         studentService.insertStudents();
 //         Students students = studentService.selectStudents();
@@ -52,6 +41,7 @@ public class MainFrontEnd {
 //         }
 //         asciiTable.addRule();
 //         logger.debug("\n{}\n", asciiTable.render());
+
         Fenetre fen = new Fenetre();
         fen.setVisible(true);
 

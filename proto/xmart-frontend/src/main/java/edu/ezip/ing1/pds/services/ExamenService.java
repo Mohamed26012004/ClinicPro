@@ -32,6 +32,7 @@ public class ExamenService {
     final String selectRequestOrder = "SELECT_ALL_EXAMENS";
     final String updateRequestOrder = "UPDATE_EXAMEN";
     final String deleteRequestOrder = "DELETE_EXAMEN";
+    final String selectOneRequestOrder = "SELECT_ONE_EXAMEN";
 
     private final NetworkConfig networkConfig;
 
@@ -84,6 +85,45 @@ public class ExamenService {
         }
     }
 
+    public Examen selectOneExamen(Examen examen) throws InterruptedException, IOException{
+
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(examen);
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(selectOneRequestOrder);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectAllExamensClientRequest clientRequest = new SelectAllExamensClientRequest(
+                networkConfig,
+                birthdate++, request, null, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if(!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            Examens examens = (Examens) joinedClientRequest.getResult();
+            Examen examSelected = null;
+            int k=1;
+            for (Examen e : examens.getExamens()) {
+                if(k==1){
+                    examSelected = e;
+                }
+                k=2;
+            }
+            return examSelected;
+        }
+        else {
+            logger.error("No students found");
+            return null;
+        }
+    }
 
     public Examens selectExamens() throws InterruptedException, IOException {
         int birthdate = 0;
