@@ -2,22 +2,14 @@ package edu.ezip.ing1.pds.business.server;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
-import edu.ezip.ing1.pds.business.dto.Facture;
-import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
 
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.commons.Response;
@@ -43,7 +35,24 @@ public class XMartCityService {
         ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND regle = ?"),
 
         FACTURES_PAYEES("SELECT t.idFacture, t.dateFacture FROM facture t WHERE t.regle=true"),
-        FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?");
+        FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?"),
+
+        SELECT_ALL_MEDECINS("SELECT m.numeroADELI, m.nom, m.prenom, m.telephone, m.specialite, m.salaire FROM medecin m"),
+        INSERT_MEDECIN("INSERT into medecin (numeroADELI, nom, prenom, telephone, specialite, salaire) values (?, ?, ?, ?, ?, ?)"),
+        UPDATE_MEDECIN("UPDATE medecin SET nom = ?, prenom = ?, telephone = ?, specialite = ?, salaire = ? WHERE numeroADELI = ?"),
+        DELETE_MEDECIN("DELETE FROM medecin WHERE numeroADELI = ?"),
+
+        SELECT_ALL_HORAIRES("SELECT h.id, h.jour, h.heureDebut, h.heureFin FROM horaire h"),
+        INSERT_HORAIRE("INSERT into horaire (jour, heureDebut, heureFin) values (?, ?, ?)"),
+        UPDATE_HORAIRE("UPDATE horaire SET jour = ?, heureDebut = ?, heureFin = ? WHERE id = ?"),
+        DELETE_HORAIRE("DELETE FROM horaire WHERE id = ?"),
+        ID_HORAIRE("SELECT id FROM horaire WHERE jour = ? AND heureDebut = ? AND heureFin = ?"),
+
+        SELECT_ALL_SALLES("SELECT s.id, s.numeroSalle, s.typeSalle, s.statut FROM salle s"),
+        INSERT_SALLE("INSERT into salle (numeroSalle, typeSalle, statut) values (?, ?, ?)"),
+        UPDATE_SALLE("UPDATE salle SET numeroSalle = ?, typeSalle = ?, statut = ? WHERE id = ?"),
+        DELETE_SALLE("DELETE FROM salle WHERE id = ?"),
+        ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?");
 
         private final String query;
 
@@ -106,6 +115,41 @@ public class XMartCityService {
                 response = facturesquotidiennes(request, connection);
                 break;
 
+            case INSERT_MEDECIN:
+                response = InsertMedecin(request, connection);
+                break;
+            case SELECT_ALL_MEDECINS:
+                response = SelectAllMedecins(request, connection);
+                break;
+            case DELETE_MEDECIN:
+                response = DeleteMedecin(request, connection);
+                break;
+            case UPDATE_MEDECIN:
+                response = UpdateMedecin(request, connection);
+                break;
+            case INSERT_HORAIRE:
+                response = InsertHoraire(request, connection);
+                break;
+            case DELETE_HORAIRE:
+                response = DeleteHoraire(request, connection);
+                break;
+            case SELECT_ALL_HORAIRES:
+                response = SelectAllHoraires(request, connection);
+                break;
+            case UPDATE_HORAIRE:
+                response = UpdateHoraire(request, connection);
+            case INSERT_SALLE:
+                response = InsertSalle(request, connection);
+                break;
+            case DELETE_SALLE:
+                response = DeleteSalle(request, connection);
+                break;
+            case UPDATE_SALLE:
+                response = UpdateSalle(request, connection);
+                break;
+            case SELECT_ALL_SALLES:
+                response = SelectAllSalles(request, connection);
+                break;
             default:
                 break;
         }
@@ -113,6 +157,7 @@ public class XMartCityService {
         return response;
     }
 
+    //Méthodes des requêtes sur les examens
     private Response InsertExamen(final Request request, final Connection connection) throws SQLException, IOException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -126,8 +171,6 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examen));
     }
-
-
 
     private Response SelectAllExamens(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
        final ObjectMapper objectMapper = new ObjectMapper();
@@ -181,9 +224,9 @@ public class XMartCityService {
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examen));
-     }
+    }
 
-     private Response DeleteExamen(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response DeleteExamen(final Request request, final Connection connection) throws SQLException, IOException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
         final Examen examen = objectMapper.readValue(request.getRequestBody(), Examen.class);
@@ -204,6 +247,7 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examen));
     }
 
+    // Méthodes des requêtes sur les factures
     private Response SelectAllFactures(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
@@ -269,7 +313,6 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
     }
 
-
     private Response facturesquotidiennes (final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
@@ -284,6 +327,208 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
     }
 
+    //Méthodes liées à la table Medecin
 
+    private Response InsertMedecin(final Request request, final Connection connection) throws SQLException, IOException {
 
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Medecin medecin = objectMapper.readValue(request.getRequestBody(), Medecin.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_MEDECIN.query);
+        stmt.setInt(1, medecin.getNumeroADELI() );
+        stmt.setString(2, medecin.getNom());
+        stmt.setString(3, medecin.getPrenom());
+        stmt.setString(4, medecin.getTelephone());
+        stmt.setString(5, medecin.getSpecialite());
+        stmt.setInt(6, medecin.getSalaire());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecin));
+    }
+
+    private Response SelectAllMedecins(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_MEDECINS.query);
+        Medecins medecins = new Medecins();
+        while (res.next()) {
+            Medecin medecin = new Medecin();
+            medecin.setNumeroADELI(res.getInt(1));
+            medecin.setNom(res.getString(2));
+            medecin.setPrenom(res.getString(3));
+            medecin.setTelephone(res.getString(4));
+            medecin.setSpecialite(res.getString(5));
+            medecin.setSalaire(res.getInt(6));
+            medecins.add(medecin);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecins));
+    }
+
+    private Response UpdateMedecin(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Medecin medecin = objectMapper.readValue(request.getRequestBody(), Medecin.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_MEDECIN.query);
+
+        stmt.setString(1, medecin.getNom());
+        stmt.setString(2, medecin.getPrenom());
+        stmt.setString(3, medecin.getTelephone());
+        stmt.setString(4, medecin.getSpecialite());
+        stmt.setInt(5, medecin.getSalaire());
+        stmt.setInt(4, medecin.getNumeroADELI());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecin));
+    }
+
+    private Response DeleteMedecin(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Medecin medecin = objectMapper.readValue(request.getRequestBody(), Medecin.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_MEDECIN.query);
+
+        stmt.setInt(1, medecin.getNumeroADELI());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecin));
+    }
+
+    // Méthodes liées à la table Horaire
+
+    private Response InsertHoraire(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Horaire horaire = objectMapper.readValue(request.getRequestBody(), Horaire.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_HORAIRE.query);
+        stmt.setString(1, horaire.getJour());
+        stmt.setTime(2, Time.valueOf(horaire.getHeureDebut()));
+        stmt.setTime(3, Time.valueOf(horaire.getHeureFin()));
+        stmt.executeUpdate();
+        System.out.println("Xmart ZOZORZRUZOIRUZIUROZERIZREIZI");
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaire));
+    }
+
+    private Response DeleteHoraire(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Horaire horaire = objectMapper.readValue(request.getRequestBody(), Horaire.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_HORAIRE.query);
+
+        final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_HORAIRE.query);
+        stmt2.setString(1, horaire.getJour());
+        stmt2.setTime(2, Time.valueOf(horaire.getHeureDebut()));
+        stmt2.setTime(3, Time.valueOf(horaire.getHeureFin()));
+
+        final ResultSet res = stmt2.executeQuery();
+        res.next();
+
+        stmt.setInt(1, res.getInt(1));
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaire));
+    }
+
+    private Response UpdateHoraire(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Horaire horaire = objectMapper.readValue(request.getRequestBody(), Horaire.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_HORAIRE.query);
+
+        stmt.setString(1, horaire.getJour());
+        stmt.setTime(2, Time.valueOf(horaire.getHeureDebut()));
+        stmt.setTime(3, Time.valueOf(horaire.getHeureFin()));
+        stmt.setInt(4, horaire.getId());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaire));
+    }
+
+    private Response SelectAllHoraires(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_HORAIRES.query);
+        Horaires horaires = new Horaires();
+        while (res.next()) {
+            Horaire horaire = new Horaire();
+            horaire.setId(res.getInt(1));
+            horaire.setJour(res.getString(2));
+            horaire.setHeureDebut(res.getTime(3).toLocalTime());
+            horaire.setHeureFin(res.getTime(4).toLocalTime());
+            horaires.add(horaire);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaires));
+    }
+
+    // Méthodes liées à la table Salle
+
+    private Response InsertSalle(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_SALLE.query);
+        stmt.setString(1, salle.getNumeroSalle());
+        stmt.setString(2, salle.getTypeSalle());
+        stmt.setString(3, salle.getStatut());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(salle));
+    }
+
+    private Response DeleteSalle(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_SALLE.query);
+
+        final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_SALLE.query);
+        stmt2.setString(1, salle.getNumeroSalle());
+        stmt2.setString(2, salle.getTypeSalle());
+
+        final ResultSet res = stmt2.executeQuery();
+        res.next();
+
+        stmt.setInt(1, res.getInt(1));
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(salle));
+    }
+
+    private Response UpdateSalle(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_SALLE.query);
+
+        stmt.setString(1, salle.getNumeroSalle());
+        stmt.setString(2, salle.getTypeSalle());
+        stmt.setString(3, salle.getStatut());
+        stmt.setInt(4, salle.getId());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(salle));
+    }
+
+    private Response SelectAllSalles(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_SALLES.query);
+        Salles salles = new Salles();
+        while (res.next()) {
+            Salle salle = new Salle();
+            salle.setId(res.getInt(1));
+            salle.setNumeroSalle(res.getString(2));
+            salle.setTypeSalle(res.getString(3));
+            salle.setStatut(res.getString(4));
+            salles.add(salle);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(salles));
+    }
 }

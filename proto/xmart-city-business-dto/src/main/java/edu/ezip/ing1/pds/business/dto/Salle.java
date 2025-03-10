@@ -11,6 +11,7 @@ import java.sql.SQLException;
 @JsonRootName(value = "salle")
 public class Salle {
 
+    private int id;
     private String numeroSalle;
     private String typeSalle;
     private String statut;
@@ -19,12 +20,12 @@ public class Salle {
     }
     public final Salle build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "numeroSalle", "typeSalle","statut");
+        setFieldsFromResulset(resultSet, "id", "numeroSalle", "typeSalle","statut");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, numeroSalle, typeSalle, statut);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id), numeroSalle, typeSalle, statut);
     }
     public Salle(String numeroSalle, String typeSalle, String statut){
         this.numeroSalle = numeroSalle;
@@ -32,6 +33,9 @@ public class Salle {
         this.statut = statut;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getNumeroSalle() {
         return numeroSalle;
     }
@@ -42,6 +46,10 @@ public class Salle {
         return typeSalle;
     }
 
+    @JsonProperty("salle_id")
+    public void setId(int id) {
+        this.id = id;
+    }
     @JsonProperty("salle_numeroSalle")
     public void setNumeroSalle(String numeroSalle) {
         this.numeroSalle = numeroSalle;
@@ -75,7 +83,8 @@ public class Salle {
     @Override
     public String toString() {
         return "Salle{" +
-                "numeroSalle='" + numeroSalle + '\'' +
+                "id=" + id +
+                ", numeroSalle='" + numeroSalle + '\'' +
                 ", typeSalle='" + typeSalle + '\'' +
                 ", statut='" + statut + '\'' +
                 '}';

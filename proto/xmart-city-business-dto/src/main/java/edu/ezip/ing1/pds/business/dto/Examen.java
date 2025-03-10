@@ -22,13 +22,13 @@ public class Examen {
     public final Examen build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         setFieldsFromResulset(resultSet, "nom", "cout","numeroSalle");
-    return this;
-}
+        return this;
+    }
 
-public final PreparedStatement build(PreparedStatement preparedStatement)
-    throws SQLException, NoSuchFieldException, IllegalAccessException {
-return buildPreparedStatement(preparedStatement, nom, String.valueOf(cout), numeroSalle);
-}
+    public final PreparedStatement build(PreparedStatement preparedStatement)
+        throws SQLException, NoSuchFieldException, IllegalAccessException {
+    return buildPreparedStatement(preparedStatement, nom, String.valueOf(cout), numeroSalle);
+    }
 
     public Examen(String nom, double cout, String numeroSalle) {
         this.cout = cout;
@@ -67,12 +67,12 @@ return buildPreparedStatement(preparedStatement, nom, String.valueOf(cout), nume
         return numeroSalle;
     }
 
-    @JsonProperty("examen_numerp_salle")
+    @JsonProperty("examen_numero_salle")
     public void setNumeroSalle(String numeroSalle) {
         this.numeroSalle = numeroSalle;
     }
 
-     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
+    private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
         for(final String fieldName : fieldNames ) {
             final Field field = this.getClass().getDeclaredField(fieldName);
