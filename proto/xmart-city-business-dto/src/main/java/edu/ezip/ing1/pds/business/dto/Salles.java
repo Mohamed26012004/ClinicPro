@@ -1,22 +1,24 @@
 package edu.ezip.ing1.pds.business.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Salles {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("salles")
     private Set<Salle> salles = new LinkedHashSet<Salle>();
 
-    public Set<Salle> getStudents() {
+    public Set<Salle> getSalles() {
         return salles;
     }
 
-    public void setStudents(Set<Salle> salles) {
+    public void setSalles(Set<Salle> salles) {
         this.salles = salles;
     }
 

@@ -3,6 +3,7 @@ package edu.ezip.ing1.pds.business.server;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.time.format.DateTimeFormatter;
 
 import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ public class XMartCityService {
 
     private final static String LoggingLabel = "B u s i n e s s - S e r v e r";
     private final Logger logger = LoggerFactory.getLogger(LoggingLabel);
+    private DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     private enum Queries {
         
@@ -376,7 +378,7 @@ public class XMartCityService {
         stmt.setString(3, medecin.getTelephone());
         stmt.setString(4, medecin.getSpecialite());
         stmt.setInt(5, medecin.getSalaire());
-        stmt.setInt(4, medecin.getNumeroADELI());
+        stmt.setInt(6, medecin.getNumeroADELI());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecin));
@@ -397,17 +399,32 @@ public class XMartCityService {
 
     // Méthodes liées à la table Horaire
 
-    private Response InsertHoraire(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response InsertHoraire(final Request request, final Connection connection) throws IOException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
         final Horaire horaire = objectMapper.readValue(request.getRequestBody(), Horaire.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_HORAIRE.query);
-        stmt.setString(1, horaire.getJour());
-        stmt.setTime(2, Time.valueOf(horaire.getHeureDebut()));
-        stmt.setTime(3, Time.valueOf(horaire.getHeureFin()));
-        stmt.executeUpdate();
-        System.out.println("Xmart ZOZORZRUZOIRUZIUROZERIZREIZI");
+        final PreparedStatement stmt;
+        try {
+            stmt = connection.prepareStatement(Queries.INSERT_HORAIRE.query);
+            Time debut = Time.valueOf(horaire.getHeureDebut());
+            Time fin = Time.valueOf(horaire.getHeureFin());
+
+            stmt.setString(1, horaire.getJour());
+            stmt.setTime(2, debut);
+            stmt.setTime(3, fin);
+
+            int rowsInserted = stmt.executeUpdate();
+            System.out.println("Nombre de lignes insérées : " + rowsInserted);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
+
+
+
+
+
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaire));
     }
 
@@ -419,9 +436,13 @@ public class XMartCityService {
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_HORAIRE.query);
 
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_HORAIRE.query);
+
+        Time debut = Time.valueOf(horaire.getHeureDebut());
+        Time fin = Time.valueOf(horaire.getHeureFin());
+
         stmt2.setString(1, horaire.getJour());
-        stmt2.setTime(2, Time.valueOf(horaire.getHeureDebut()));
-        stmt2.setTime(3, Time.valueOf(horaire.getHeureFin()));
+        stmt2.setTime(2, debut);
+        stmt2.setTime(3, fin);
 
         final ResultSet res = stmt2.executeQuery();
         res.next();

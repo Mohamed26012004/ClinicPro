@@ -12,6 +12,7 @@ public class Medecins {
     @JsonProperty("medecins")
     private Set<Medecin> medecins = new LinkedHashSet<Medecin>();
 
+
     public Set<Medecin> getMedecins() {
         return medecins;
     }
@@ -19,6 +20,7 @@ public class Medecins {
     public void setMedecins(Set<Medecin> medecins) {
         this.medecins = medecins;
     }
+
     public final Medecins add (final Medecin medecin) {
         medecins.add(medecin);
         return this;
