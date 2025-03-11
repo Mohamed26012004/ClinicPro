@@ -54,7 +54,13 @@ public class XMartCityService {
         INSERT_SALLE("INSERT into salle (numeroSalle, typeSalle, statut) values (?, ?, ?)"),
         UPDATE_SALLE("UPDATE salle SET numeroSalle = ?, typeSalle = ?, statut = ? WHERE id = ?"),
         DELETE_SALLE("DELETE FROM salle WHERE id = ?"),
-        ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?");
+        ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
+
+        SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p"),
+        INSERT_PATIENT("INSERT into patient (nom, prenom, telephone, adresse) values (?, ?, ?, ?)"),
+        UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
+        DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
+        ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?");
 
         private final String query;
 
@@ -151,6 +157,18 @@ public class XMartCityService {
                 break;
             case SELECT_ALL_SALLES:
                 response = SelectAllSalles(request, connection);
+                break;
+            case SELECT_ALL_PATIENTS:
+                response = SelectAllPatients(request, connection);
+                break;
+            case INSERT_PATIENT:
+                response = InsertPatient(request, connection);
+                break;
+            case DELETE_PATIENT:
+                response = DeletePatient(request, connection);
+                break;
+            case UPDATE_PATIENT:
+                response = UpdatePatient(request, connection);
                 break;
             default:
                 break;
@@ -552,4 +570,74 @@ public class XMartCityService {
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(salles));
     }
+
+    // Méthodes liées à la table Patient
+
+    private Response InsertPatient(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Patient patient = objectMapper.readValue(request.getRequestBody(), Patient.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_PATIENT.query);
+        stmt.setString(1, patient.getNom());
+        stmt.setString(2, patient.getPrenom());
+        stmt.setString(3, patient.getTelephone());
+        stmt.setString(4, patient.getAdresse());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(patient));
+    }
+
+    private Response SelectAllPatients(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_PATIENTS.query);
+        Patients patients = new Patients();
+        while (res.next()) {
+            Patient patient = new Patient();
+            patient.setIdPatient(res.getInt(1));
+            patient.setNom(res.getString(2));
+            patient.setPrenom(res.getString(3));
+            patient.setTelephone(res.getString(4));
+            patient.setAdresse(res.getString(5));
+            patients.add(patient);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(patients));
+    }
+
+    private Response UpdatePatient(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Patient patient = objectMapper.readValue(request.getRequestBody(), Patient.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_PATIENT.query);
+
+        stmt.setString(1, patient.getNom());
+        stmt.setString(2, patient.getPrenom());
+        stmt.setString(3, patient.getTelephone());
+        stmt.setString(4, patient.getAdresse());
+        stmt.setInt(5, patient.getIdPatient());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(patient));
+    }
+
+    private Response DeletePatient(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Patient patient = objectMapper.readValue(request.getRequestBody(), Patient.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PATIENT.query);
+
+        stmt.setString(1, patient.getNom());
+        stmt.setString(2, patient.getPrenom());
+        stmt.setString(3, patient.getTelephone());
+        stmt.setString(4, patient.getAdresse());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(patient));
+    }
+
+
 }
