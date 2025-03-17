@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName(value = "compteRendu")
 public class compteRendu {
     private  int id_compteRendu;
-    private  String symptome;
+    private  String typeSymptome;
+    private  String descriptionSymptome;
 
 
     public compteRendu() {
@@ -20,27 +21,33 @@ public class compteRendu {
 
     public final compteRendu build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_antecedentMedical","symptome");
+        setFieldsFromResulset(resultSet, "id_antecedentMedical","typeSymptome", "descriptionSymptome");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_compteRendu),symptome);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_compteRendu),typeSymptome, descriptionSymptome);
     }
 
-    public compteRendu(String symptome) {
-        this.symptome = symptome;
+    public compteRendu(String typeSymptome, String descriptionSymptome) {
+        this.typeSymptome = typeSymptome;
+        this.descriptionSymptome = descriptionSymptome;
     }
 
     public int getId_compteRendu() {return id_compteRendu;}
-    public String getSymptome() {
-        return symptome;
+    public String getTypeSymptome() {
+        return typeSymptome;
+    }
+    public String getDescriptionSymptome() {
+        return descriptionSymptome;
     }
 
-    @JsonProperty("compteRendu_symptome")
-    public void setSymptome(String Symptome) {this.symptome = symptome;}
+    @JsonProperty("compteRendu_typeSymptome")
+    public void setTypeSymptome(String typeSymptome) {this.typeSymptome = typeSymptome;}
+    @JsonProperty("compteRendu_descriptionSymptome")
+    public void setDescriptionSymptome(String descriptionSymptome) {this.descriptionSymptome = descriptionSymptome;}
     @JsonProperty("compteRendu_id_compteRendu")
     public void setId_compteRendu(int id_antecedentMedical) {
         this.id_compteRendu = id_compteRendu;
@@ -67,7 +74,8 @@ public class compteRendu {
     public String toString() {
         return "compteRendu{" +
                 "id_compteRendu='" + id_compteRendu + '\'' +
-                ", symptome='" + symptome + '\'' +
+                ", typeSymptome='" + typeSymptome + '\'' +
+                ", descriptionSymptome='" + descriptionSymptome + '\'' +
                 '}';
     }
 
