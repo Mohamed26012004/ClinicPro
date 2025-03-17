@@ -41,6 +41,7 @@ public class Diagnostic {
 
     public int getId_Diagnostic() {return id_Diagnostic;}
     public String getcodeCIM10() {return codeCIM10;}
+    public String getNomMaladie() {return nomMaladie;}
     public String getDescription_Diagnostic() {return description_Diagnostic;}
 
 
