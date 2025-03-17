@@ -12,7 +12,8 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName(value = "Diagnostic")
 public class Diagnostic {
     private  int id_Diagnostic;
-    private  String CIM10;
+    private  String codeCIM10;
+    private  String nomMaladie;
     private  String description_Diagnostic;
 
 
@@ -21,29 +22,32 @@ public class Diagnostic {
 
     public final Diagnostic build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_Diagnostic", "CIM10","description_Diagnostic");
+        setFieldsFromResulset(resultSet, "id_Diagnostic", "codeCIM10", "nomMaladie", "description_Diagnostic");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic),CIM10, description_Diagnostic);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic), codeCIM10, nomMaladie, description_Diagnostic);
     }
 
-    public Diagnostic(String CIM10, String description_Diagnostic) {
-        this.CIM10 = CIM10;
+    public Diagnostic(String codeCIM10, String nomMaladie, String description_Diagnostic) {
+        this.codeCIM10 = codeCIM10;
+        this.nomMaladie = nomMaladie;
         this.description_Diagnostic = description_Diagnostic;
     }
 
 
     public int getId_Diagnostic() {return id_Diagnostic;}
-    public String getCIM10() {return CIM10;}
+    public String getcodeCIM10() {return codeCIM10;}
     public String getDescription_Diagnostic() {return description_Diagnostic;}
 
 
-    @JsonProperty("Diagnostic_CIM10")
-    public void setCIM10(String CIM10) {this.CIM10 = CIM10;}
+    @JsonProperty("Diagnostic_codeCIM10")
+    public void setcodeCIM10(String codeCIM10) {this.codeCIM10 = codeCIM10;}
+    @JsonProperty("Diagnostic_nomMaladie")
+    public void setNomMaladie(String nomMaladie) {this.nomMaladie = nomMaladie;}
     @JsonProperty("Diagnostic_id_Diagnostic")
     public void setId_Diagnostic(int id_Diagnostic) {this.id_Diagnostic = id_Diagnostic;}
     @JsonProperty("Diagnostic_description_Diagnostic")
@@ -70,7 +74,8 @@ public class Diagnostic {
     public String toString() {
         return "Diagnostic{" +
                 "id_Diagnostic='" + id_Diagnostic + '\'' +
-                ", CIM10='" + CIM10 + '\'' +
+                ", codeCIM10='" + codeCIM10 + '\'' +
+                ", nomMaladie='" + nomMaladie + '\'' +
                 ", description_Diagnostic='" + description_Diagnostic + '\'' +
                 '}';
     }
