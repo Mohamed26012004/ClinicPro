@@ -3,14 +3,17 @@ package edu.ezip.ing1.pds.servicesplanning;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
-import edu.ezip.ing1.pds.business.dto.Medecins;
+import edu.ezip.ing1.pds.business.dto.Horaires;
 import edu.ezip.ing1.pds.business.dto.Patient;
-import edu.ezip.ing1.pds.business.dto.Patients;
+import edu.ezip.ing1.pds.business.dto.RendezVous;
+import edu.ezip.ing1.pds.business.dto.RendezVouss;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.requestsplanning.InsertPatientClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllPatientsClientRequest;
+import edu.ezip.ing1.pds.requestsplanning.InsertRendezVousClientRequest;
+import edu.ezip.ing1.pds.requestsplanning.SelectAllMedecinsClientRequest;
+import edu.ezip.ing1.pds.requestsplanning.SelectAllRendezVousClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -20,42 +23,40 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.UUID;
 
-public class PatientService {
+public class RendezVousService {
 
-    private final static String LoggingLabel = "FrontEnd - PatientService";
+    private final static String LoggingLabel = "FrontEnd - RendezVousService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
 
-    final String insertRequestOrder = "INSERT_PATIENT";
-    final String selectRequestOrder = "SELECT_ALL_PATIENTS";
-    final String updateRequestOrder = "UPDATE_PATIENT";
-    final String deleteRequestOrder = "DELETE_PATIENT";
-
+    final String insertRequestOrder = "INSERT_RENDEZ_VOUS";
+    final String selectRequestOrder = "SELECT_ALL_RENDEZ_VOUS";
+    final String updateRequestOrder = "UPDATE_RENDEZ_VOUS";
+    final String deleteRequestOrder = "DELETE_RENDEZ_VOUS";
 
     private final NetworkConfig networkConfig;
-
-    public PatientService(NetworkConfig networkConfig) {
+    public RendezVousService(NetworkConfig networkConfig) {
         this.networkConfig = networkConfig;
     }
 
-    public void insertPatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, insertRequestOrder);
+    public void insertRendezVous(RendezVous rdv)throws InterruptedException, IOException {
+        insertDeleteUpdateRendezVous(rdv, insertRequestOrder);
     }
 
-    public void updatePatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, updateRequestOrder);
+    public void updateRendezVous(RendezVous rdv)throws InterruptedException, IOException {
+        insertDeleteUpdateRendezVous(rdv, updateRequestOrder);
     }
 
-    public void deletePatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, deleteRequestOrder);
+    public void deleteRendezVous(RendezVous rdv)throws InterruptedException, IOException {
+        insertDeleteUpdateRendezVous(rdv, deleteRequestOrder);
     }
-    public void insertDeleteUpdatePatient(Patient patient, String requestOrder) throws InterruptedException, IOException {
+    public void insertDeleteUpdateRendezVous(RendezVous rdv, String requestOrder) throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
 
         int birthdate = 0;
 
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(patient);
-        logger.trace("Patient with its JSON face : {}", jsonifiedGuy);
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rdv);
+        logger.trace("RendezVous with its JSON face : {}", jsonifiedGuy);
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
@@ -64,25 +65,25 @@ public class PatientService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        final InsertPatientClientRequest clientRequest = new InsertPatientClientRequest(
+        final InsertRendezVousClientRequest clientRequest = new InsertRendezVousClientRequest(
                 networkConfig,
-                birthdate++, request, patient, requestBytes);
+                birthdate++, request, rdv, requestBytes);
         clientRequests.push(clientRequest);
 
 
         while (!clientRequests.isEmpty()) {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
-            final Patient p = (Patient)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {} {} --> {}",
+            final RendezVous r = (RendezVous)clientRequest2.getInfo();
+            logger.debug("Thread {} complete : {} {} {} {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    p.getNom(), p.getPrenom(), p.getTelephone(),
-                    p.getAdresse(),
+                    r.getNumeroADELI(), r.getIdPatient(), r.getId(), r.getDateRendezVous(),
+                    r.getHeureDebut(), r.getHeureFin(),
                     clientRequest2.getResult());
         }
     }
 
-    public Patients selectPatients() throws InterruptedException, IOException {
+    public RendezVouss selectAllRendezVous() throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -93,7 +94,7 @@ public class PatientService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectAllPatientsClientRequest clientRequest = new SelectAllPatientsClientRequest(
+        final SelectAllRendezVousClientRequest clientRequest = new SelectAllRendezVousClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
         clientRequests.push(clientRequest);
@@ -102,11 +103,12 @@ public class PatientService {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (Patients) joinedClientRequest.getResult();
+            return (RendezVouss) joinedClientRequest.getResult();
         }
         else {
-            logger.error("No Medecins found");
+            logger.error("No horaires found");
             return null;
         }
     }
+
 }
