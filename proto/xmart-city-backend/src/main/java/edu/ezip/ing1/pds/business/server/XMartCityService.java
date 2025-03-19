@@ -66,7 +66,33 @@ public class XMartCityService {
         INSERT_PAIEMENT("INSERT into paiement (montant, dateFacture, moyenDePaiement) values (?, ?, ?, ?)"),
         UPDATE_PAIEMENT("UPDATE patient SET montant = ?, dateFacture = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
         DELETE_PAIEMENT("DELETE FROM patient WHERE montant = ? AND dateFacture = ? AND moyenDePaiement = ?"),
-        ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?");
+        ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+
+        SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id, a.type_antecedentMedical, a.description_antecedentMedical FROM AntecedentMedical a"),
+        INSERT_ANTECEDENT_MEDICAL("INSERT into AntecedentMedical (type_antedecedentMedical, description_antecedentMedical) values (?, ?)"),
+        UPDATE_ANTECEDENT_MEDICAL("UPDATE AntecedentMedical SET type_antecedentMedical = ?, description_antecedentMedical = ? WHERE id_antecedentMedical = ?"),
+        DELETE_ANTECEDENT_MEDICAL("DELETE FROM AntecedentMedical WHERE id = ?"),
+        ID_ANTECEDENT_MEDICAL("SELECT id FROM AntecedentMedical WHERE type_antecedentMedical = ? AND description_antecedentMedical = ?"),
+
+        SELECT_ALL_COMPTE_RENDUS("SELECT c.id, c.typeSymptome, c.descriptionSymptome FROM CompteRendu c"),
+        INSERT_COMPTE_RENDU("INSERT into CompteRendu (typeSymptome, descriptionSymptome) values (?, ?)"),
+        UPDATE_COMPTE_RENDU("UPDATE CompteRendu SET typeSymptome = ?, descriptionSymptome = ? WHERE id = ?"),
+        DELETE_COMPTE_RENDU("DELETE FROM AntecedentMedical WHERE id = ?"),
+        ID_COMPTE_RENDU("SELECT id FROM CompteRendu WHERE typeSymptome = ? AND descriptionSymptome = ?"),
+
+        SELECT_ALL_DIAGNOSTICS("SELECT d.id, c.codeCIM10, c.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
+        INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic) values (?, ?, ?)"),
+        UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ? WHERE id = ?"),
+        DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id = ?"),
+        ID_DIAGNOSTIC("SELECT id FROM Diagnostic WHERE codeCIM10 = ? AND nomMaladie = ? AND descriptionDiagnostic = ?"),
+
+        SELECT_ALL_TRAITEMENTS("SELECT t.id, t.typeTraitement, t.descriptionTraitement, t.debutTraitement, t.finTraitement FROM Traitement t"),
+        INSERT_TRAITEMENT("INSERT into Traitement (typeTraitement, descriptionTraitement, debutTraitement, finTraitement) values (?, ?, ?, ?)"),
+        UPDATE_TRAITEMENT("UPDATE Traitement SET typeTraitement = ?, descriptionTraitement = ?, debutTraitement = ?, finTraitement = ? WHERE id = ?"),
+        DELETE_TRAITEMENT("DELETE FROM Traitement WHERE id = ?"),
+        ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ?");
+
+
 
         private final String query;
 
@@ -189,6 +215,63 @@ public class XMartCityService {
             case DELETE_PAIEMENT:
                 response = DeletePaiement(request, connection);
                 break;
+
+
+            case SELECT_ALL_ANTECEDENT_MEDICALS:
+                response = SelectAllAntecedentMedicals(request, connection);
+                break;
+            case INSERT_ANTECEDENT_MEDICAL:
+                response = InsertAntecedentMedical(request, connection);
+                break;
+            case UPDATE_ANTECEDENT_MEDICAL:
+                response = UpdateAntecedentMedical(request, connection);
+                break;
+            case DELETE_ANTECEDENT_MEDICAL:
+                response = DeleteAntecedentMedical(request, connection);
+                break;
+
+
+            case SELECT_ALL_COMPTE_RENDUS:
+                response = SelectAllCompteRendus(request, connection);
+                break;
+            case INSERT_COMPTE_RENDU:
+                response = InsertCompteRendu(request, connection);
+                break;
+            case UPDATE_COMPTE_RENDU:
+                response = UpdateCompteRendu(request, connection);
+                break;
+            case DELETE_COMPTE_RENDU:
+                response = DeleteCompteRendu(request, connection);
+                break;
+
+            case SELECT_ALL_DIAGNOSTICS:
+                response = SelectAllDiagnostics(request, connection);
+                break;
+            case INSERT_DIAGNOSTIC:
+                response = InsertDiagnostic(request, connection);
+                break;
+            case UPDATE_DIAGNOSTIC:
+                response = UpdateDiagnostic(request, connection);
+                break;
+            case DELETE_DIAGNOSTIC:
+                response = DeleteDiagnostic(request, connection);
+                break;
+
+
+            case SELECT_ALL_TRAITEMENTS:
+                response = SelectAllTraitements(request, connection);
+                break;
+            case INSERT_TRAITEMENT:
+                response = InsertTraitement(request, connection);
+                break;
+            case UPDATE_TRAITEMENT:
+                response = UpdateTraitement(request, connection);
+                break;
+            case DELETE_TRAITEMENT:
+                response = DeleteTraitement(request, connection);
+                break;
+
+
 
             default:
                 break;
@@ -714,6 +797,234 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
+
+
+    // Méthodes de CRUD de la table AntecedentMedical
+
+    private Response InsertAntecedentMedical(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final AntecedentMedical antecedentMedical = objectMapper.readValue(request.getRequestBody(), AntecedentMedical.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_ANTECEDENT_MEDICAL.query);
+        stmt.setString(1, antecedentMedical.getType_antecedentMedical());
+        stmt.setString(2, antecedentMedical.getDescription_antecedentMedical());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedical));
+    }
+
+    private Response SelectAllAntecedentMedicals(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_ANTECEDENT_MEDICALS.query);
+        AntecedentMedicals antecedentMedicals = new AntecedentMedicals();
+        while (res.next()) {
+            AntecedentMedical antecedentMedical = new AntecedentMedical();
+            antecedentMedical.setId_antecedentMedical(res.getInt(1));
+            antecedentMedical.setType_antecedentMedical(res.getString(2));
+            antecedentMedical.setDescription_antecedentMedical(res.getString(3));
+            antecedentMedicals.add(antecedentMedical);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedicals));
+    }
+
+    private Response UpdateAntecedentMedical(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final AntecedentMedical antecedentMedical = objectMapper.readValue(request.getRequestBody(), AntecedentMedical.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_ANTECEDENT_MEDICAL.query);
+        stmt.setString(1, antecedentMedical.getType_antecedentMedical());
+        stmt.setString(2, antecedentMedical.getDescription_antecedentMedical());
+        stmt.setInt(3, antecedentMedical.getId_antecedentMedical());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedical));
+    }
+
+    private Response DeleteAntecedentMedical(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final AntecedentMedical antecedentMedical = objectMapper.readValue(request.getRequestBody(), AntecedentMedical.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_ANTECEDENT_MEDICAL.query);
+        stmt.setInt(1, antecedentMedical.getId_antecedentMedical());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedical));
+    }
+
+
+    // Méthodes de CRUD de la table CompteRendu
+
+    private Response InsertCompteRendu(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_COMPTE_RENDU.query);
+        stmt.setString(1, compteRendu.getTypeSymptome());
+        stmt.setString(2, compteRendu.getDescriptionSymptome());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
+    }
+
+    private Response SelectAllCompteRendus(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_COMPTE_RENDUS.query);
+        CompteRendus compteRendus = new CompteRendus();
+        while (res.next()) {
+            CompteRendu compteRendu = new CompteRendu();
+            compteRendu.setId_compteRendu(res.getInt(1));
+            compteRendu.setTypeSymptome(res.getString(2));
+            compteRendu.setDescriptionSymptome(res.getString(3));
+            compteRendus.add(compteRendu);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendus));
+    }
+
+    private Response UpdateCompteRendu(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_COMPTE_RENDU.query);
+        stmt.setString(1, compteRendu.getTypeSymptome());
+        stmt.setString(2, compteRendu.getDescriptionSymptome());
+        stmt.setInt(3, compteRendu.getId_compteRendu());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
+    }
+
+    private Response DeleteCompteRendu(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_COMPTE_RENDU.query);
+        stmt.setInt(1, compteRendu.getId_compteRendu());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
+    }
+
+
+    // Méthodes de CRUD de la table Diagnostic
+
+    private Response InsertDiagnostic(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_DIAGNOSTIC.query);
+        stmt.setString(1, diagnostic.getcodeCIM10());
+        stmt.setString(2, diagnostic.getNomMaladie());
+        stmt.setString(3, diagnostic.getDescription_Diagnostic());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
+    }
+
+    private Response SelectAllDiagnostics(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_DIAGNOSTICS.query);
+        Diagnostics diagnostics = new Diagnostics();
+        while (res.next()) {
+            Diagnostic diagnostic = new Diagnostic();
+            diagnostic.setId_Diagnostic(res.getInt(1));
+            diagnostic.setcodeCIM10(res.getString(2));
+            diagnostic.setNomMaladie(res.getString(3));
+            diagnostic.setDescription_Diagnostic(res.getString(4));
+            diagnostics.add(diagnostic);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostics));
+    }
+
+    private Response UpdateDiagnostic(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_DIAGNOSTIC.query);
+        stmt.setString(1, diagnostic.getcodeCIM10());
+        stmt.setString(2, diagnostic.getNomMaladie());
+        stmt.setString(3, diagnostic.getDescription_Diagnostic());
+        stmt.setInt(4, diagnostic.getId_Diagnostic());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
+    }
+
+    private Response DeleteDiagnostic(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_DIAGNOSTIC.query);
+        stmt.setInt(1, diagnostic.getId_Diagnostic());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
+    }
+
+
+    // Méthodes de CRUD de la table Traitement
+
+    private Response InsertTraitement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_TRAITEMENT.query);
+        stmt.setString(1, traitement.getType_Traitement());
+        stmt.setString(2, traitement.getDescription_Traitement());
+        stmt.setString(3, traitement.getDebut_Traitement());
+        stmt.setString(3, traitement.getFin_Traitement());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
+    }
+
+    private Response SelectAllTraitements(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_TRAITEMENTS.query);
+        Traitements traitements = new Traitements();
+        while (res.next()) {
+            Traitement traitement = new Traitement();
+            traitement.setId_Traitement(res.getInt(1));
+            traitement.setType_Traitement(res.getString(2));
+            traitement.setDescription_Traitement(res.getString(3));
+            traitement.setDebut_Traitement(res.getString(4));
+            traitement.setFin_Traitement(res.getString(5));
+            traitements.add(traitement);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitements));
+    }
+
+    private Response UpdateTraitement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_TRAITEMENT.query);
+        stmt.setString(1, traitement.getType_Traitement());
+        stmt.setString(2, traitement.getDescription_Traitement());
+        stmt.setString(3, traitement.getDebut_Traitement());
+        stmt.setString(4, traitement.getFin_Traitement());
+        stmt.setInt(5, traitement.getId_Traitement());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
+    }
+
+    private Response DeleteTraitement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_TRAITEMENT.query);
+        stmt.setInt(1, traitement.getId_Traitement());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
+    }
+
+
+}
 
 
 
