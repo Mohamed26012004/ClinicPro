@@ -77,7 +77,13 @@ public class Facture {
         return preparedStatement;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "Facture{" +
+                "dateFacture='" + dateFacture + '\'' +
+                ", idFacture=" + idFacture +
+                ", regle=" + regle +
+                '}';
+    }
 }
 
