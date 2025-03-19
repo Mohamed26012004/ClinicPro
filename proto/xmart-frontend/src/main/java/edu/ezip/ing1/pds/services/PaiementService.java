@@ -8,7 +8,6 @@ import edu.ezip.ing1.pds.business.dto.Paiements;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.InsertPaiementsClientRequest;
 import edu.ezip.ing1.pds.requests.SelectAllPaiementsClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,51 +33,51 @@ public class PaiementService {
     public PaiementService(NetworkConfig networkConfig) {
         this.networkConfig = networkConfig;
     }
+//
+//    public void insertPaiement(Paiement paiement)throws InterruptedException, IOException {
+//        insertDeleteUpdatePaiement(paiement, insertRequestOrder);
+//    }
+//
+//    public void updatePaiement(Paiement paiement)throws InterruptedException, IOException {
+//        insertDeleteUpdatePaiement(paiement, updateRequestOrder);
+//    }
+//
+//    public void deletePaiement(Paiement paiement)throws InterruptedException, IOException {
+//        insertDeleteUpdatePaiement(paiement, deleteRequestOrder);
+//    }
 
-    public void insertPaiement(Paiement paiement)throws InterruptedException, IOException {
-        insertDeleteUpdatePaiement(paiement, insertRequestOrder);
-    }
-
-    public void updatePaiement(Paiement paiement)throws InterruptedException, IOException {
-        insertDeleteUpdatePaiement(paiement, updateRequestOrder);
-    }
-
-    public void deletePaiement(Paiement paiement)throws InterruptedException, IOException {
-        insertDeleteUpdatePaiement(paiement, deleteRequestOrder);
-    }
-
-    public void insertDeleteUpdatePaiement(Paiement paiement, String requestOrder) throws InterruptedException, IOException {
-        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
-
-        int birthdate = 0;
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(paiement);
-        logger.trace("Paiement with its JSON face : {}", jsonifiedGuy);
-        final String requestId = UUID.randomUUID().toString();
-        final Request request = new Request();
-        request.setRequestId(requestId);
-        request.setRequestOrder(requestOrder);
-        request.setRequestContent(jsonifiedGuy);
-        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
-
-        final InsertPaiementsClientRequest clientRequest = new InsertPaiementsClientRequest(
-                networkConfig,
-                birthdate++, request, paiement, requestBytes);
-        clientRequests.push(clientRequest);
-
-
-        while (!clientRequests.isEmpty()) {
-            final ClientRequest clientRequest2 = clientRequests.pop();
-            clientRequest2.join();
-            final Paiement paie = (Paiement)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {} --> {}",
-                    clientRequest2.getThreadName(),
-                    paie.getidPaiement(), paie.getmontant(), paie.getdatePaiement(), paie.getmoyenDePaiement(),
-                    clientRequest2.getResult());
-        }
-    }
+//    public void insertDeleteUpdatePaiement(Paiement paiement, String requestOrder) throws InterruptedException, IOException {
+//        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+//
+//        int birthdate = 0;
+//
+//        final ObjectMapper objectMapper = new ObjectMapper();
+//        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(paiement);
+//        logger.trace("Paiement with its JSON face : {}", jsonifiedGuy);
+//        final String requestId = UUID.randomUUID().toString();
+//        final Request request = new Request();
+//        request.setRequestId(requestId);
+//        request.setRequestOrder(requestOrder);
+//        request.setRequestContent(jsonifiedGuy);
+//        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+//        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+//
+//        final InsertPaiementsClientRequest clientRequest = new InsertPaiementsClientRequest(
+//                networkConfig,
+//                birthdate++, request, paiement, requestBytes);
+//        clientRequests.push(clientRequest);
+//
+//
+//        while (!clientRequests.isEmpty()) {
+//            final ClientRequest clientRequest2 = clientRequests.pop();
+//            clientRequest2.join();
+//            final Paiement paie = (Paiement)clientRequest2.getInfo();
+//            logger.debug("Thread {} complete : {} {} {} --> {}",
+//                    clientRequest2.getThreadName(),
+//                    paie.getidPaiement(), paie.getmontant(), paie.getdatePaiement(), paie.getmoyenDePaiement(),
+//                    clientRequest2.getResult());
+//        }
+//    }
 
     public Paiements selectPaiements() throws InterruptedException, IOException {
         int birthdate = 0;

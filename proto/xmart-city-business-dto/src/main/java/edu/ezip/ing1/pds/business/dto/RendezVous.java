@@ -19,6 +19,7 @@ public class RendezVous {
     private int idRendezVous;
     private int idPatient;
     private int id;
+    private int idSalle;
     private int numeroADELI;
     @JsonDeserialize(using = DeserialisationDate.class)
     private LocalDate dateRendezVous;
@@ -26,6 +27,7 @@ public class RendezVous {
     private LocalTime heureDebut;
     @JsonDeserialize(using = ClasseDeDeserialisation.class)
     private LocalTime heureFin;
+
     private final DateTimeFormatter formatHeure = DateTimeFormatter.ofPattern("HH:mm");
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -34,19 +36,20 @@ public class RendezVous {
 
     public final RendezVous build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "numeroADELI", "idPatient","id", "dateRendezVous", "heureDebut", "heureFin");
+        setFieldsFromResulset(resultSet, "numeroADELI", "idPatient","id", "idSalle", "dateRendezVous", "heureDebut", "heureFin");
         return this;
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         return buildPreparedStatement(preparedStatement, String.valueOf(numeroADELI), String.valueOf(idPatient),
-        String.valueOf(id), dateRendezVous.format(formatDate), heureDebut.format(formatHeure), heureFin.format(formatHeure));
+        String.valueOf(id), String.valueOf(idSalle), dateRendezVous.format(formatDate), heureDebut.format(formatHeure), heureFin.format(formatHeure));
     }
-    public RendezVous(int numeroADELI, int idPatient, int id, LocalDate dateRendezVous, LocalTime heureDebut, LocalTime heureFin) {
+    public RendezVous(int numeroADELI, int idPatient, int id, int idSalle, LocalDate dateRendezVous, LocalTime heureDebut, LocalTime heureFin) {
         this.numeroADELI = numeroADELI;
         this.idPatient = idPatient;
         this.id = id;
+        this.idSalle = idSalle;
         this.heureFin = heureFin;
         this.heureDebut = heureDebut;
         this.dateRendezVous = dateRendezVous;
@@ -67,6 +70,22 @@ public class RendezVous {
         }
         return preparedStatement;
     }
+
+    public int getNumeroADELI() {
+        return numeroADELI;
+    }
+    public int getIdPatient() {
+        return idPatient;
+    }
+    public int getId() {
+        return id;
+    }
+    public int getIdRendezVous() {
+        return idRendezVous;
+    }
+    public int getIdSalle() {
+        return idSalle;
+    }
     public LocalDate getDateRendezVous() {
         return dateRendezVous;
     }
@@ -76,18 +95,8 @@ public class RendezVous {
     public LocalTime getHeureFin() {
         return heureFin;
     }
-    public int getId() {
-        return id;
-    }
-    public int getIdPatient() {
-        return idPatient;
-    }
-    public int getIdRendezVous() {
-        return idRendezVous;
-    }
-    public int getNumeroADELI() {
-        return numeroADELI;
-    }
+
+
 
     @JsonProperty("rendezvous_dateRedezVous")
     public void setDateRendezVous(LocalDate dateRendezVous) {
@@ -117,19 +126,22 @@ public class RendezVous {
     public void setNumeroADELI(int numeroADELI) {
         this.numeroADELI = numeroADELI;
     }
+    @JsonProperty("rendezvous_idSalle")
+    public void setIdSalle(int idSalle) {
+        this.idSalle = idSalle;
+    }
 
     @Override
     public String toString() {
         return "RendezVous{" +
-                "dateRendezVous=" + dateRendezVous +
-                ", idRendezVous=" + idRendezVous +
-                ", idPatient=" + idPatient +
-                ", id=" + id +
-                ", numeroADELI=" + numeroADELI +
                 ", heureDebut=" + heureDebut +
                 ", heureFin=" + heureFin +
-                ", formatHeure=" + formatHeure +
-                ", formatDate=" + formatDate +
+                ", id=" + id +
+                ", idPatient=" + idPatient +
+                ", idRendezVous=" + idRendezVous +
+                ", idSalle=" + idSalle +
+                ", numeroADELI=" + numeroADELI +
+                ", idSalle=" + idSalle +
                 '}';
     }
 }

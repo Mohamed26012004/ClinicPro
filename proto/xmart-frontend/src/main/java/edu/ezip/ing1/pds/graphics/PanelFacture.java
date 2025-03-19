@@ -62,17 +62,17 @@ public class PanelFacture extends JPanel{
                     regle = false;
                 }
                 k++;
-                Date date = new Date();
-                Facture facture = new Facture(regle, date);
+//                Date date = new Date();
+//                Facture facture = new Facture(regle, date);
 
                 //pan.removeAll();
-                try {
-                    factureService.insertFacture(facture);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+//                try {
+////                    factureService.insertFacture(facture);
+//                } catch (InterruptedException ex) {
+//                    throw new RuntimeException(ex);
+//                } catch (IOException ex) {
+//                    throw new RuntimeException(ex);
+//                }
 
             }
         });

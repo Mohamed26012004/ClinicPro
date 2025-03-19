@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -42,7 +41,7 @@ public class PanelHoraire extends JPanel {
             @Override
             public void mouseExited(MouseEvent e) {
                 JPanel p = (JPanel) e.getSource();
-                p.setBackground(null);
+                if(p != panelHoraireCliquer) p.setBackground(null);
             }
         });
 

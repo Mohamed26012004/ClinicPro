@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName(value = "facture")
 public class Facture {
     private  int idFacture;
-    private  Date dateFacture;
+    private  String dateFacture;
     private  Boolean regle;
 
 
@@ -27,10 +27,10 @@ public class Facture {
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idFacture),regle.toString(), dateFacture.toString());
+        return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture, regle.toString());
     }
 
-    public Facture(boolean regle, Date dateFacture) {
+    public Facture(boolean regle, String dateFacture) {
         this.regle = regle;
         this.dateFacture = dateFacture;
     }
@@ -43,16 +43,14 @@ public class Facture {
         return idFacture;
     }
 
-    public Date getDateFacture() {
+
+    public String getDateFacture() {
         return dateFacture;
     }
 
-
-    @JsonProperty("facture_dateFacture")
-    public void setDateFacture(Date dateFacture) {
+    public void setDateFacture(String dateFacture) {
         this.dateFacture = dateFacture;
     }
-
 
     @JsonProperty("facture_idFacture")
     public void setIdFacture(int idFacture) {
@@ -79,14 +77,7 @@ public class Facture {
         return preparedStatement;
     }
 
-    @Override
-    public String toString() {
-        return "facture{" +
-                "regle='" + regle + '\'' +
-                ", idFacture='" + idFacture + '\'' +
-                ", datefacture='" + dateFacture + '\'' +
-                '}';
-    }
+
 
 }
 

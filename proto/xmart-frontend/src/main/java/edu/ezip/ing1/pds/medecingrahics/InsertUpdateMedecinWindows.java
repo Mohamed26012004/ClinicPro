@@ -10,13 +10,12 @@ import edu.ezip.ing1.pds.servicesplanning.HoraireService;
 import edu.ezip.ing1.pds.servicesplanning.MedecinService;
 
 import javax.swing.*;
-import javax.swing.border.Border;
+
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.sql.Time;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

@@ -23,12 +23,12 @@ public class XMartCityService {
 
     private enum Queries {
         
-        SELECT_ALL_EXAMENS("SELECT t.nom, t.cout, t.numeroSalle, t.id FROM examen t"),
-        INSERT_EXAMEN("INSERT into examen (nom, cout, numeroSalle) values (?, ?, ?)"),
-        UPDATE_EXAMEN("UPDATE examen SET nom = ?, cout = ?, numeroSalle = ? WHERE id = ?"),
+        SELECT_ALL_EXAMENS("SELECT t.id, t.nom, t.cout, t.duree FROM examen t"),
+        INSERT_EXAMEN("INSERT into examen (nom, cout, duree) values (?, ?, ?)"),
+        UPDATE_EXAMEN("UPDATE examen SET nom = ?, cout = ?, duree = ? WHERE id = ?"),
         DELETE_EXAMEN("DELETE FROM examen WHERE id = ?"),
-        SELECT_ONE_EXAMEN("SELECT t.nom, t.cout, t.numeroSalle, t.id FROM examen t WHERE nom = ? AND cout = ? AND numeroSalle = ?"),
-        ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND numeroSalle = ?"),
+        SELECT_ONE_EXAMEN("SELECT t.id, t.nom, t.cout, t.duree, FROM examen t WHERE nom = ? AND cout = ? AND duree = ?"),
+        ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND duree = ?"),
 
         SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.regle FROM facture t"),
         INSERT_FACTURE("INSERT into facture (dateFacture, regle) values (?, ?)"),
@@ -64,10 +64,10 @@ public class XMartCityService {
         UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
         DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_RENDEZ_VOUS("SELECT p.numeroADELI, p.idPatient, p.id, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
-        INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, id, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?)"),
-        UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, id = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
-        DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND id = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
+        SELECT_ALL_RENDEZ_VOUS("SELECT p.numeroADELI, p.idPatient, p.id, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
+        INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, id, idSalle, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?)"),
+        UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, id = ?, idSalle = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
+        DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND id = ?  AND idSalle = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
 
         INSERT_CONSULTE("INSERT into consulte (numeroADELI, id) values (?, ?)"),
         SELECT_HORAIRE_MEDECIN("SELECT h.jour, h.heureDebut, h.heureFin FROM horaire h, consulte c, medecin m WHERE m.numeroADELI = ? AND m.numeroADELI = c.numeroADELI AND h.id = c.id "),
@@ -244,7 +244,7 @@ public class XMartCityService {
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_EXAMEN.query);
         stmt.setString(1, examen.getNom());
         stmt.setDouble(2, examen.getCout());
-        stmt.setString(3, examen.getNumeroSalle());
+        stmt.setTime(3, Time.valueOf(examen.getDuree()));
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examen));
@@ -257,10 +257,10 @@ public class XMartCityService {
         Examens examens = new Examens();
         while (res.next()) {
             Examen examen = new Examen();
-            examen.setNom(res.getString(1));
-            examen.setCout(res.getDouble(2));
-            examen.setNumeroSalle(res.getString(3));
-            examen.setId(res.getInt(4));
+            examen.setId(res.getInt(1));
+            examen.setNom(res.getString(2));
+            examen.setCout(res.getDouble(3));
+            examen.setDuree(res.getTime(4).toLocalTime());
             examens.add(examen);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examens));
@@ -273,16 +273,16 @@ public class XMartCityService {
 
         stmt.setString(1, exam.getNom());
         stmt.setDouble(2, exam.getCout());
-        stmt.setString(3, exam.getNumeroSalle());
+        stmt.setTime(3, Time.valueOf(exam.getDuree()));
 
         final ResultSet res = stmt.executeQuery();
         Examens examens = new Examens();
         while (res.next()) {
             Examen examen = new Examen();
-            examen.setNom(res.getString(1));
-            examen.setCout(res.getDouble(2));
-            examen.setNumeroSalle(res.getString(3));
-            examen.setId(res.getInt(4));
+            examen.setId(res.getInt(1));
+            examen.setNom(res.getString(2));
+            examen.setCout(res.getDouble(3));
+            examen.setDuree(res.getTime(4).toLocalTime());
             examens.add(examen);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(examens));
@@ -297,7 +297,7 @@ public class XMartCityService {
 
         stmt.setString(1, examen.getNom());
         stmt.setDouble(2, examen.getCout());
-        stmt.setString(3, examen.getNumeroSalle());
+        stmt.setTime(3, Time.valueOf(examen.getDuree()));
         stmt.setInt(4, examen.getId());
         stmt.executeUpdate();
 
@@ -314,7 +314,7 @@ public class XMartCityService {
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_EXAMEN.query);
         stmt2.setString(1, examen.getNom());
         stmt2.setDouble(2, examen.getCout());
-        stmt2.setString(3, examen.getNumeroSalle());
+        stmt2.setTime(3, Time.valueOf(examen.getDuree()));
 
         final ResultSet res = stmt2.executeQuery();
         res.next();
@@ -758,9 +758,10 @@ public class XMartCityService {
             stmt.setInt(1, rdv.getNumeroADELI());
             stmt.setInt(2, rdv.getIdPatient());
             stmt.setInt(3, rdv.getId());
-            stmt.setDate(4,date);
-            stmt.setTime(5, debut);
-            stmt.setTime(6, fin);
+            stmt.setInt(4, rdv.getIdSalle());
+            stmt.setDate(5,date);
+            stmt.setTime(6, debut);
+            stmt.setTime(7, fin);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -840,9 +841,10 @@ public class XMartCityService {
             rdv.setNumeroADELI(res.getInt(1));
             rdv.setIdPatient(res.getInt(2));
             rdv.setId(res.getInt(3));
-            rdv.setDateRendezVous(res.getDate(4).toLocalDate());
-            rdv.setHeureDebut(res.getTime(5).toLocalTime());
-            rdv.setHeureFin(res.getTime(6).toLocalTime());
+            rdv.setIdSalle(res.getInt(4));
+            rdv.setDateRendezVous(res.getDate(5).toLocalDate());
+            rdv.setHeureDebut(res.getTime(6).toLocalTime());
+            rdv.setHeureFin(res.getTime(7).toLocalTime());
             rdvs.add(rdv);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
@@ -858,10 +860,11 @@ public class XMartCityService {
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
         stmt.setInt(3, rdv.getId());
-        stmt.setDate(4, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(5, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureFin()));
-        stmt.setInt(7, rdv.getIdRendezVous());
+        stmt.setInt(4, rdv.getIdSalle());
+        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
+        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
+        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
+        stmt.setInt(8, rdv.getIdRendezVous());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
@@ -877,9 +880,10 @@ public class XMartCityService {
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
         stmt.setInt(3, rdv.getId());
-        stmt.setDate(4, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(5, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureFin()));
+        stmt.setInt(4, rdv.getIdSalle());
+        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
+        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
+        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
 
         stmt.executeUpdate();
 
