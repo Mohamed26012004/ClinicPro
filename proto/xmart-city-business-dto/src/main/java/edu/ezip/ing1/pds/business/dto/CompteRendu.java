@@ -1,25 +1,23 @@
-
 package edu.ezip.ing1.pds.business.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
+public class CompteRendu {
 
-@JsonRootName(value = "compteRendu")
-public class compteRendu {
     private  int id_compteRendu;
     private  String typeSymptome;
     private  String descriptionSymptome;
 
 
-    public compteRendu() {
+    public CompteRendu() {
     }
 
-    public final compteRendu build(final ResultSet resultSet)
+    public final CompteRendu build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         setFieldsFromResulset(resultSet, "id_antecedentMedical","typeSymptome", "descriptionSymptome");
         return this;
@@ -31,7 +29,7 @@ public class compteRendu {
         return buildPreparedStatement(preparedStatement, String.valueOf(id_compteRendu),typeSymptome, descriptionSymptome);
     }
 
-    public compteRendu(String typeSymptome, String descriptionSymptome) {
+    public CompteRendu(String typeSymptome, String descriptionSymptome) {
         this.typeSymptome = typeSymptome;
         this.descriptionSymptome = descriptionSymptome;
     }
@@ -72,12 +70,10 @@ public class compteRendu {
 
     @Override
     public String toString() {
-        return "compteRendu{" +
+        return "CompteRendu{" +
                 "id_compteRendu='" + id_compteRendu + '\'' +
                 ", typeSymptome='" + typeSymptome + '\'' +
                 ", descriptionSymptome='" + descriptionSymptome + '\'' +
                 '}';
     }
-
 }
-

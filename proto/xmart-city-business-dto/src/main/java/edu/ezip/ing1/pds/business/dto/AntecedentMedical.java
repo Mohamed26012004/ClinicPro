@@ -1,25 +1,23 @@
-
 package edu.ezip.ing1.pds.business.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
+public class AntecedentMedical {
 
-@JsonRootName(value = "antecedentMedical")
-public class antecedentMedical {
     private  int id_antecedentMedical;
     private  String type_antecedentMedical;
     private  String description_antecedentMedical;
 
 
-    public antecedentMedical() {
+    public AntecedentMedical() {
     }
 
-    public final antecedentMedical build(final ResultSet resultSet)
+    public final AntecedentMedical build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         setFieldsFromResulset(resultSet, "id_antecedentMedical", "type_antecedentMedical","description_antecedentMedical");
         return this;
@@ -31,7 +29,7 @@ public class antecedentMedical {
         return buildPreparedStatement(preparedStatement, String.valueOf(id_antecedentMedical),type_antecedentMedical, description_antecedentMedical);
     }
 
-    public antecedentMedical(String type_antecedentMedical, String description_antecedentMedical) {
+    public AntecedentMedical(String type_antecedentMedical, String description_antecedentMedical) {
         this.type_antecedentMedical = type_antecedentMedical;
         this.description_antecedentMedical = description_antecedentMedical;
     }
@@ -72,12 +70,10 @@ public class antecedentMedical {
 
     @Override
     public String toString() {
-        return "antecedentMedical{" +
+        return "AntecedentMedical{" +
                 "id_antecedentMedical='" + id_antecedentMedical + '\'' +
                 ", type_antecedentMedical='" + type_antecedentMedical + '\'' +
                 ", description_antecedentMedical='" + description_antecedentMedical + '\'' +
                 '}';
     }
-
 }
-
