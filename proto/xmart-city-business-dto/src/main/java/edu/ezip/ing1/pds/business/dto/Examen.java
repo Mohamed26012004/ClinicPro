@@ -4,9 +4,12 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 @JsonRootName(value = "examen")
 public class Examen {
@@ -14,26 +17,28 @@ public class Examen {
     private  String nom;
     private  double cout;
     private  int id;
-    private String numeroSalle;
+    @JsonDeserialize(using = ClasseDeDeserialisation.class)
+    private LocalTime duree;
+    private DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     public Examen(){
     }
 
     public final Examen build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "nom", "cout","numeroSalle");
+        setFieldsFromResulset(resultSet, "id", "nom", "cout","duree");
         return this;
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
         throws SQLException, NoSuchFieldException, IllegalAccessException {
-    return buildPreparedStatement(preparedStatement, nom, String.valueOf(cout), numeroSalle);
+    return buildPreparedStatement(preparedStatement, nom, String.valueOf(cout), duree.format(formattage));
     }
 
-    public Examen(String nom, double cout, String numeroSalle) {
+    public Examen(String nom, double cout,LocalTime duree) {
         this.cout = cout;
         this.nom = nom;
-        this.numeroSalle = numeroSalle;
+        this.duree = duree;
     }
 
     public String getNom() {
@@ -63,13 +68,13 @@ public class Examen {
         this.id = id;
     }
 
-    public String getNumeroSalle() {
-        return numeroSalle;
+    public LocalTime getDuree() {
+        return duree;
     }
 
-    @JsonProperty("examen_numero_salle")
-    public void setNumeroSalle(String numeroSalle) {
-        this.numeroSalle = numeroSalle;
+    @JsonProperty("examen_duree")
+    public void setDuree(LocalTime duree) {
+        this.duree = duree;
     }
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
@@ -90,16 +95,11 @@ public class Examen {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Examen{");
-        sb.append("nom=").append(nom);
-        sb.append(", cout=").append(cout);
-        sb.append(", id=").append(id);
-        sb.append(", numeroSalle=").append(numeroSalle);
-        sb.append('}');
-        return sb.toString();
+        return "Examen{" +
+                "cout=" + cout +
+                ", duree=" + duree +
+                ", id=" + id +
+                ", nom='" + nom + '\'' +
+                '}';
     }
-
-    
-
 }
