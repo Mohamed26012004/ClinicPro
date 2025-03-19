@@ -80,7 +80,7 @@ public class ExamenService {
             final Examen exam = (Examen)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    exam.getNom(), exam.getCout(), exam.getNumeroSalle(),
+                    exam.getNom(), exam.getCout(), exam.getDuree(),
                     clientRequest2.getResult());
         }
     }

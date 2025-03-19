@@ -12,7 +12,6 @@ public class Examens {
     @JsonProperty("examens")
     private  Set<Examen> examens = new LinkedHashSet<Examen>();
 
-    
 
     public final Examens add (final Examen exam) {
         examens.add(exam);
