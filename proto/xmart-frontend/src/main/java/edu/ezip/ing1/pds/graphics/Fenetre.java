@@ -1,10 +1,13 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
+
+import java.awt.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
@@ -13,7 +16,7 @@ public class Fenetre extends JFrame{
 
 
         private static JPanel contentPane;
-        private static JButton boutonExamem;
+        private static JLabel boutonExamem;
         private static JButton boutonFacture;
         private static JButton boutonPerformance;
 
@@ -27,9 +30,6 @@ public class Fenetre extends JFrame{
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-            //JPanel panel = (JPanel) new PanelMaxime();
-            contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
-            //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
         
@@ -37,50 +37,28 @@ public class Fenetre extends JFrame{
         public static JPanel PanelGauche(){
             JPanel pane = new JPanel();
             pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-        
-            boutonExamem = new JButton("Examens");
-            boutonExamem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    contentPane.removeAll();
-                    contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonExamem);
-            pane.add(Box.createRigidArea(new Dimension(0, 5)));
 
-            boutonFacture = new JButton("Facture");
-            boutonFacture.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PanelFacture panel = new PanelFacture();
-                    contentPane.removeAll();
-                    contentPane.add(panel, BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonFacture);
+            pane.add(panelBoutonExamen());
             pane.add(Box.createRigidArea(new Dimension(0, 5)));
-
-            boutonPerformance = new JButton("Performance");
-            boutonPerformance.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PanelPerformance panel = new PanelPerformance();                   contentPane.removeAll();
-                    contentPane.add(panel, BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonPerformance);
                 
             return pane;
+        }
+
+        public static JPanel panelBoutonExamen(){
+            boutonExamem = new JLabel("Salles");
+            JPanel panelExamen = new JPanel();
+            panelExamen.add(boutonExamem);
+            panelExamen.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    contentPane.removeAll();
+                    contentPane.add(new PanelManipulationSalle(), BorderLayout.CENTER);
+                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
+                    contentPane.repaint();
+                    contentPane.revalidate();
+                }
+            });
+            return panelExamen;
         }
 
 
