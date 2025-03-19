@@ -5,40 +5,35 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonRootName(value = "equipement")
-public class Equipement {
-    private  int idEquipement;
-    private  int coutEquipement;
-    private  String nomEquipement;
-    @JsonDeserialize(using = DeserialisationDate2.class) // doit etre au dessus des dates
-    private LocalDate dateEquipement;
+@JsonRootName(value = "maintenance")
+public class Maintenance {
+    private  String typeMaintenance;
+    private  int coutMaintenance;
+    private  int idMaintenance;
+    private Date dateMaintenace;
 
 
-
-    public Equipement() {
+    public Maintenance() {
     }
-    public final Equipement build(final ResultSet resultSet)
+    public final Maintenance build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idEquipement", "coutEquipement","nomEquipement", "dateEquipement");
+        setFieldsFromResulset(resultSet, "idMaintenance", "typeMaintenance","coutMaintenance", "dateMaintenance");
         return this;
 
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idEquipement),String.valueOf(coutEquipement), nomEquipement, dateEquipement.toString());
+        return buildPreparedStatement(preparedStatement, String.valueOf(idMaintenance),String.valueOf(coutMaintenance), typeMaintenance, dateMaintenace.toString());
     }
 
-    public Equipement(int coutEquipement, String nomEquipement, LocalDate dateEquipement, int idEquipement) {
+    public Maintenance(int coutMaintenance, String typeMaintenance, int idMaintenance, Date dateMaintenance) {
         this.nomEquipement = nomEquipement;
         this.coutEquipement = coutEquipement;
-        this.dateEquipement = dateEquipement;
-        this.idEquipement= idEquipement;
     }
 
     public int   getCoutEquipement() {
@@ -52,7 +47,7 @@ public class Equipement {
     public String getNomEquipement() {
         return nomEquipement;
     }
-    public LocalDate getDateEquipement(){
+    public Date getDateEquipement(){
         return dateEquipement;
     }
 
@@ -73,7 +68,7 @@ public class Equipement {
         this.nomEquipement = nomEquipement;
     }
     @JsonProperty("equipement_dateEquipement")
-    public void setDateEquipement(LocalDate dateEquipement) {
+    public void setDateEquipement(Date dateEquipement) {
         this.dateEquipement = dateEquipement;
     }
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
