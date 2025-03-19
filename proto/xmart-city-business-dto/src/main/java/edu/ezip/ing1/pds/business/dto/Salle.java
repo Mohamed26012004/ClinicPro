@@ -1,16 +1,19 @@
 package edu.ezip.ing1.pds.business.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
+
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonRootName;
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonRootName(value = "salle")
 public class Salle {
 
+    private int id;
     private String numeroSalle;
     private String typeSalle;
     private String statut;
@@ -19,12 +22,12 @@ public class Salle {
     }
     public final Salle build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet,"numeroSalle", "typeSalle","statut");
+        setFieldsFromResulset(resultSet, "id", "numeroSalle", "typeSalle","statut");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, numeroSalle, typeSalle, statut);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id), numeroSalle, typeSalle, statut);
     }
     public Salle(String numeroSalle, String typeSalle, String statut){
         this.numeroSalle = numeroSalle;
@@ -32,6 +35,9 @@ public class Salle {
         this.statut = statut;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getNumeroSalle() {
         return numeroSalle;
     }
@@ -40,6 +46,11 @@ public class Salle {
     }
     public String getTypeSalle() {
         return typeSalle;
+    }
+
+    @JsonProperty("salle_id")
+    public void setId(int id) {
+        this.id = id;
     }
     @JsonProperty("salle_numeroSalle")
     public void setNumeroSalle(String numeroSalle) {
@@ -74,6 +85,7 @@ public class Salle {
     @Override
     public String toString() {
         return "Salle{" +
+                "id=" + id +
                 ", numeroSalle='" + numeroSalle + '\'' +
                 ", typeSalle='" + typeSalle + '\'' +
                 ", statut='" + statut + '\'' +
