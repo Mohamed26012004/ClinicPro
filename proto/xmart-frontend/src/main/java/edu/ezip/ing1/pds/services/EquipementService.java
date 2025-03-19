@@ -19,7 +19,6 @@ import edu.ezip.ing1.pds.business.dto.Equipements;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.commons.SelectAllEquipementsClientRequest; 
 import edu.ezip.ing1.pds.requests.InsertEquipementClientRequest;
 import edu.ezip.ing1.pds.requests.SelectAllEquipementsClientRequest;
 

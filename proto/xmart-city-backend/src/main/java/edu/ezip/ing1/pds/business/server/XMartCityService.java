@@ -104,7 +104,6 @@ public class XMartCityService {
         DELETE_TRAITEMENT("DELETE FROM Traitement WHERE id = ?"),
         ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ?"),
 
-        ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
@@ -153,6 +152,8 @@ public class XMartCityService {
                 response = selectOneExamen(request, connection);
                 break;
 
+
+
             case SELECT_ALL_FACTURES:
                 response = SelectAllFactures(request, connection);
                 break;
@@ -173,6 +174,8 @@ public class XMartCityService {
                 response = facturesquotidiennes(request, connection);
                 break;
 
+
+
             case INSERT_MEDECIN:
                 response = InsertMedecin(request, connection);
                 break;
@@ -191,6 +194,8 @@ public class XMartCityService {
             case UPDATE_MEDECIN:
                 response = UpdateMedecin(request, connection);
                 break;
+
+
             case INSERT_HORAIRE:
                 response = InsertHoraire(request, connection);
                 break;
@@ -204,6 +209,8 @@ public class XMartCityService {
                 response = SelectOneHoraire(request, connection);
                 break;
             case UPDATE_HORAIRE:
+
+
                 response = UpdateHoraire(request, connection);
             case INSERT_SALLE:
                 response = InsertSalle(request, connection);
@@ -217,6 +224,7 @@ public class XMartCityService {
             case SELECT_ALL_SALLES:
                 response = SelectAllSalles(request, connection);
                 break;
+
             case SELECT_ALL_PATIENTS:
                 response = SelectAllPatients(request, connection);
                 break;
@@ -295,27 +303,6 @@ public class XMartCityService {
                 break;
             case DELETE_TRAITEMENT:
                 response = DeleteTraitement(request, connection);
-                break;
-
-
-
-            case INSERT_RENDEZ_VOUS:
-                response = InsertRendezVous(request, connection);
-                break;
-            case DELETE_RENDEZ_VOUS:
-                response = DeleteRendezVous(request, connection);
-                break;
-            case UPDATE_RENDEZ_VOUS:
-                response = UpdateRendezVous(request, connection);
-                break;
-            case SELECT_ALL_RENDEZ_VOUS:
-                response = SelectAllRendezVous(request, connection);
-                break;
-            case INSERT_CONSULTE:
-                response = InsertConsulte(request, connection);
-                break;
-            case SELECT_HORAIRE_MEDECIN:
-                response = SelectHoraireMedecin(request, connection);
                 break;
             case INSERT_RENDEZ_VOUS:
                 response = InsertRendezVous(request, connection);
@@ -1272,6 +1259,66 @@ public class XMartCityService {
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaires));
     }
+    // Méthodes des requêtes sur les equipements
+
+    private Response SelectAllEquipements(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_EQUIPEMENTS.query);
+        Equipements equipements = new Equipements();
+        while (res.next()) {
+            Equipement equipement = new Equipement();
+            equipement.setIdEquipement(res.getInt(1));
+            equipement.setCoutEquipement(res.getInt(2));
+            equipement.setDateEquipement(res.getDate(3).toLocalDate());
+            equipement.setNomEquipement(res.getString(4));
+            equipements.add(equipement);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipements));
+    }
+
+    private Response InsertEquipement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_EQUIPEMENT.query);
+        stmt.setInt(1,equipement.getIdEquipement());
+        stmt.setString(2, equipement.getNomEquipement());
+        stmt.setDate(3, Date.valueOf(equipement.getDateEquipement()));
+        stmt.setInt(4, equipement.getCoutEquipement());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));
+    }
+
+    private Response UpdateEquipement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_EQUIPEMENT.query);
+        stmt.setDate(3, Date.valueOf(equipement.getDateEquipement()));
+        stmt.setString(4, equipement.getNomEquipement());
+        stmt.setInt(2, equipement.getCoutEquipement());
+        stmt.setInt(1, equipement.getIdEquipement());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));
+    }
+
+    private Response DeleteEquipement(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_FACTURE.query);
+        stmt.setInt(1, equipement.getIdEquipement());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));
+    }
+
+
 
 }
 
