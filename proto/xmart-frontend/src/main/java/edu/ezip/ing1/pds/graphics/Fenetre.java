@@ -33,8 +33,6 @@ public class Fenetre extends JFrame{
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-            //JPanel panel = (JPanel) new PanelMaxime();
-            contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
             //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
