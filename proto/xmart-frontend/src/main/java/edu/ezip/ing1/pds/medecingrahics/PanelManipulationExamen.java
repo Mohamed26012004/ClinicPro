@@ -1,9 +1,9 @@
 package edu.ezip.ing1.pds.medecingrahics;
 
-import edu.ezip.ing1.pds.business.dto.Salle;
+import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.servicesplanning.SalleService;
+import edu.ezip.ing1.pds.services.ExamenService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +11,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-
-public class PanelManipulationSalle extends JPanel {
+public class PanelManipulationExamen extends JPanel {
 
     final static String networkConfigFile = "network.yaml";
     final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-    final static SalleService salleService = new SalleService(networkConfig);
+    final static ExamenService examenService = new ExamenService(networkConfig);
 
     private static JButton ajouter;
     private static JButton modifier;
@@ -25,15 +24,16 @@ public class PanelManipulationSalle extends JPanel {
     private static JPanel panneau = new JPanel(new BorderLayout());
 
 
-    public PanelManipulationSalle() {
+    public PanelManipulationExamen(){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(500, 300));
+        setPreferredSize(new Dimension(800, 800));
         try {
-            for(Salle salle : salleService.selectSalles().getSalles()){
-                PanelSalle pan = new PanelSalle(salle);
+            //examens = examenService.selectExamens();
+            for(Examen exam : examenService.selectExamens().getExamens()){
+                PanelExamen pan = new PanelExamen(exam);
                 add(pan);
             }
-
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -42,12 +42,15 @@ public class PanelManipulationSalle extends JPanel {
 
     }
 
-    public static JPanel afficheSalle() {
-        PanelManipulationSalle panel = new PanelManipulationSalle();
+
+    public static JPanel afficheExamens() {
+        PanelManipulationExamen panel = new  PanelManipulationExamen();
         scrollPane = new JScrollPane(panel);
 
         panneau.removeAll();
         panneau.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel titre = new JPanel(new FlowLayout());
 
         panneau.add(boutons(), BorderLayout.NORTH);
 
@@ -63,7 +66,7 @@ public class PanelManipulationSalle extends JPanel {
         ajouter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FrameCreationSalle fen = new FrameCreationSalle(null);
+                FrameCreationExamen fen = new FrameCreationExamen(null);
             }
         });
         pane.add(ajouter);
@@ -72,10 +75,11 @@ public class PanelManipulationSalle extends JPanel {
         modifier.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PanelSalle p = PanelSalle.panelSalleCliquer;
-                Salle salle = p.salleOfPanel();
+                Examen examen = new Examen();
+                PanelExamen p = PanelExamen.panelExamenCliquer;
                 p.setBackground(null);
-                FrameCreationSalle fen = new FrameCreationSalle(salle);
+                examen = p.ExamenOfPanel();
+                FrameCreationExamen fen = new FrameCreationExamen(examen);
             }
         });
         pane.add(modifier);
@@ -83,28 +87,27 @@ public class PanelManipulationSalle extends JPanel {
         supprimer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PanelSalle p = PanelSalle.panelSalleCliquer;
-                Salle salle = p.salleOfPanel();
+                Examen examen = new Examen();
+                PanelExamen p = PanelExamen.panelExamenCliquer;
                 p.setBackground(null);
+                examen = p.ExamenOfPanel();
 
                 final String networkConfigFile = "network.yaml";
                 final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-                final SalleService service = new SalleService(networkConfig);
+                final ExamenService examenService = new ExamenService(networkConfig);
                 try {
-                   service.deleteSalle(salle);
+                    examenService.deleteExamen(examen);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-                PanelManipulationSalle.afficheSalle().revalidate();
-                PanelManipulationSalle.afficheSalle().repaint();
+                PanelManipulationExamen.afficheExamens().revalidate();
+                PanelManipulationExamen.afficheExamens().repaint();
             }
         });
         pane.add(supprimer);
 
         return pane;
     }
-
 }
-

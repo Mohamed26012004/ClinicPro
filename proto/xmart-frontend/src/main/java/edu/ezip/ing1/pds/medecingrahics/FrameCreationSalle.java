@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 public class FrameCreationSalle extends JFrame {
 
@@ -26,27 +27,34 @@ public class FrameCreationSalle extends JFrame {
     private JComboBox<String> boxStatut = new JComboBox<>(tab);
     private JButton enregistrer;
     private JButton annuler;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm");
 
-    public FrameCreationSalle(){
+    public FrameCreationSalle(Salle salle){
         super("Création Salle");
         setSize(400, 200);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        add(formulaire());
-        add(boutons(), BorderLayout.SOUTH);
+        add(formulaire(salle));
+        add(boutons(salle), BorderLayout.SOUTH);
 
         setVisible(true);
     }
 
-    public JPanel formulaire(){
+    public JPanel formulaire(Salle salle){
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 2, 5, 5));
         numeroSalle = new JLabel("Numéro Salle : ");
         typeSalle = new JLabel("Type Salle : ");
         statut = new JLabel("Statut");
-        valueNumero = new JTextField("");
-        valueType = new JTextField("");
 
+
+        if (salle != null){
+            valueNumero = new JTextField(salle.getNumeroSalle());
+            valueType = new JTextField(salle.getTypeSalle());
+        }else{
+            valueType = new JTextField("");
+            valueNumero = new JTextField("");
+        }
         panel.add(numeroSalle);
         panel.add(valueNumero);
         panel.add(typeSalle);
@@ -57,7 +65,7 @@ public class FrameCreationSalle extends JFrame {
         return panel;
     }
 
-    public JPanel boutons(){
+    public JPanel boutons(Salle salle){
         JPanel panel = new JPanel(new FlowLayout());
         enregistrer = new JButton("Enregistrer");
         annuler = new JButton("Annuler");
@@ -72,18 +80,31 @@ public class FrameCreationSalle extends JFrame {
                 String type = valueType.getText();
                 String statut = (String) boxStatut.getSelectedItem();
 
-                Salle salle = new Salle(numero, type, statut);
-                try {
-                    PanelManipulationSalle.SalleDejaExistantes().removeAll();
-                    salleService.insertSalle(salle);
-                    PanelManipulationSalle.SalleDejaExistantes().repaint();
-                    PanelManipulationSalle.SalleDejaExistantes().revalidate();
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+                Salle s = new Salle(numero, type, statut);
+                if (salle != null){
+                    try {
+                        salleService.deleteSalle(salle);
+                        salleService.insertSalle(s);
+                        PanelManipulationSalle.afficheSalle().repaint();
+                        PanelManipulationSalle.afficheSalle().revalidate();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    FrameCreationSalle.this.dispose();
+                }else {
+                    try {
+                        salleService.insertSalle(s);
+                        PanelManipulationSalle.afficheSalle().repaint();
+                        PanelManipulationSalle.afficheSalle().revalidate();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    FrameCreationSalle.this.dispose();
                 }
-                FrameCreationSalle.this.dispose();
 
             }
         });
@@ -94,7 +115,6 @@ public class FrameCreationSalle extends JFrame {
                 FrameCreationSalle.this.dispose();
             }
         });
-
 
         return panel;
     }
