@@ -49,7 +49,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
     private ArrayList<Horaire> listeHoraireDejaExistant = new ArrayList<>();
     private Horaires horaireMedecin = new Horaires();
     private static Horaires horaireDejaExistant;
-
+    private Medecin medecin;
     static {
         try {
             horaireDejaExistant = horaireService.selectHoraires();
@@ -68,27 +68,38 @@ public class InsertUpdateMedecinWindows extends JFrame {
         super("Médécins");
         horaireMedecin = horaireService.selectHoraireMedecin(medecin);
 
-        setSize(700, 700);
+        setSize(700, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
         contentPane.setBorder(new EmptyBorder(15, 15, 15, 15));
-        contentPane.add(formulaire());
+        contentPane.add(formulaire(medecin));
         contentPane.add(Box.createRigidArea(new Dimension(0, 20)));
         JLabel label = new JLabel("Horaires");
         JPanel pan = new JPanel(new FlowLayout(FlowLayout.LEFT));
         pan.add(label);
         contentPane.add(pan);
         contentPane.add(Box.createRigidArea(new Dimension(0, 10)));
-        contentPane.add(panelHorairesMedecin());
+        contentPane.add(panelHorairesMedecin(medecin));
         contentPane.add(Box.createRigidArea(new Dimension(0, 20)));
-        contentPane.add(southButtons());
+        contentPane.add(southButtons(medecin));
         setVisible(true);
+        this.medecin = medecin;
     }
 
-    public JPanel formulaire(){
+    public JPanel formulaire(Medecin medecin){
         JPanel panel = new JPanel(new GridLayout(6, 2, 5, 5));
+
+        if (medecin != null){
+            valueNumero = new JTextField(String.valueOf(medecin.getNumeroADELI()));
+            valueNom = new JTextField(medecin.getNom());
+            valuePrenom = new JTextField(medecin.getPrenom());
+            valueTelephone = new JTextField(medecin.getTelephone());
+            valueSpecialite = new JTextField(medecin.getSpecialite());
+            valueSalaire = new JTextField(String.valueOf(medecin.getSalaire()));
+
+        }
         panel.add(numero);
         panel.add(valueNumero);
         panel.add(nom);
@@ -106,18 +117,18 @@ public class InsertUpdateMedecinWindows extends JFrame {
     /*
     Panneau principal situé sous Horaire, contenant les Horaires du médécins ou le formulaire d'ajout.
      */
-    public JPanel panelHorairesMedecin(){
+    public JPanel panelHorairesMedecin(Medecin medecin){
         panneau = new JPanel(new BorderLayout());
         panneau.setBorder(new EmptyBorder(15, 15, 15, 15));
         panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
-        panneau.add(afficheListHoraireAajouter(), BorderLayout.CENTER);
+        panneau.add(afficheListHoraireAajouter(medecin), BorderLayout.CENTER);
 
         return panneau;
     }
 
     //Méthode contant les boutons d'enregistrement, de suppression...
 
-    public JPanel southButtons(){
+    public JPanel southButtons(Medecin m){
         JPanel panel = new JPanel(new FlowLayout());
         JButton enregistrer =  new JButton("Enregistrer");
         JButton modifier = new JButton("Modifier");
@@ -205,7 +216,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 panneau.removeAll();
                 panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
-                panneau.add(methodeHoraireDejaExistant(), BorderLayout.CENTER);
+                panneau.add(methodeHoraireDejaExistant(medecin), BorderLayout.CENTER);
                 panneau.repaint();
                 panneau.revalidate();
             }
@@ -224,7 +235,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
                 }
                 panneau.removeAll();
                 panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
-                panneau.add(afficheListHoraireAajouter(), BorderLayout.CENTER);
+                panneau.add(afficheListHoraireAajouter(medecin), BorderLayout.CENTER);
                 panneau.repaint();
                 panneau.revalidate();
             }
@@ -284,7 +295,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
                 }
                 panneau.removeAll();
                 panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
-                panneau.add(afficheListHoraireAajouter(), BorderLayout.CENTER);
+                panneau.add(afficheListHoraireAajouter(medecin), BorderLayout.CENTER);
                 panneau.repaint();
                 panneau.revalidate();
             }
@@ -298,7 +309,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
         return panel;
     }
 
-    public JPanel methodeHoraireDejaExistant(){
+    public JPanel methodeHoraireDejaExistant(Medecin medecin){
         panelHoraireDejaExistant.setLayout(new BorderLayout());
         panelHoraireDejaExistant.removeAll();
         JPanel p = new JPanel(new FlowLayout());
@@ -327,7 +338,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
                 }
                 panneau.removeAll();
                 panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
-                panneau.add(afficheListHoraireAajouter(), BorderLayout.CENTER);
+                panneau.add(afficheListHoraireAajouter(medecin), BorderLayout.CENTER);
                 panneau.repaint();
                 panneau.revalidate();
             }
@@ -338,7 +349,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
         return panelHoraireDejaExistant;
     }
 
-    public JPanel afficheListHoraireAajouter(){
+    public JPanel afficheListHoraireAajouter(Medecin medecin){
         JPanel pane = new JPanel(new BorderLayout());
 
         pane.removeAll();
