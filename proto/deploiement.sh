@@ -41,10 +41,6 @@ echo "Démarrage du backend sur la VM backend..."
 ssh -i ~/.ssh/id_ed25519 "$VM_BACKEND_USER@$VM_BACKEND_IP" << EOF
     pkill -f "$JAR_BACKEND" || true  # Arrêter le process s'il existe déjà
     nohup java -jar "$VM_BACKEND_DIR/$JAR_BACKEND" > "$VM_BACKEND_DIR/logs.txt" 2>&1 &
-
-     # Ouvre un terminal interactif pour voir les logs
-    gnome-terminal -- bash -c "tail -f $VM_BACKEND_DIR/logs.txt; exec bash"
-
     echo "Backend démarré sur la VM backend"
 EOF
 
