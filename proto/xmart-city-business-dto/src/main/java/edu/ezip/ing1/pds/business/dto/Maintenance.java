@@ -1,5 +1,5 @@
 
-package edu.ezip.ing1.pds.business.dto;
+/*package edu.ezip.ing1.pds.business.dto;
 
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
@@ -97,5 +97,5 @@ public class Maintenance {
                 '}';
     }
 
-}
+}*/
 

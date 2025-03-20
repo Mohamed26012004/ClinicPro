@@ -28,7 +28,7 @@ public class Fenetre extends JFrame{
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
             //JPanel panel = (JPanel) new PanelMaxime();
-            contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
+           // contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
             //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
@@ -43,7 +43,7 @@ public class Fenetre extends JFrame{
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     contentPane.removeAll();
-                    contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
+                    //contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
                     contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
                     contentPane.repaint();
                     contentPane.revalidate();
