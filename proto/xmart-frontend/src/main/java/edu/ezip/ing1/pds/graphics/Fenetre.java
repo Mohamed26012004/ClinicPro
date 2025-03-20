@@ -1,11 +1,13 @@
 package edu.ezip.ing1.pds.graphics;
 
+import edu.ezip.ing1.pds.medecingrahics.InsertUpdateMedecinWindows;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
 
 import java.awt.*;
 
 import java.awt.event.*;
+import java.io.IOException;
 
 import javax.swing.*;
 
@@ -19,20 +21,18 @@ public class Fenetre extends JFrame{
         private static JLabel boutonEquipement;
         private static JButton boutonPerformance;
 
-
-
     public Fenetre(){
             super("Demo");
-            setSize(700, 500);
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
+            contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
 
         }
-        
             
         public JPanel PanelGauche(){
             JPanel pane = new JPanel();
@@ -44,6 +44,8 @@ public class Fenetre extends JFrame{
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonEquipement());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
+            pane.add(panelBoutonMedecint());
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
                 
             return pane;
         }
@@ -53,6 +55,7 @@ public class Fenetre extends JFrame{
             JPanel panelExamen = new JPanel();
             panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             panelExamen.add(boutonExamem);
+            effetSurBouton(panelExamen);
             panelExamen.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -71,18 +74,7 @@ public class Fenetre extends JFrame{
         JPanel panel = new JPanel();
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panel.add(boutonSalle);
-        panel.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
-            }
-        });
+        effetSurBouton(panel);
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -101,6 +93,7 @@ public class Fenetre extends JFrame{
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
+        effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -108,6 +101,46 @@ public class Fenetre extends JFrame{
             }
         });
         return panelExamen;
+    }
+
+    public JPanel panelBoutonMedecint(){
+        JLabel label = new JLabel("Médécins");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(label);
+        effetSurBouton(panelExamen);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    InsertUpdateMedecinWindows f = new InsertUpdateMedecinWindows(null);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        return panelExamen;
+    }
+
+    public static void effetSurBouton(JPanel p){
+        p.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                p.setBackground(new Color(83, 83, 83));
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                p.setBackground(new Color(123,123,123));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                p.setBackground(null);
+            }
+        });
     }
        
 }
