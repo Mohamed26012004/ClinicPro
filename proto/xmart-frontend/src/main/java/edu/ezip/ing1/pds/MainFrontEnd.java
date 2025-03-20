@@ -30,10 +30,10 @@ public class MainFrontEnd {
 
        // Fenetre fen = new Fenetre();
         //fen.setVisible(true);
-        EquipementFront f = new EquipementFront();
+        //EquipementFront f = new EquipementFront();
         DiagnosticFront d = new DiagnosticFront();
-//        EquipementFront f = new EquipementFront();
-        PaiementFront f =new PaiementFront();
+
+        //PaiementFront p =new PaiementFront();
 
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);

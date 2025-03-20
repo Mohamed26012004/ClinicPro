@@ -41,13 +41,12 @@ public class DiagnosticFront {
 
         JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
 
-        id_DiagnosticChamp = new JTextField();
+
         codeCIM10Champ = new JTextField();
         nomMaladieChamp= new JTextField();
         descriptionDiagnosticChamp = new JTextField();
 
-        panelNord.add(new JLabel("ID Diagnostic :"));
-        panelNord.add(id_DiagnosticChamp);
+
         panelNord.add(new JLabel("Code CIM10 :"));
         panelNord.add(codeCIM10Champ);
         panelNord.add(new JLabel("Nom maladie :"));
@@ -75,7 +74,7 @@ public class DiagnosticFront {
 
         boutonAjouter.addActionListener(e -> {
             try {
-                int id_Diagnostic = Integer.parseInt(id_DiagnosticChamp.getText().trim());
+
                 String codeCIM10 = codeCIM10Champ.getText().trim();
                 String nomMaladie = nomMaladieChamp.getText().trim();
                 String descriptionDiagnostic = descriptionDiagnosticChamp.getText().trim();
@@ -89,7 +88,6 @@ public class DiagnosticFront {
                 }
 
                 Diagnostic diagnostic = new Diagnostic();
-                diagnostic.setId_Diagnostic(id_Diagnostic);
                 diagnostic.setCodeCIM10(codeCIM10);
                 diagnostic.setNomMaladie(nomMaladie);
                 diagnostic.setDescription_Diagnostic(descriptionDiagnostic);
@@ -98,10 +96,7 @@ public class DiagnosticFront {
                 chargerDiagnostics();
                 viderChamps();
 
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le cout doit être un nombre valide",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
+            }catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
@@ -110,7 +105,6 @@ public class DiagnosticFront {
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
-                id_DiagnosticChamp.setText(model.getValueAt(i, 0).toString());
                 codeCIM10Champ.setText(model.getValueAt(i, 1).toString());
                 nomMaladieChamp.setText(model.getValueAt(i, 2).toString());
                 descriptionDiagnosticChamp.setText(model.getValueAt(i, 3).toString())
@@ -123,8 +117,7 @@ public class DiagnosticFront {
                 int i = table.getSelectedRow();
                 if (i >= 0) {
                     Diagnostic Diagnostic = new Diagnostic();
-                    Diagnostic.setId_Diagnostic(Integer.parseInt(id_DiagnosticChamp.getText().trim()));
-                    Diagnostic.setCodeCIM10(codeCIM10Champ.getText().trim());
+                    Diagnostic.setId_Diagnostic(Integer.parseInt(model.getValueAt(i, 0).toString()));                    Diagnostic.setCodeCIM10(codeCIM10Champ.getText().trim());
                     Diagnostic.setNomMaladie(nomMaladieChamp.getText().trim());
                     Diagnostic.setDescription_Diagnostic(descriptionDiagnosticChamp.getText().trim());
 
@@ -144,9 +137,7 @@ public class DiagnosticFront {
                 if (i >= 0) {
                     Diagnostic Diagnostic = new Diagnostic();
                     Diagnostic.setId_Diagnostic(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    Diagnostic.setCodeCIM10(model.getValueAt(i, 1).toString());
-                    Diagnostic.setNomMaladie(model.getValueAt(i, 2).toString());
-                    Diagnostic.setDescription_Diagnostic(model.getValueAt(i, 3).toString());
+
 
                     diagnosticService.deleteDiagnostic(Diagnostic);
                     chargerDiagnostics();
@@ -184,7 +175,6 @@ public class DiagnosticFront {
     }
 
     private void viderChamps() {
-        id_DiagnosticChamp.setText("");
         codeCIM10Champ.setText("");
         nomMaladieChamp.setText("");
         descriptionDiagnosticChamp.setText("");

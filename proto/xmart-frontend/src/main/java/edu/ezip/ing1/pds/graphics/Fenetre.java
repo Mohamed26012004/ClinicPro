@@ -46,6 +46,8 @@ public class Fenetre extends JFrame{
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonPaiement());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
+            pane.add(panelBoutonDiagnostic());
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
                 
             return pane;
         }
@@ -121,6 +123,20 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 PaiementFront f = new PaiementFront();
+            }
+        });
+        return panelExamen;
+    }
+
+    public JPanel panelBoutonDiagnostic(){
+        boutonExamem = new JLabel("Diagnostic");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonExamem);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                DiagnosticFront d = new DiagnosticFront();
             }
         });
         return panelExamen;
