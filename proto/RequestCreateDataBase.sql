@@ -90,3 +90,10 @@ CREATE TABLE consulte(
    FOREIGN KEY(id) REFERENCES horaire(id)
 );
 
+CREATE TABLE equipement(
+   idEquipement INT,
+   nomEquipement VARCHAR(50) NOT NULL,
+   dateAchat DATE NOT NULL,
+   coutEquipement DECIMAL(15,2) NOT NULL,
+   PRIMARY KEY(idEquipement)
+);

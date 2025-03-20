@@ -21,8 +21,8 @@ public class MainFrontEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-//        Fenetre fen = new Fenetre();
-//        fen.setVisible(true);
+        Fenetre fen = new Fenetre();
+        fen.setVisible(true);
 //
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);
