@@ -109,7 +109,7 @@ public class XMartCityService {
         SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement FROM paiement p"),
         INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement) values (?, ?, ?)"),
         UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
-        DELETE_PAIEMENT("DELETE FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        DELETE_PAIEMENT("DELETE FROM paiement WHERE idPaiement = ?"),
         ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
@@ -966,9 +966,7 @@ public class XMartCityService {
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PAIEMENT.query);
-        stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
-        stmt.setString(3, paiement.getmoyenDePaiement());
+        stmt.setInt(1, paiement.getidPaiement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));

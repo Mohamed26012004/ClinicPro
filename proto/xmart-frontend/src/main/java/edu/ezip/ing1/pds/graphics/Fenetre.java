@@ -16,8 +16,8 @@ public class Fenetre extends JFrame{
         private JPanel contentPane;
         private static JLabel boutonExamem;
         private static JLabel boutonSalle;
-        private static JButton boutonFacture;
-        private static JButton boutonPerformance;
+        private static JLabel boutonEquipement;
+        private static JLabel boutonPaiement;
 
 
 
@@ -41,6 +41,10 @@ public class Fenetre extends JFrame{
             pane.add(panelBoutonExamen());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonSalle());
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+            pane.add(panelBoutonEquipement());
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+            pane.add(panelBoutonPaiement());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
                 
             return pane;
@@ -94,6 +98,32 @@ public class Fenetre extends JFrame{
         return panel;
     }
 
+    public JPanel panelBoutonEquipement(){
+        boutonEquipement = new JLabel("Equipement");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonEquipement);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                EquipementFront f = new EquipementFront();
+            }
+        });
+        return panelExamen;
+    }
 
+    public JPanel panelBoutonPaiement(){
+        boutonExamem = new JLabel("Paiement");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonExamem);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PaiementFront f = new PaiementFront();
+            }
+        });
+        return panelExamen;
+    }
        
 }

@@ -14,6 +14,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.DiagnosticFront;
 import edu.ezip.ing1.pds.graphics.EquipementFront;
 import edu.ezip.ing1.pds.graphics.Fenetre;
+import edu.ezip.ing1.pds.graphics.PaiementFront;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 
@@ -22,13 +23,17 @@ public class MainFrontEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        Fenetre fen = new Fenetre();
-        fen.setVisible(true);
-//
+//        Fenetre fen = new Fenetre();
+//        fen.setVisible(true);
+
+//        EquipementFront f = new EquipementFront();
+
        // Fenetre fen = new Fenetre();
         //fen.setVisible(true);
         EquipementFront f = new EquipementFront();
         DiagnosticFront d = new DiagnosticFront();
+//        EquipementFront f = new EquipementFront();
+        PaiementFront f =new PaiementFront();
 
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);
