@@ -12,6 +12,7 @@ public class AntecedentMedical {
     private  int id_antecedentMedical;
     private  String type_antecedentMedical;
     private  String description_antecedentMedical;
+    private  int idPatient;
 
 
     public AntecedentMedical() {
@@ -19,19 +20,20 @@ public class AntecedentMedical {
 
     public final AntecedentMedical build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_antecedentMedical", "type_antecedentMedical","description_antecedentMedical");
+        setFieldsFromResulset(resultSet, "id_antecedentMedical", "type_antecedentMedical","description_antecedentMedical", "idPatient");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_antecedentMedical),type_antecedentMedical, description_antecedentMedical);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_antecedentMedical),type_antecedentMedical, description_antecedentMedical, String.valueOf(idPatient));
     }
 
-    public AntecedentMedical(String type_antecedentMedical, String description_antecedentMedical) {
+    public AntecedentMedical(String type_antecedentMedical, String description_antecedentMedical, int idPatient) {
         this.type_antecedentMedical = type_antecedentMedical;
         this.description_antecedentMedical = description_antecedentMedical;
+        this.idPatient = idPatient;
     }
 
 
@@ -40,6 +42,7 @@ public class AntecedentMedical {
         return type_antecedentMedical;
     }
     public String getDescription_antecedentMedical() {return description_antecedentMedical;}
+    public int getIdPatient() {return idPatient;}
 
 
     @JsonProperty("antecedentMedical_type_antecedentMedical")
@@ -50,6 +53,8 @@ public class AntecedentMedical {
     }
     @JsonProperty("antecedentMedical_description_antecedentMedical")
     public void setDescription_antecedentMedical(String description_antecedentMedical) {this.description_antecedentMedical = description_antecedentMedical;}
+    @JsonProperty("antecedentMedical_idPatient")
+    public void setIdPatient (int idPatient) {this.idPatient = idPatient;}
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
@@ -74,6 +79,7 @@ public class AntecedentMedical {
                 "id_antecedentMedical='" + id_antecedentMedical + '\'' +
                 ", type_antecedentMedical='" + type_antecedentMedical + '\'' +
                 ", description_antecedentMedical='" + description_antecedentMedical + '\'' +
+                ", idPatient='" + idPatient + '\'' +
                 '}';
     }
 }

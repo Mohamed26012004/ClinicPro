@@ -80,28 +80,28 @@ public class XMartCityService {
         DELETE_PAIEMENT("DELETE FROM patient WHERE montant = ? AND dateFacture = ? AND moyenDePaiement = ?"),
         ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
-        SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id, a.type_antecedentMedical, a.description_antecedentMedical FROM AntecedentMedical a"),
-        INSERT_ANTECEDENT_MEDICAL("INSERT into AntecedentMedical (type_antedecedentMedical, description_antecedentMedical) values (?, ?)"),
-        UPDATE_ANTECEDENT_MEDICAL("UPDATE AntecedentMedical SET type_antecedentMedical = ?, description_antecedentMedical = ? WHERE id_antecedentMedical = ?"),
-        DELETE_ANTECEDENT_MEDICAL("DELETE FROM AntecedentMedical WHERE id = ?"),
-        ID_ANTECEDENT_MEDICAL("SELECT id FROM AntecedentMedical WHERE type_antecedentMedical = ? AND description_antecedentMedical = ?"),
+        SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
+        INSERT_ANTECEDENT_MEDICAL("INSERT into antecedentMedical (type_antecedentMedical, description_antecedentMedical, idPatient) values (?, ?, ?)"),
+        UPDATE_ANTECEDENT_MEDICAL("UPDATE antecedentMedical SET type_antecedentMedical = ?, description_antecedentMedical = ?, idPatient = ? WHERE id_antecedentMedical = ?"),
+        DELETE_ANTECEDENT_MEDICAL("DELETE FROM antecedentMedical WHERE id_antecedentMedical = ?"),
+        ID_ANTECEDENT_MEDICAL("SELECT id FROM antecedentMedical WHERE type_antecedentMedical = ? AND description_antecedentMedical = ? AND idPatient = ?"),
 
-        SELECT_ALL_COMPTE_RENDUS("SELECT c.id, c.typeSymptome, c.descriptionSymptome FROM CompteRendu c"),
-        INSERT_COMPTE_RENDU("INSERT into CompteRendu (typeSymptome, descriptionSymptome) values (?, ?)"),
-        UPDATE_COMPTE_RENDU("UPDATE CompteRendu SET typeSymptome = ?, descriptionSymptome = ? WHERE id = ?"),
-        DELETE_COMPTE_RENDU("DELETE FROM AntecedentMedical WHERE id = ?"),
-        ID_COMPTE_RENDU("SELECT id FROM CompteRendu WHERE typeSymptome = ? AND descriptionSymptome = ?"),
+        SELECT_ALL_COMPTE_RENDUS("SELECT c.id_compteRendu, c.typeSymptome, c.descriptionSymptome FROM compteRendu c"),
+        INSERT_COMPTE_RENDU("INSERT into compteRendu (typeSymptome, descriptionSymptome) values (?, ?)"),
+        UPDATE_COMPTE_RENDU("UPDATE compteRendu SET typeSymptome = ?, descriptionSymptome = ? WHERE id_compteRendu = ?"),
+        DELETE_COMPTE_RENDU("DELETE FROM compteRendu WHERE id_compteRendu = ?"),
+        ID_COMPTE_RENDU("SELECT id FROM compteRendu WHERE typeSymptome = ? AND descriptionSymptome = ?"),
 
-        SELECT_ALL_DIAGNOSTICS("SELECT d.id, c.codeCIM10, c.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
+        SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, c.codeCIM10, c.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
         INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic) values (?, ?, ?)"),
-        UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ? WHERE id = ?"),
-        DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id = ?"),
+        UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ? WHERE id_Diagnostic = ?"),
+        DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id_Diagnostic = ?"),
         ID_DIAGNOSTIC("SELECT id FROM Diagnostic WHERE codeCIM10 = ? AND nomMaladie = ? AND descriptionDiagnostic = ?"),
 
-        SELECT_ALL_TRAITEMENTS("SELECT t.id, t.typeTraitement, t.descriptionTraitement, t.debutTraitement, t.finTraitement FROM Traitement t"),
+        SELECT_ALL_TRAITEMENTS("SELECT t.id_Traitement, t.typeTraitement, t.descriptionTraitement, t.debutTraitement, t.finTraitement FROM Traitement t"),
         INSERT_TRAITEMENT("INSERT into Traitement (typeTraitement, descriptionTraitement, debutTraitement, finTraitement) values (?, ?, ?, ?)"),
-        UPDATE_TRAITEMENT("UPDATE Traitement SET typeTraitement = ?, descriptionTraitement = ?, debutTraitement = ?, finTraitement = ? WHERE id = ?"),
-        DELETE_TRAITEMENT("DELETE FROM Traitement WHERE id = ?"),
+        UPDATE_TRAITEMENT("UPDATE Traitement SET typeTraitement = ?, descriptionTraitement = ?, debutTraitement = ?, finTraitement = ? WHERE id_Traitement = ?"),
+        DELETE_TRAITEMENT("DELETE FROM Traitement WHERE id_Traitement = ?"),
         ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ?"),
 
 
@@ -1006,6 +1006,7 @@ public class XMartCityService {
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_ANTECEDENT_MEDICAL.query);
         stmt.setString(1, antecedentMedical.getType_antecedentMedical());
         stmt.setString(2, antecedentMedical.getDescription_antecedentMedical());
+        stmt.setInt(3, antecedentMedical.getIdPatient());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedical));
@@ -1021,6 +1022,7 @@ public class XMartCityService {
             antecedentMedical.setId_antecedentMedical(res.getInt(1));
             antecedentMedical.setType_antecedentMedical(res.getString(2));
             antecedentMedical.setDescription_antecedentMedical(res.getString(3));
+            antecedentMedical.setIdPatient(res.getInt(4));
             antecedentMedicals.add(antecedentMedical);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedicals));
@@ -1034,6 +1036,7 @@ public class XMartCityService {
         stmt.setString(1, antecedentMedical.getType_antecedentMedical());
         stmt.setString(2, antecedentMedical.getDescription_antecedentMedical());
         stmt.setInt(3, antecedentMedical.getId_antecedentMedical());
+        stmt.setInt(4, antecedentMedical.getIdPatient());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(antecedentMedical));
@@ -1172,7 +1175,7 @@ public class XMartCityService {
         stmt.setString(1, traitement.getType_Traitement());
         stmt.setString(2, traitement.getDescription_Traitement());
         stmt.setString(3, traitement.getDebut_Traitement());
-        stmt.setString(3, traitement.getFin_Traitement());
+        stmt.setString(4, traitement.getFin_Traitement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
