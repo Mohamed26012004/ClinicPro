@@ -1,13 +1,11 @@
 package edu.ezip.ing1.pds.graphics;
 
-import edu.ezip.ing1.pds.medecingrahics.InsertUpdateMedecinWindows;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
 
 import java.awt.*;
 
 import java.awt.event.*;
-import java.io.IOException;
 
 import javax.swing.*;
 
@@ -19,7 +17,7 @@ public class Fenetre extends JFrame{
         private static JLabel boutonExamem;
         private static JLabel boutonSalle;
         private static JLabel boutonEquipement;
-        private static JButton boutonPerformance;
+        private static JLabel boutonPaiement;
 
     public Fenetre(){
             super("Demo");
@@ -46,7 +44,9 @@ public class Fenetre extends JFrame{
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonMedecint());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
-                
+            pane.add(panelBoutonPaiement());
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+
             return pane;
         }
 
@@ -93,11 +93,24 @@ public class Fenetre extends JFrame{
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
-        effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 EquipementFront f = new EquipementFront();
+            }
+        });
+        return panelExamen;
+    }
+
+    public JPanel panelBoutonPaiement(){
+        boutonExamem = new JLabel("Paiement");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonExamem);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                PaiementFront f = new PaiementFront();
             }
         });
         return panelExamen;
@@ -142,5 +155,5 @@ public class Fenetre extends JFrame{
             }
         });
     }
-       
+
 }

@@ -40,13 +40,13 @@ public class Diagnostic {
 
 
     public int getId_Diagnostic() {return id_Diagnostic;}
-    public String getcodeCIM10() {return codeCIM10;}
+    public String getCodeCIM10() {return codeCIM10;}
     public String getNomMaladie() {return nomMaladie;}
     public String getDescription_Diagnostic() {return description_Diagnostic;}
 
 
     @JsonProperty("Diagnostic_codeCIM10")
-    public void setcodeCIM10(String codeCIM10) {this.codeCIM10 = codeCIM10;}
+    public void setCodeCIM10(String codeCIM10) {this.codeCIM10 = codeCIM10;}
     @JsonProperty("Diagnostic_nomMaladie")
     public void setNomMaladie(String nomMaladie) {this.nomMaladie = nomMaladie;}
     @JsonProperty("Diagnostic_id_Diagnostic")
