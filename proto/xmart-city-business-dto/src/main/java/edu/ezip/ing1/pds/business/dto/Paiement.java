@@ -27,8 +27,7 @@ public class Paiement {
         return buildPreparedStatement(preparedStatement, String.valueOf(idPaiement), String.valueOf(montant), datePaiement, moyenDePaiement);
     }
 
-    public Paiement(int idPaiement, double montant, String datePaiement, String moyenDePaiement) {
-        this.idPaiement = idPaiement;
+    public Paiement(double montant, String datePaiement, String moyenDePaiement) {
         this.montant = montant;
         this.datePaiement = datePaiement;
         this.moyenDePaiement = moyenDePaiement;

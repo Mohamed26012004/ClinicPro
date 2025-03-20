@@ -1,10 +1,14 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
+import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
+import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
+
+import java.awt.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.*;
 
@@ -12,79 +16,76 @@ import javax.swing.*;
 public class Fenetre extends JFrame{
 
 
-        private static JPanel contentPane;
-        private static JButton boutonExamem;
+        private JPanel contentPane;
+        private static JLabel boutonExamem;
+        private static JLabel boutonSalle;
         private static JButton boutonFacture;
         private static JButton boutonPerformance;
 
-        
-        public Fenetre(){
+
+
+    public Fenetre(){
             super("Demo");
             setSize(700, 500);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    
+
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
             //JPanel panel = (JPanel) new PanelMaxime();
-           // contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
+            contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
             //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
         
             
-        public static JPanel PanelGauche(){
+        public JPanel PanelGauche(){
             JPanel pane = new JPanel();
             pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
-        
-            boutonExamem = new JButton("Examens");
-            boutonExamem.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    contentPane.removeAll();
-                    //contentPane.add(PanelMaxime.afficheExamens(), BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonExamem);
-            pane.add(Box.createRigidArea(new Dimension(0, 5)));
 
-            boutonFacture = new JButton("Facture");
-            boutonFacture.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PanelFacture panel = new PanelFacture();
-                    contentPane.removeAll();
-                    contentPane.add(panel, BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonFacture);
-            pane.add(Box.createRigidArea(new Dimension(0, 5)));
+            pane.add(panelBoutonExamen());
+            pane.add(Box.createRigidArea(new Dimension(0, 10)));
+            pane.add(panelBoutonSalle());
+            pane.add(Box.createRigidArea(new Dimension(0, 10)));
 
-            boutonPerformance = new JButton("Performance");
-            boutonPerformance.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    PanelPerformance panel = new PanelPerformance();                   contentPane.removeAll();
-                    contentPane.add(panel, BorderLayout.CENTER);
-                    contentPane.add(Fenetre.PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
-                }
-            });
-            pane.add(boutonPerformance);
-                
             return pane;
         }
 
+        public JPanel panelBoutonExamen(){
+            boutonExamem = new JLabel("Examens");
+            JPanel panelExamen = new JPanel();
+            panelExamen.add(boutonExamem);
+            panelExamen.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    contentPane.removeAll();
+                    contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
+                    contentPane.add(PanelGauche(), BorderLayout.WEST);
+                    contentPane.repaint();
+                    contentPane.revalidate();
+                }
+            });
+            return panelExamen;
+        }
 
-        
+    public JPanel panelBoutonSalle(){
+        boutonSalle = new JLabel("Salles");
+        JPanel panel = new JPanel();
+        panel.add(boutonSalle);
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                contentPane.removeAll();
+                contentPane.add(PanelManipulationSalle.afficheSalle(), BorderLayout.CENTER);
+                contentPane.add(PanelGauche(), BorderLayout.WEST);
+                contentPane.repaint();
+                contentPane.revalidate();
+            }
+        });
+        return panel;
+    }
+
 
        
 }

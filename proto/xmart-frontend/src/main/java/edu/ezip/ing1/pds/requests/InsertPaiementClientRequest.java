@@ -9,9 +9,9 @@ import edu.ezip.ing1.pds.commons.Request;
 import java.io.IOException;
 import java.util.Map;
  
-public class InsertPaiementsClientRequest extends ClientRequest<Paiement, String> {
+public class InsertPaiementClientRequest extends ClientRequest<Paiement, String> {
  
-    public InsertPaiementsClientRequest(
+    public InsertPaiementClientRequest(
             NetworkConfig networkConfig, int myBirthDate, Request request, Paiement info, byte[] bytes)
             throws IOException {
         super(networkConfig, myBirthDate, request, info, bytes);
