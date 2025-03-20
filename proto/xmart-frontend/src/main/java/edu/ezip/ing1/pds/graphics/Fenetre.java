@@ -1,14 +1,11 @@
-/*/package edu.ezip.ing1.pds.graphics;
+package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
 
 import java.awt.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 import javax.swing.*;
 
@@ -33,7 +30,6 @@ public class Fenetre extends JFrame{
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-            //contentPane.add(new PanelFacture(), BorderLayout.CENTER);
 
         }
         
@@ -43,16 +39,17 @@ public class Fenetre extends JFrame{
             pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
             pane.add(panelBoutonExamen());
-            pane.add(Box.createRigidArea(new Dimension(0, 10)));
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonSalle());
-            pane.add(Box.createRigidArea(new Dimension(0, 10)));
-
+            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+                
             return pane;
         }
 
         public JPanel panelBoutonExamen(){
             boutonExamem = new JLabel("Examens");
             JPanel panelExamen = new JPanel();
+            panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             panelExamen.add(boutonExamem);
             panelExamen.addMouseListener(new MouseAdapter() {
                 @Override
@@ -70,7 +67,20 @@ public class Fenetre extends JFrame{
     public JPanel panelBoutonSalle(){
         boutonSalle = new JLabel("Salles");
         JPanel panel = new JPanel();
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panel.add(boutonSalle);
+        panel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -86,4 +96,4 @@ public class Fenetre extends JFrame{
 
 
        
-}*/
+}
