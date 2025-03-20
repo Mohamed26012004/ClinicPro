@@ -14,6 +14,8 @@ public class CompteRendu {
     private  String descriptionSymptome;
 
 
+
+
     public CompteRendu() {
     }
 
@@ -47,7 +49,7 @@ public class CompteRendu {
     @JsonProperty("compteRendu_descriptionSymptome")
     public void setDescriptionSymptome(String descriptionSymptome) {this.descriptionSymptome = descriptionSymptome;}
     @JsonProperty("compteRendu_id_compteRendu")
-    public void setId_compteRendu(int id_antecedentMedical) {
+    public void setId_compteRendu(int id_compteRendu) {
         this.id_compteRendu = id_compteRendu;
     }
 
