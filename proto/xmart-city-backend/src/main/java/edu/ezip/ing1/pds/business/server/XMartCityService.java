@@ -2,16 +2,48 @@ package edu.ezip.ing1.pds.business.server;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
 import java.time.format.DateTimeFormatter;
 
-import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.ezip.ing1.pds.business.dto.AntecedentMedical;
+import edu.ezip.ing1.pds.business.dto.AntecedentMedicals;
+import edu.ezip.ing1.pds.business.dto.CompteRendu;
+import edu.ezip.ing1.pds.business.dto.CompteRendus;
+import edu.ezip.ing1.pds.business.dto.Consulte;
+import edu.ezip.ing1.pds.business.dto.Diagnostic;
+import edu.ezip.ing1.pds.business.dto.Diagnostics;
+import edu.ezip.ing1.pds.business.dto.Equipement;
+import edu.ezip.ing1.pds.business.dto.Equipements;
+import edu.ezip.ing1.pds.business.dto.Examen;
+import edu.ezip.ing1.pds.business.dto.Examens;
+import edu.ezip.ing1.pds.business.dto.Facture;
+import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.Horaire;
+import edu.ezip.ing1.pds.business.dto.Horaires;
+import edu.ezip.ing1.pds.business.dto.Medecin;
+import edu.ezip.ing1.pds.business.dto.Medecins;
+import edu.ezip.ing1.pds.business.dto.Paiement;
+import edu.ezip.ing1.pds.business.dto.Paiements;
+import edu.ezip.ing1.pds.business.dto.Patient;
+import edu.ezip.ing1.pds.business.dto.Patients;
+import edu.ezip.ing1.pds.business.dto.RendezVous;
+import edu.ezip.ing1.pds.business.dto.RendezVouss;
+import edu.ezip.ing1.pds.business.dto.Salle;
+import edu.ezip.ing1.pds.business.dto.Salles;
+import edu.ezip.ing1.pds.business.dto.Traitement;
+import edu.ezip.ing1.pds.business.dto.Traitements;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.commons.Response;
 
@@ -108,7 +140,8 @@ public class XMartCityService {
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
         UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
-        DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ?"),
+        DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
+
         ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?");
 
         private final String query;
@@ -1302,10 +1335,10 @@ public class XMartCityService {
         final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_EQUIPEMENT.query);
-        stmt.setDate(3, Date.valueOf(equipement.getDateEquipement()));
-        stmt.setString(4, equipement.getNomEquipement());
-        stmt.setInt(2, equipement.getCoutEquipement());
-        stmt.setInt(1, equipement.getIdEquipement());
+        stmt.setDate(2, Date.valueOf(equipement.getDateEquipement()));
+        stmt.setString(3, equipement.getNomEquipement());
+        stmt.setInt(1, equipement.getCoutEquipement());
+        stmt.setInt(4, equipement.getIdEquipement());
 
         stmt.executeUpdate();
 
@@ -1316,8 +1349,11 @@ public class XMartCityService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_FACTURE.query);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_EQUIPEMENT.query);
         stmt.setInt(1, equipement.getIdEquipement());
+        stmt.setInt(2, equipement.getCoutEquipement());
+        stmt.setString(3, equipement.getNomEquipement());
+        stmt.setDate(4, Date.valueOf(equipement.getDateEquipement()));;
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));

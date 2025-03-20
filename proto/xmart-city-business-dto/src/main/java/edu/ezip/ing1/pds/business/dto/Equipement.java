@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -19,7 +20,7 @@ public class Equipement {
     @JsonDeserialize(using = DeserialisationDate2.class) // doit etre au dessus des dates
     private LocalDate dateEquipement;
 
-
+    private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Equipement() {
     }
@@ -31,7 +32,7 @@ public class Equipement {
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idEquipement),String.valueOf(coutEquipement), nomEquipement, dateEquipement.toString());
+        return buildPreparedStatement(preparedStatement, String.valueOf(idEquipement),String.valueOf(coutEquipement), nomEquipement, dateEquipement.format(formatDate));
     }
 
     public Equipement(int coutEquipement, String nomEquipement, LocalDate dateEquipement, int idEquipement) {
