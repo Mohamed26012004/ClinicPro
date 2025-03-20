@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.graphics;
+/*/package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
@@ -86,4 +86,4 @@ public class Fenetre extends JFrame{
 
 
        
-}
+}*/

@@ -1,6 +1,6 @@
-databaseName: "clinicpro"
-host: "172.31.240.29"
+databaseName: "Essai"
+host: "127.0.0.1"
 port: 3306
-username : "toto"
-password: "toto11"
+username : "raslene"
+password: "Tibertiber@11"
 poolSize: 1

@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.graphics;
+/*package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
@@ -43,4 +43,4 @@ public class PanelPerformance extends JPanel {
         pan.revalidate();
         add(pan, BorderLayout.CENTER);
     }
-}
+}*/

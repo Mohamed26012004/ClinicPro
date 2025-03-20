@@ -45,7 +45,7 @@ public class EquipementService {
         insertDeleteUpdateEquipement(equipement, insertRequestOrder);
     }
 
-    public void updateExamen(Equipement equipement)throws InterruptedException, IOException {
+    public void updateEquipement(Equipement equipement)throws InterruptedException, IOException {
         insertDeleteUpdateEquipement(equipement, updateRequestOrder);
     }
 
