@@ -74,11 +74,11 @@ public class XMartCityService {
 
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement"),
+        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement FROM paiement p"),
         INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement) values (?, ?, ?)"),
-        UPDATE_PAIEMENT("UPDATE patient SET montant = ?, dateFacture = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
-        DELETE_PAIEMENT("DELETE FROM patient WHERE montant = ? AND dateFacture = ? AND moyenDePaiement = ?"),
-        ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
+        DELETE_PAIEMENT("DELETE FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id, a.type_antecedentMedical, a.description_antecedentMedical FROM AntecedentMedical a"),
         INSERT_ANTECEDENT_MEDICAL("INSERT into AntecedentMedical (type_antedecedentMedical, description_antecedentMedical) values (?, ?)"),
@@ -109,7 +109,8 @@ public class XMartCityService {
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
         UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ?"),
-        ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?");
+        ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
+        SELECT_DISPONIBILITE("");
 
         private final String query;
 
@@ -933,7 +934,9 @@ public class XMartCityService {
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PAIEMENT.query);
-        stmt.setInt(1, paiement.getidPaiement());
+        stmt.setDouble(1, paiement.getmontant());
+        stmt.setString(2, paiement.getdatePaiement());
+        stmt.setString(3, paiement.getmoyenDePaiement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
