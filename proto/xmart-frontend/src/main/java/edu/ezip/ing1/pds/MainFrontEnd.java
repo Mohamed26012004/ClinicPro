@@ -12,6 +12,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 
 import edu.ezip.ing1.pds.graphics.EquipementFront;
+import edu.ezip.ing1.pds.graphics.PaiementFront;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 
@@ -27,7 +28,8 @@ public class MainFrontEnd {
 
        // Fenetre fen = new Fenetre();
         //fen.setVisible(true);
-        EquipementFront f = new EquipementFront();
+//        EquipementFront f = new EquipementFront();
+        PaiementFront f =new PaiementFront();
 
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);
