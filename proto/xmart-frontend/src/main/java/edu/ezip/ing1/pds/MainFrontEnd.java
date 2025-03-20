@@ -23,17 +23,17 @@ public class MainFrontEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-//        Fenetre fen = new Fenetre();
-//        fen.setVisible(true);
+        Fenetre fen = new Fenetre();
+        fen.setVisible(true);
 
 //        EquipementFront f = new EquipementFront();
 
        // Fenetre fen = new Fenetre();
         //fen.setVisible(true);
-        //EquipementFront f = new EquipementFront();
-        DiagnosticFront d = new DiagnosticFront();
+//        EquipementFront f = new EquipementFront();
+//        DiagnosticFront d = new DiagnosticFront();
+//        EquipementFront f = new EquipementFront();
 
-        //PaiementFront p =new PaiementFront();
 
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);

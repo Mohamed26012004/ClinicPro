@@ -359,7 +359,7 @@ public class InsertUpdateMedecinWindows extends JFrame {
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setPreferredSize(new Dimension(400, 400));
+        panel.setPreferredSize(new Dimension(150, 150));
         for (PanelHoraire h : listHoraireAajouter){
             panel.add(h);
         }
