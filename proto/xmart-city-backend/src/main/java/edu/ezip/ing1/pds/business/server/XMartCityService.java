@@ -938,7 +938,6 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-
     private Response SelectAllRendezVous(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
