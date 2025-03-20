@@ -80,7 +80,7 @@ public class DiagnosticService {
             final Diagnostic d = (Diagnostic)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    d.getcodeCIM10(), d.getNomMaladie(), d.getDescription_Diagnostic(),
+                    d.getCodeCIM10(), d.getNomMaladie(), d.getDescription_Diagnostic(),
                     clientRequest2.getResult());
         }
     }
