@@ -75,7 +75,7 @@ public class XMartCityService {
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
         SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement"),
-        INSERT_PAIEMENT("INSERT into paiement (montant, dateFacture, moyenDePaiement) values (?, ?, ?, ?)"),
+        INSERT_PAIEMENT("INSERT into paiement (montant, dateFacture, moyenDePaiement) values (?, ?, ?)"),
         UPDATE_PAIEMENT("UPDATE patient SET montant = ?, dateFacture = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
         DELETE_PAIEMENT("DELETE FROM patient WHERE montant = ? AND dateFacture = ? AND moyenDePaiement = ?"),
         ID_PAIEMENT("SELECT idPeiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
@@ -938,6 +938,7 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
+
     private Response SelectAllRendezVous(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
