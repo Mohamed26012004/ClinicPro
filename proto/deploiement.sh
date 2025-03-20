@@ -56,13 +56,7 @@ EOF
 
 # Démarrage du frontend
 echo "Démarrage du frontend..."
-#cd "$FRONTEND_DIR" || exit 1
-#mvn clean package -am -pl xmart-frontend
-#
-#if [ $? -ne 0 ]; then
-#    echo " Erreur lors du build du frontend !"
-#    exit 1
-#fi
+
 
 java -jar "$CHEMIN_FRONTEND/target/xmart-frontend-1.0-SNAPSHOT-jar-with-dependencies.jar" &
 

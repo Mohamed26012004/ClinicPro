@@ -30,8 +30,8 @@ public class MainFrontEnd {
 
        // Fenetre fen = new Fenetre();
         //fen.setVisible(true);
-        EquipementFront f = new EquipementFront();
-        DiagnosticFront d = new DiagnosticFront();
+//        EquipementFront f = new EquipementFront();
+//        DiagnosticFront d = new DiagnosticFront();
 //        EquipementFront f = new EquipementFront();
 
 

@@ -27,7 +27,6 @@ public class PanelManipulationExamen extends JPanel {
     public PanelManipulationExamen(){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(500, 300));
-        setPreferredSize(new Dimension(800, 800));
         try {
             //examens = examenService.selectExamens();
             for(Examen exam : examenService.selectExamens().getExamens()){

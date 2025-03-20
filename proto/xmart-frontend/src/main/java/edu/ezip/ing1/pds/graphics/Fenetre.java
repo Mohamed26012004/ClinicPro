@@ -1,11 +1,13 @@
 package edu.ezip.ing1.pds.graphics;
 
+import edu.ezip.ing1.pds.medecingrahics.InsertUpdateMedecinWindows;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
 
 import java.awt.*;
 
 import java.awt.event.*;
+import java.io.IOException;
 
 import javax.swing.*;
 
