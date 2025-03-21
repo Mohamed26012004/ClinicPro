@@ -1,4 +1,6 @@
 package edu.ezip.ing1.pds;
+ 
+import edu.ezip.ing1.pds.graphics.Fenetre;
 
 import java.io.IOException;
 
@@ -23,9 +25,6 @@ public class MainFrontEnd {
 
         Fenetre fen = new Fenetre();
         fen.setVisible(true);
-//
-       // Fenetre fen = new Fenetre();
-        //fen.setVisible(true);
 //        EquipementFront f = new EquipementFront();
 
 //        Date dat = new Date();
