@@ -109,7 +109,7 @@ public class XMartCityService {
         SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement FROM paiement p"),
         INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement) values (?, ?, ?)"),
         UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
-        DELETE_PAIEMENT("DELETE FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        DELETE_PAIEMENT("DELETE FROM paiement WHERE idPaiement = ?"),
         ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
@@ -124,7 +124,7 @@ public class XMartCityService {
         DELETE_COMPTE_RENDU("DELETE FROM compteRendu WHERE id_compteRendu = ?"),
         ID_COMPTE_RENDU("SELECT id FROM compteRendu WHERE typeSymptome = ? AND descriptionSymptome = ?"),
 
-        SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, c.codeCIM10, c.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
+        SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, d.codeCIM10, d.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
         INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic) values (?, ?, ?)"),
         UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ? WHERE id_Diagnostic = ?"),
         DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id_Diagnostic = ?"),
@@ -966,9 +966,7 @@ public class XMartCityService {
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PAIEMENT.query);
-        stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
-        stmt.setString(3, paiement.getmoyenDePaiement());
+        stmt.setInt(1, paiement.getidPaiement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
@@ -1150,7 +1148,7 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getcodeCIM10());
+        stmt.setString(1, diagnostic.getCodeCIM10());
         stmt.setString(2, diagnostic.getNomMaladie());
         stmt.setString(3, diagnostic.getDescription_Diagnostic());
         stmt.executeUpdate();
@@ -1166,7 +1164,7 @@ public class XMartCityService {
         while (res.next()) {
             Diagnostic diagnostic = new Diagnostic();
             diagnostic.setId_Diagnostic(res.getInt(1));
-            diagnostic.setcodeCIM10(res.getString(2));
+            diagnostic.setCodeCIM10(res.getString(2));
             diagnostic.setNomMaladie(res.getString(3));
             diagnostic.setDescription_Diagnostic(res.getString(4));
             diagnostics.add(diagnostic);
@@ -1179,7 +1177,7 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getcodeCIM10());
+        stmt.setString(1, diagnostic.getCodeCIM10());
         stmt.setString(2, diagnostic.getNomMaladie());
         stmt.setString(3, diagnostic.getDescription_Diagnostic());
         stmt.setInt(4, diagnostic.getId_Diagnostic());

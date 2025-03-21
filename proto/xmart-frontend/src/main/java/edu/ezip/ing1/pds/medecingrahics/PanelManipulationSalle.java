@@ -63,8 +63,12 @@ public class PanelManipulationSalle extends JPanel {
         ajouter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 FrameCreationSalle fen = new FrameCreationSalle(null);
+                PanelManipulationSalle.afficheSalle().revalidate();
+                PanelManipulationSalle.afficheSalle().repaint();
             }
+
         });
         pane.add(ajouter);
 
@@ -76,6 +80,8 @@ public class PanelManipulationSalle extends JPanel {
                 Salle salle = p.salleOfPanel();
                 p.setBackground(null);
                 FrameCreationSalle fen = new FrameCreationSalle(salle);
+                PanelManipulationSalle.afficheSalle().revalidate();
+                PanelManipulationSalle.afficheSalle().repaint();
             }
         });
         pane.add(modifier);

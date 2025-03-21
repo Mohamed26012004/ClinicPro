@@ -27,7 +27,6 @@ public class PanelManipulationExamen extends JPanel {
     public PanelManipulationExamen(){
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(500, 300));
-        setPreferredSize(new Dimension(800, 800));
         try {
             //examens = examenService.selectExamens();
             for(Examen exam : examenService.selectExamens().getExamens()){
@@ -50,8 +49,6 @@ public class PanelManipulationExamen extends JPanel {
         panneau.removeAll();
         panneau.add(scrollPane, BorderLayout.CENTER);
 
-        JPanel titre = new JPanel(new FlowLayout());
-
         panneau.add(boutons(), BorderLayout.NORTH);
 
         panneau.revalidate();
@@ -66,7 +63,10 @@ public class PanelManipulationExamen extends JPanel {
         ajouter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 FrameCreationExamen fen = new FrameCreationExamen(null);
+                PanelManipulationExamen.afficheExamens().revalidate();
+                PanelManipulationExamen.afficheExamens().repaint();
             }
         });
         pane.add(ajouter);
@@ -80,6 +80,8 @@ public class PanelManipulationExamen extends JPanel {
                 p.setBackground(null);
                 examen = p.ExamenOfPanel();
                 FrameCreationExamen fen = new FrameCreationExamen(examen);
+                PanelManipulationExamen.afficheExamens().revalidate();
+                PanelManipulationExamen.afficheExamens().repaint();
             }
         });
         pane.add(modifier);
