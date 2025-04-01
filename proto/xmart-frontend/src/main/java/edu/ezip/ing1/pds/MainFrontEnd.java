@@ -4,10 +4,13 @@ import java.io.IOException;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 
 import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.RendezVous;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 
@@ -17,14 +20,16 @@ import edu.ezip.ing1.pds.graphics.Fenetre;
 import edu.ezip.ing1.pds.graphics.PaiementFront;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
+import edu.ezip.ing1.pds.servicesplanning.CreneauService;
+import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
 
 public class MainFrontEnd {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        Fenetre fen = new Fenetre();
-        fen.setVisible(true);
+//        Fenetre fen = new Fenetre();
+//        fen.setVisible(true);
 
 //        EquipementFront f = new EquipementFront();
 
@@ -37,8 +42,11 @@ public class MainFrontEnd {
 
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);
-//        final String networkConfigFile = "network.yaml";
-//        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+
+        final String networkConfigFile = "network.yaml";
+        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+        final RendezVousService rdvService = new RendezVousService(networkConfig);
+        final CreneauService creneauService = new CreneauService(networkConfig);
 //        final TraitementService traitementService = new TraitementService(networkConfig);
 //        final AntecedentMedicalService antecedentMedicalService = new AntecedentMedicalService(networkConfig);
 //        final PatientService patientService = new PatientService (networkConfig);
@@ -54,6 +62,19 @@ public class MainFrontEnd {
 //        factureService.insertFacture(fac);
 //        Factures factures = factureService.selectFactures();
 //        System.out.println(factures);
+
+        LocalDate  date = LocalDate.now();
+        LocalTime debut = LocalTime.of(16, 00);
+        LocalTime fin = LocalTime.of(16, 30);
+
+//        RendezVous rendezVous = new RendezVous(0, 3, 6, 2, date, debut, fin);
+//
+//        rdvService.insertRendezVous(rendezVous);
+
+        RendezVous rdv = new RendezVous();
+        rdv.setDateRendezVous(date);
+        System.out.println(creneauService.selectCreneauxParDate(rdv));
+
 
     }
 }
