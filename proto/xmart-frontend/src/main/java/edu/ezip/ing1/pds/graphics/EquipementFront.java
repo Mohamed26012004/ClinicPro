@@ -35,7 +35,7 @@ public class EquipementFront {
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.equipementService = new EquipementService (networkConfig);
 
-        JFrame frame = new JFrame("Gestion des Eqquipement");
+        JFrame frame = new JFrame("Gestion des Equipements");
         frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -187,7 +187,7 @@ public class EquipementFront {
     private void viderChamps() {
         idEquipementChamp.setText("");
         coutEquipementchamp.setText("");
-        coutEquipementchamp.setText("");
+        nomEquipementchamp.setText("");
         dateEquipementChamp.setText("");
     }
 

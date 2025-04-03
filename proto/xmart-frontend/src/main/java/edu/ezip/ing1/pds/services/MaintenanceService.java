@@ -1,12 +1,11 @@
 package edu.ezip.ing1.pds.services;
-
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.UUID;
 
-import edu.ezip.ing1.pds.business.dto.TotalCouts;
-import edu.ezip.ing1.pds.requests.TotalCoutParJourClientRequest;
+import edu.ezip.ing1.pds.business.dto.TotalMaintenances;
+import edu.ezip.ing1.pds.requests.TotalMaintenanceParJourClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -15,83 +14,82 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import edu.ezip.commons.LoggingUtils;
-import edu.ezip.ing1.pds.business.dto.Equipement;
-import edu.ezip.ing1.pds.business.dto.Equipements;
+import edu.ezip.ing1.pds.business.dto.Maintenance;
+import edu.ezip.ing1.pds.business.dto.Maintenances;
 
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.InsertEquipementClientRequest;
-import edu.ezip.ing1.pds.requests.SelectAllEquipementsClientRequest;
+import edu.ezip.ing1.pds.requests.InsertMaintenanceClientRequest;
+import edu.ezip.ing1.pds.requests.SelectAllMaintenancesClientRequest;
 
 
 
 
-public class EquipementService {
-
-    private final static String LoggingLabel = "FrontEnd - StudentService";
+public class MaintenanceService {
+    private final static String LoggingLabel = "FrontEnd - MaintenanceService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
-    
-    final String insertRequestOrder = "INSERT_EQUIPEMENT";
-    final String selectRequestOrder = "SELECT_ALL_EQUIPEMENTS";
-    final String updateRequestOrder = "UPDATE_EQUIPEMENT";
-    final String deleteRequestOrder = "DELETE_EQUIPEMENT";
-    final String totalCoutParJourRequestOrder = "TOTAL_COUT_PAR_JOUR";
+
+    final String insertRequestOrder = "INSERT_MAINTENANCE";
+    final String selectRequestOrder = "SELECT_ALL_MAINTENANCES";
+    final String updateRequestOrder = "UPDATE_MAINTENANCE";
+    final String deleteRequestOrder = "DELETE_MAINTENANCE";
+    final String totalMaintenanceParJourRequestOrder = "TOTAL_MAINTENANCE_PAR_JOUR";
 
 
     private final NetworkConfig networkConfig;
 
-    public EquipementService(NetworkConfig networkConfig) {
+    public MaintenanceService(NetworkConfig networkConfig) {
         this.networkConfig = networkConfig;
     }
 
-    public void insertEquipement(Equipement equipement)throws InterruptedException, IOException {
-        insertDeleteUpdateEquipement(equipement, insertRequestOrder);
+    public void insertMaintenance(Maintenance maintenance)throws InterruptedException, IOException {
+        insertDeleteUpdateMaintenance(maintenance, insertRequestOrder);
     }
 
-    public void updateEquipement(Equipement equipement)throws InterruptedException, IOException {
-        insertDeleteUpdateEquipement(equipement, updateRequestOrder);
+    public void updateMaintenance(Maintenance maintenance)throws InterruptedException, IOException {
+        insertDeleteUpdateMaintenance(maintenance, updateRequestOrder);
     }
 
-    public void deleteEquipement(Equipement equipement)throws InterruptedException, IOException {
-        insertDeleteUpdateEquipement(equipement, deleteRequestOrder);
+    public void deleteMaintenance(Maintenance maintenance)throws InterruptedException, IOException {
+        insertDeleteUpdateMaintenance(maintenance, deleteRequestOrder);
     }
-    
-    public void insertDeleteUpdateEquipement(Equipement equipement, String requestOrder) throws InterruptedException, IOException {
+
+    public void insertDeleteUpdateMaintenance(Maintenance maintenance, String requestOrder) throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
-       
-        int birthdate = 0;
-       
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(equipement);
-            logger.trace("Equipement with its JSON face : {}", jsonifiedGuy);
-            final String requestId = UUID.randomUUID().toString();
-            final Request request = new Request();
-            request.setRequestId(requestId);
-            request.setRequestOrder(requestOrder);
-            request.setRequestContent(jsonifiedGuy);
-            objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-            final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-            final InsertEquipementClientRequest clientRequest = new InsertEquipementClientRequest(
-                    networkConfig,
-                    birthdate++, request, equipement, requestBytes);
-            clientRequests.push(clientRequest);
-        
+        int birthdate = 0;
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(maintenance);
+        logger.trace("Maintenance with its JSON face : {}", jsonifiedGuy);
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(requestOrder);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+
+        final InsertMaintenanceClientRequest clientRequest = new InsertMaintenanceClientRequest(
+                networkConfig,
+                birthdate++, request, maintenance, requestBytes);
+        clientRequests.push(clientRequest);
+
 
         while (!clientRequests.isEmpty()) {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
-            final Equipement equipements = (Equipement)clientRequest2.getInfo();
+            final Maintenance maintenances = (Maintenance)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    equipement.getNomEquipement(), equipement.getCoutEquipement(), equipement.getDateEquipement(),
+                    maintenance.getTypeMaintenance(), maintenance.getCoutMaintenance(), maintenance.getDateMaintenance(),
                     clientRequest2.getResult());
         }
     }
 
 
-    public Equipements selectEquipements() throws InterruptedException, IOException {
+    public Maintenances selectMaintenances() throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -102,7 +100,7 @@ public class EquipementService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectAllEquipementsClientRequest clientRequest = new SelectAllEquipementsClientRequest(
+        final SelectAllMaintenancesClientRequest clientRequest = new SelectAllMaintenancesClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
         clientRequests.push(clientRequest);
@@ -111,27 +109,27 @@ public class EquipementService {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName()); //Une fenêtre pour afficher les examens
-            return (Equipements) joinedClientRequest.getResult();
+            return (Maintenances) joinedClientRequest.getResult();
         }
         else {
-            logger.error("No students found");
+            logger.error("No Maintenances found");
             return null;
         }
     }
-    public TotalCouts getTotalCoutParJour() throws InterruptedException, IOException {
+    public TotalMaintenances getTotalMaintenanceParJour() throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<>();
         final ObjectMapper objectMapper = new ObjectMapper();
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
-        request.setRequestOrder(totalCoutParJourRequestOrder);
+        request.setRequestOrder(totalMaintenanceParJourRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
 
-        final TotalCoutParJourClientRequest clientRequest = new TotalCoutParJourClientRequest(
+        final TotalMaintenanceParJourClientRequest clientRequest = new TotalMaintenanceParJourClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
         clientRequests.push(clientRequest);
@@ -140,7 +138,7 @@ public class EquipementService {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (TotalCouts) joinedClientRequest.getResult();
+            return (TotalMaintenances) joinedClientRequest.getResult();
         } else {
             logger.error("No total costs found");
             return null;
@@ -149,3 +147,5 @@ public class EquipementService {
 
 
 }
+
+
