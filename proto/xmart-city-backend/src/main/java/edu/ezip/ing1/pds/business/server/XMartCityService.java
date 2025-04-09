@@ -30,7 +30,7 @@ public class XMartCityService {
 
     private enum Queries {
 
-        SELECT_ALL_EXAMENS("SELECT t.id, t.nom, t.cout, t.duree FROM examen t"),
+        SELECT_ALL_EXAMENS("SELECT t.id, t.nom, t.cout, t.duree FROM examen t ORDER BY t.nom"),
         INSERT_EXAMEN("INSERT into examen (nom, cout, duree) values (?, ?, ?)"),
         UPDATE_EXAMEN("UPDATE examen SET nom = ?, cout = ?, duree = ? WHERE id = ?"),
         DELETE_EXAMEN("DELETE FROM examen WHERE id = ?"),
@@ -46,32 +46,32 @@ public class XMartCityService {
         FACTURES_PAYEES("SELECT t.idFacture, t.dateFacture FROM facture t WHERE t.regle=true"),
         FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?"),
 
-        SELECT_ALL_MEDECINS("SELECT m.numeroADELI, m.nom, m.prenom, m.telephone, m.specialite, m.salaire FROM medecin m"),
+        SELECT_ALL_MEDECINS("SELECT m.numeroADELI, m.nom, m.prenom, m.telephone, m.specialite, m.salaire FROM medecin m ORDER BY m.nom, m.prenom, m.specialite"),
         INSERT_MEDECIN("INSERT into medecin (numeroADELI, nom, prenom, telephone, specialite, salaire) values (?, ?, ?, ?, ?, ?)"),
         UPDATE_MEDECIN("UPDATE medecin SET nom = ?, prenom = ?, telephone = ?, specialite = ?, salaire = ? WHERE numeroADELI = ?"),
         DELETE_MEDECIN("DELETE FROM medecin WHERE numeroADELI = ?"),
         SELECT_SPECIALITE_MEDECIN("SELECT m.specialite FROM medecin m"),
         SELECT_MEDECIN_PAR_SPECIALITE("SELECT m.nom, m.prenom FROM medecin m WHERE specialite = ?"),
 
-        SELECT_ALL_HORAIRES("SELECT h.id, h.jour, h.heureDebut, h.heureFin FROM horaire h"),
+        SELECT_ALL_HORAIRES("SELECT h.id, h.jour, h.heureDebut, h.heureFin FROM horaire h ORDER BY h.jour, h.heureDebut"),
         INSERT_HORAIRE("INSERT into horaire (jour, heureDebut, heureFin) values (?, ?, ?)"),
         UPDATE_HORAIRE("UPDATE horaire SET jour = ?, heureDebut = ?, heureFin = ? WHERE id = ?"),
         DELETE_HORAIRE("DELETE FROM horaire WHERE id = ?"),
         ID_HORAIRE("SELECT id FROM horaire WHERE jour = ? AND heureDebut = ? AND heureFin = ?"),
         SELECT_ONE_HORAIRE("SELECT h.id, h.jour, h.heureDebut, h.heureFin FROM horaire h WHERE jour = ? AND heureDebut = ? AND heureFin = ?"),
 
-        SELECT_ALL_SALLES("SELECT s.id, s.numeroSalle, s.typeSalle, s.statut FROM salle s"),
+        SELECT_ALL_SALLES("SELECT s.id, s.numeroSalle, s.typeSalle, s.statut FROM salle s ORDER BY s.typeSalle"),
         INSERT_SALLE("INSERT into salle (numeroSalle, typeSalle, statut) values (?, ?, ?)"),
         UPDATE_SALLE("UPDATE salle SET numeroSalle = ?, typeSalle = ?, statut = ? WHERE id = ?"),
         DELETE_SALLE("DELETE FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
         ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
 
-        SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p"),
+        SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p ORDER BY p.nom, p.prenom "),
         INSERT_PATIENT("INSERT into patient (nom, prenom, telephone, adresse) values (?, ?, ?, ?)"),
         UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
         DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_RENDEZ_VOUS("SELECT p.numeroADELI, p.idPatient, p.id, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
+        SELECT_ALL_RENDEZ_VOUS("SELECT p.idRendezVous, p.numeroADELI, p.idPatient, p.id, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
         INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, id, idSalle, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?)"),
         UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, id = ?, idSalle = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
         DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND id = ?  AND idSalle = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
@@ -119,7 +119,7 @@ public class XMartCityService {
         ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
 
         INSERT_DISPONIBILITE("INSERT into disponibilite (numeroADELI, dateDisponibilite, heureDebut, heureFin, statut) values (?, ?, ?, ?, ?)"),
-        DELETE_DISPONIBILITE("DELETE FROM disponibilite WHERE numeroADELI = ? AND dateDisponibilite = ? AND heureDebut = ? AND heureFin = ? AND statut = 'Indisponible'"),
+        DELETE_DISPONIBILITE("DELETE FROM disponibilite WHERE numeroADELI = ? AND dateDisponibilite = ? AND heureDebut = ? AND heureFin = ? AND statut = 'Réservé'"),
         SELECT_DISPONIBILITE_PAR_DATE("SELECT h.heureDebut, h.heureFin " +
                 "FROM horaire h " +
                 "WHERE jour = (SELECT CASE DAYOFWEEK(?) " +
@@ -137,7 +137,15 @@ public class XMartCityService {
                 "    AND ( (h.heureDebut < d.heureDebut AND h.heureFin > d.heureDebut)" +
                 "    OR (h.heureDebut < d.heureFin AND h.heureFin > d.heureFin))" +
                 "    AND d.statut = 'Réservé' " +
-                ")");
+                ")"),
+
+        SELECT_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p"),
+        INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin, id_Diagnostic, Id_Traitement, id_compteRendu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "),
+        DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
+        UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
+        DESACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 0"),   //Important pour PERMETTRE l'insertion les planifications qui n'ont pas encore de diagnostic, traitement ...
+        ACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 1")
+        ;
         private final String query;
 
         private Queries(final String query) {
@@ -362,7 +370,16 @@ public class XMartCityService {
 
             case SELECT_DISPONIBILITE_PAR_DATE:
                 response = SelectAllDisponibilite(request, connection);
-
+                break;
+            case INSERT_PLANIFICATION:
+                response = InsertPlanification(request, connection);
+                break;
+            case DELETE_PLANIFICATION:
+                response = DeletePlanification(request, connection);
+                break;
+            case SELECT_PLANIFICATION:
+                response = SelectAllPlanifications(request, connection);
+                break;
             default:
                 break;
         }
@@ -923,13 +940,14 @@ public class XMartCityService {
         RendezVouss rdvs = new RendezVouss();
         while (res.next()) {
             RendezVous rdv = new RendezVous();
-            rdv.setNumeroADELI(res.getInt(1));
-            rdv.setIdPatient(res.getInt(2));
-            rdv.setId(res.getInt(3));
-            rdv.setIdSalle(res.getInt(4));
-            rdv.setDateRendezVous(res.getDate(5).toLocalDate());
-            rdv.setHeureDebut(res.getTime(6).toLocalTime());
-            rdv.setHeureFin(res.getTime(7).toLocalTime());
+            rdv.setIdRendezVous(res.getInt(1));
+            rdv.setNumeroADELI(res.getInt(2));
+            rdv.setIdPatient(res.getInt(3));
+            rdv.setId(res.getInt(4));
+            rdv.setIdSalle(res.getInt(5));
+            rdv.setDateRendezVous(res.getDate(6).toLocalDate());
+            rdv.setHeureDebut(res.getTime(7).toLocalTime());
+            rdv.setHeureFin(res.getTime(8).toLocalTime());
             rdvs.add(rdv);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
@@ -1392,6 +1410,110 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(creneaux));
     }
 
+
+    // Méthodes des requêtes sur la table planification
+
+    private Response InsertPlanification(final Request request, final Connection connection) throws IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+
+        final Statement statement1;
+        final Statement statement2;
+        final PreparedStatement stmt;
+        final PreparedStatement stmt2;
+        try {
+            statement1 = connection.createStatement();
+            statement2 = connection.createStatement();
+            stmt = connection.prepareStatement(Queries.INSERT_PLANIFICATION.query);
+            Time debut = Time.valueOf(planification.getHeureDebut());
+            Time fin = Time.valueOf(planification.getHeureFin());
+            Date date = Date.valueOf(planification.getDatePlanification());
+
+            stmt.setInt(1, planification.getNumeroADELI());
+            stmt.setInt(2, planification.getIdPatient());
+            stmt.setInt(3, planification.getIdExamen());
+            stmt.setInt(4, planification.getIdSalle());
+            stmt.setDate(5,date);
+            stmt.setTime(6, debut);
+            stmt.setTime(7, fin);
+            stmt.setInt(8, planification.getIdDiagnostic());
+            stmt.setInt(9, planification.getIdTraitement());
+            stmt.setInt(10, planification.getIdCompteRendu());
+
+            statement1.executeUpdate(Queries.DESACTIVATION_FK.query); //Désactive les contraintes de clés étrangères
+            stmt.executeUpdate();
+            statement2.executeUpdate(Queries.ACTIVATION_FK.query);    //Réactive les contraintes de clés étrangères
+
+            stmt2 = connection.prepareStatement(Queries.INSERT_DISPONIBILITE.query);
+            stmt2.setInt(1, planification.getNumeroADELI());
+            stmt2.setDate(2, date);
+            stmt2.setTime(3, debut);
+            stmt2.setTime(4, fin);
+            stmt2.setString(5, indisponible);
+            stmt2.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planification));
+    }
+
+    private Response DeletePlanification(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PLANIFICATION.query);
+        final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
+
+        final Statement statement1;
+        final Statement statement2;
+        statement1 = connection.createStatement();
+        statement2 = connection.createStatement();
+
+        stmt.setInt(1, planification.getNumeroADELI());
+        stmt.setInt(2, planification.getIdPatient());
+        stmt.setInt(3, planification.getIdExamen());
+        stmt.setInt(4, planification.getIdSalle());
+        stmt.setDate(5, Date.valueOf(planification.getDatePlanification()));
+        stmt.setTime(6, Time.valueOf(planification.getHeureDebut()));
+        stmt.setTime(7, Time.valueOf(planification.getHeureFin()));
+
+        statement1.executeUpdate(Queries.DESACTIVATION_FK.query);
+        stmt.executeUpdate();
+        statement2.executeUpdate(Queries.ACTIVATION_FK.query);
+
+        stmt2.setInt(1, planification.getNumeroADELI());
+        stmt2.setDate(2, Date.valueOf(planification.getDatePlanification()));
+        stmt2.setTime(3, Time.valueOf(planification.getHeureDebut()));
+        stmt2.setTime(4, Time.valueOf(planification.getHeureFin()));
+        stmt2.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planification));
+    }
+
+    private Response SelectAllPlanifications(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_PLANIFICATION.query);
+        PlanificationExamens planificationExamens = new PlanificationExamens();
+        while (res.next()) {
+            PlanificationExamen planificationExamen = new PlanificationExamen();
+            planificationExamen.setIdPlanification(res.getInt(1));
+            planificationExamen.setNumeroADELI(res.getInt(2));
+            planificationExamen.setIdPatient(res.getInt(3));
+            planificationExamen.setIdExamen(res.getInt(4));
+            planificationExamen.setIdSalle(res.getInt(5));
+            planificationExamen.setDatePlanification(res.getDate(6).toLocalDate());
+            planificationExamen.setHeureDebut(res.getTime(7).toLocalTime());
+            planificationExamen.setHeureFin(res.getTime(8).toLocalTime());
+            planificationExamens.add(planificationExamen);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
+    }
 
 
 }
