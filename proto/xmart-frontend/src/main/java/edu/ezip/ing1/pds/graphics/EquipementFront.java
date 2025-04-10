@@ -181,19 +181,25 @@ public class EquipementFront {
     }
 
     private void chargerEquipements() throws IOException, InterruptedException {
-        model.setRowCount(0);
+        model.setRowCount(0);  // Vider le tableau actuel
+
+        // Récupérer les équipements
         Equipements equipements = equipementService.selectEquipements();
+
+        // Si les équipements ne sont pas vides, on trie par date (de la plus ancienne à la plus récente)
         if (equipements != null && equipements.getEquipements() != null) {
-            for (Equipement e : equipements.getEquipements()) {
-                model.addRow(new Object[]{
-                        e.getIdEquipement(),
-                        e.getCoutEquipement(),
-                        e.getNomEquipement(),
-                        e.getDateEquipement()
-                });
-            }
+            equipements.getEquipements().stream()
+                    .sorted((e1, e2) -> e1.getDateEquipement().compareTo(e2.getDateEquipement()))  // Tri par date
+                    .forEach(e -> model.addRow(new Object[]{
+                            e.getIdEquipement(),
+                            e.getCoutEquipement(),
+                            e.getNomEquipement(),
+                            e.getDateEquipement()  // Afficher la date d'achat
+                    }));
         }
     }
+
+
 
     private void viderChamps() {
         idEquipementChamp.setText("");

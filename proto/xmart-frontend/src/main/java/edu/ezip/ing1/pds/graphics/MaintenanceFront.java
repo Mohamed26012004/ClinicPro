@@ -182,19 +182,24 @@ public class MaintenanceFront {
     }
 
     private void chargerMaintenances() throws IOException, InterruptedException {
-        model.setRowCount(0);
+        model.setRowCount(0);  // Vider le tableau actuel
+
+        // Récupérer les maintenances depuis le service
         Maintenances maintenances = maintenanceService.selectMaintenances();
+
+        // Si les maintenances ne sont pas vides, on les trie par date (de la plus ancienne à la plus récente)
         if (maintenances != null && maintenances.getMaintenances() != null) {
-            for (Maintenance e : maintenances.getMaintenances()) {
-                model.addRow(new Object[]{
-                        e.getIdMaintenance(),
-                        e.getCoutMaintenance(),
-                        e.getTypeMaintenance(),
-                        e.getDateMaintenance()
-                });
-            }
+            maintenances.getMaintenances().stream()
+                    .sorted((m1, m2) -> m1.getDateMaintenance().compareTo(m2.getDateMaintenance()))  // Tri par date
+                    .forEach(m -> model.addRow(new Object[]{
+                            m.getIdMaintenance(),                 // ID de la maintenance
+                            m.getCoutMaintenance(),               // Coût de la maintenance
+                            m.getTypeMaintenance(),               // Type de maintenance
+                            m.getDateMaintenance().toString()     // Date de la maintenance (format String)
+                    }));
         }
     }
+
 
     private void viderChamps() {
         idMaintenanceChamp.setText("");

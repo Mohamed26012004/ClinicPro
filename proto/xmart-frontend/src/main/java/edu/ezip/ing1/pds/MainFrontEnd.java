@@ -36,7 +36,7 @@ public class MainFrontEnd {
           TotalMaintenanceFront fen = new TotalMaintenanceFront();
           MaintenanceFront p= new MaintenanceFront();
           //TotalCoutFront tc = new TotalCoutFront();
-          //EquipementFront ef = new EquipementFront();
+          ///EquipementFront ef = new EquipementFront();
           CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
           CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
 ////
