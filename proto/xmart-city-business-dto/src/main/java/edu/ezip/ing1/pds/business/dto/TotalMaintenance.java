@@ -33,7 +33,7 @@ public class TotalMaintenance {
         this.dateMaintenance = dateMaintenance;
     }
 
-    public int getTotalMaintenance() {
+    public double getTotalMaintenance() {
         return totalMaintenance;
     }
 

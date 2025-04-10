@@ -1,22 +1,11 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import edu.ezip.ing1.pds.business.dto.Equipement;
 import edu.ezip.ing1.pds.business.dto.Equipements;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
@@ -28,14 +17,14 @@ public class EquipementFront {
     private DefaultTableModel model;
     private JTable table;
     private final EquipementService equipementService;
-    private DateTimeFormatter formattage = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public EquipementFront() {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-        this.equipementService = new EquipementService (networkConfig);
+        this.equipementService = new EquipementService(networkConfig);
 
-        JFrame frame = new JFrame("Gestion des Equipements");
+        JFrame frame = new JFrame("Gestion des Équipements");
         frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
@@ -43,22 +32,48 @@ public class EquipementFront {
         JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
 
         idEquipementChamp = new JTextField();
-        nomEquipementchamp = new JTextField();
         coutEquipementchamp = new JTextField();
+        nomEquipementchamp = new JTextField();
+        nomEquipementchamp.setEditable(false); // Empêche la saisie manuelle
         dateEquipementChamp = new JTextField();
 
-        panelNord.add(new JLabel("ID Equipement :"));
+        // Liste déroulante personnalisée pour le champ de nom
+        String[] nomsEquipementPredefinis = {
+                "Stéthoscope", "Tensiomètre", "Thermomètre", "Lit", "Gants", "Seringue", "Autoclave"
+        };
+        JList<String> listeEquipements = new JList<>(nomsEquipementPredefinis);
+        JScrollPane scrollPane = new JScrollPane(listeEquipements);
+        scrollPane.setPreferredSize(new Dimension(150, 100));
+        JPopupMenu popupNomEquipement = new JPopupMenu();
+        popupNomEquipement.setLayout(new BorderLayout());
+        popupNomEquipement.add(scrollPane, BorderLayout.CENTER);
+
+        nomEquipementchamp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                popupNomEquipement.show(nomEquipementchamp, 0, nomEquipementchamp.getHeight());
+            }
+        });
+
+        listeEquipements.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                String selection = listeEquipements.getSelectedValue();
+                nomEquipementchamp.setText(selection);
+                popupNomEquipement.setVisible(false);
+            }
+        });
+
+        panelNord.add(new JLabel("ID Équipement :"));
         panelNord.add(idEquipementChamp);
-        panelNord.add(new JLabel("Cout :"));
+        panelNord.add(new JLabel("Coût :"));
         panelNord.add(coutEquipementchamp);
-        panelNord.add(new JLabel("nom Equipement :"));
+        panelNord.add(new JLabel("Nom Équipement :"));
         panelNord.add(nomEquipementchamp);
         panelNord.add(new JLabel("Date Achat :"));
         panelNord.add(dateEquipementChamp);
 
         frame.add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"IDEquipement", "CoutEquipement", "NomEquipement", "Date Achat"};
+        String[] columns = {"ID Équipement", "Coût", "Nom", "Date Achat"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -71,7 +86,6 @@ public class EquipementFront {
         panelSud.add(boutonAjouter);
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
-
         frame.add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
@@ -80,8 +94,6 @@ public class EquipementFront {
                 int cout = Integer.parseInt(coutEquipementchamp.getText().trim());
                 String nomEquipement = nomEquipementchamp.getText().trim();
                 LocalDate dateAchat = LocalDate.parse(dateEquipementChamp.getText().trim(), formattage);
-
-
 
                 if (nomEquipement.isEmpty()) {
                     JOptionPane.showMessageDialog(frame, "Tous les champs doivent être remplis",
@@ -100,7 +112,7 @@ public class EquipementFront {
                 viderChamps();
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le cout doit être un nombre valide",
+                JOptionPane.showMessageDialog(frame, "Le coût doit être un nombre valide",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
@@ -114,8 +126,7 @@ public class EquipementFront {
                 idEquipementChamp.setText(model.getValueAt(i, 0).toString());
                 coutEquipementchamp.setText(model.getValueAt(i, 1).toString());
                 nomEquipementchamp.setText(model.getValueAt(i, 2).toString());
-                dateEquipementChamp.setText(model.getValueAt(i, 3).toString())
-                ;
+                dateEquipementChamp.setText(model.getValueAt(i, 3).toString());
             }
         });
 
@@ -162,7 +173,7 @@ public class EquipementFront {
         try {
             chargerEquipements();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des equipements: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des équipements: " + ex.getMessage(),
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 

@@ -33,7 +33,7 @@ public class TotalCout {
         this.dateAchat = dateAchat;
     }
 
-    public int getTotalCout() {
+    public double getTotalCout() {
         return totalCout;
     }
 
