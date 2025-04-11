@@ -64,6 +64,8 @@ public class XMartCityService {
         INSERT_SALLE("INSERT into salle (numeroSalle, typeSalle, statut) values (?, ?, ?)"),
         UPDATE_SALLE("UPDATE salle SET numeroSalle = ?, typeSalle = ?, statut = ? WHERE id = ?"),
         DELETE_SALLE("DELETE FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
+        UPDATE_SALLE_RESERVATION("UPDATE salle SET statut = 'Réservé' WHERE id = ?"),
+        UPDATE_SALLE_DELETE_RESERVATION("UPDATE salle SET statut = 'Libre' WHERE id = ? "),
         ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
 
         SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p ORDER BY p.nom, p.prenom "),
@@ -144,7 +146,13 @@ public class XMartCityService {
         DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
         UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
         DESACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 0"),   //Important pour PERMETTRE l'insertion les planifications qui n'ont pas encore de diagnostic, traitement ...
-        ACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 1")
+        ACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 1"),
+
+        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE("SELECT id FROM (" +
+                "    SELECT idPlanification AS id FROM planification WHERE idSalle = ?" +
+                "    UNION" +
+                "    SELECT idRendezVous AS id FROM rendezvous WHERE idSalle = ?" +
+                ") AS unionId");
         ;
         private final String query;
 
@@ -379,6 +387,10 @@ public class XMartCityService {
                 break;
             case SELECT_PLANIFICATION:
                 response = SelectAllPlanifications(request, connection);
+                break;
+
+            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE:
+                response = SelectIdRendezVousAndPlanificationParSalle(request, connection);
                 break;
             default:
                 break;
@@ -902,6 +914,7 @@ public class XMartCityService {
 
         final PreparedStatement stmt;
         final PreparedStatement stmt2;
+        final PreparedStatement stmt3;
         try {
             stmt = connection.prepareStatement(Queries.INSERT_RENDEZ_VOUS.query);
             Time debut = Time.valueOf(rdv.getHeureDebut());
@@ -924,6 +937,10 @@ public class XMartCityService {
             stmt2.setTime(4, fin);
             stmt2.setString(5, indisponible);
             stmt2.executeUpdate();
+
+            stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_RESERVATION.query);
+            stmt3.setInt(1, rdv.getIdSalle());
+            stmt3.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -980,6 +997,7 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RENDEZ_VOUS.query);
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
+        final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_DELETE_RESERVATION.query);
 
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
@@ -996,6 +1014,9 @@ public class XMartCityService {
         stmt2.setTime(3, Time.valueOf(rdv.getHeureDebut()));
         stmt2.setTime(4, Time.valueOf(rdv.getHeureFin()));
         stmt2.executeUpdate();
+
+        stmt3.setInt(1, rdv.getIdSalle());
+        stmt3.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
     }
@@ -1422,6 +1443,7 @@ public class XMartCityService {
         final Statement statement2;
         final PreparedStatement stmt;
         final PreparedStatement stmt2;
+        final PreparedStatement stmt3;
         try {
             statement1 = connection.createStatement();
             statement2 = connection.createStatement();
@@ -1453,6 +1475,10 @@ public class XMartCityService {
             stmt2.setString(5, indisponible);
             stmt2.executeUpdate();
 
+            stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_RESERVATION.query);
+            stmt3.setInt(1, planification.getIdSalle());
+            stmt3.executeUpdate();
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
 
@@ -1468,6 +1494,7 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PLANIFICATION.query);
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
+        final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_DELETE_RESERVATION.query);
 
         final Statement statement1;
         final Statement statement2;
@@ -1492,6 +1519,9 @@ public class XMartCityService {
         stmt2.setTime(4, Time.valueOf(planification.getHeureFin()));
         stmt2.executeUpdate();
 
+        stmt3.setInt(1, planification.getIdSalle());
+        stmt3.executeUpdate();
+
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(planification));
     }
 
@@ -1513,6 +1543,26 @@ public class XMartCityService {
             planificationExamens.add(planificationExamen);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
+    }
+
+
+    private Response SelectIdRendezVousAndPlanificationParSalle(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE.query);
+        final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
+
+        stmt.setInt(1, salle.getId());
+        stmt.setInt(2, salle.getId());
+        final ResultSet res = stmt.executeQuery();
+
+        RendezVouss rdvs = new RendezVouss();
+        while (res.next()) {
+            RendezVous rdv = new RendezVous();
+            rdv.setIdRendezVous(res.getInt(1));
+
+            rdvs.add(rdv);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
     }
 
 
