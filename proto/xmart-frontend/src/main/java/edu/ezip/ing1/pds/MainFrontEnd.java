@@ -28,8 +28,8 @@ public class MainFrontEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-//        Fenetre fen = new Fenetre();
-//        fen.setVisible(true);
+        Fenetre fen = new Fenetre();
+        fen.setVisible(true);
 
 //        EquipementFront f = new EquipementFront();
 
@@ -43,10 +43,10 @@ public class MainFrontEnd {
 //        Date dat = new Date();
 //        Facture fac = new Facture(true, dat);
 
-        final String networkConfigFile = "network.yaml";
-        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-        final RendezVousService rdvService = new RendezVousService(networkConfig);
-        final CreneauService creneauService = new CreneauService(networkConfig);
+//        final String networkConfigFile = "network.yaml";
+//        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+//        final RendezVousService rdvService = new RendezVousService(networkConfig);
+//        final CreneauService creneauService = new CreneauService(networkConfig);
 //        final TraitementService traitementService = new TraitementService(networkConfig);
 //        final AntecedentMedicalService antecedentMedicalService = new AntecedentMedicalService(networkConfig);
 //        final PatientService patientService = new PatientService (networkConfig);
@@ -63,17 +63,17 @@ public class MainFrontEnd {
 //        Factures factures = factureService.selectFactures();
 //        System.out.println(factures);
 
-        LocalDate  date = LocalDate.now();
-        LocalTime debut = LocalTime.of(16, 00);
-        LocalTime fin = LocalTime.of(16, 30);
+//        LocalDate  date = LocalDate.now();
+//        LocalTime debut = LocalTime.of(16, 00);
+//        LocalTime fin = LocalTime.of(16, 30);
 
 //        RendezVous rendezVous = new RendezVous(0, 3, 6, 2, date, debut, fin);
 //
 //        rdvService.insertRendezVous(rendezVous);
 
-        RendezVous rdv = new RendezVous();
-        rdv.setDateRendezVous(date);
-        System.out.println(creneauService.selectCreneauxParDate(rdv));
+//        RendezVous rdv = new RendezVous();
+//        rdv.setDateRendezVous(date);
+//        System.out.println(creneauService.selectCreneauxParDate(rdv));
 
 
     }
