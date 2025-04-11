@@ -30,7 +30,7 @@ public class Fenetre extends JFrame{
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-            contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
+//            contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
 
         }
             
@@ -65,7 +65,13 @@ public class Fenetre extends JFrame{
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     contentPane.removeAll();
-                    contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
+                    try {
+                        contentPane.add(new PanelManipulationExamen(), BorderLayout.CENTER);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     contentPane.add(PanelGauche(), BorderLayout.WEST);
                     contentPane.repaint();
                     contentPane.revalidate();
