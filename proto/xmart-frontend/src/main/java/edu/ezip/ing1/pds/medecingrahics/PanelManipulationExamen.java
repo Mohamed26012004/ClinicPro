@@ -1,12 +1,10 @@
 package edu.ezip.ing1.pds.medecingrahics;
 
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
-import edu.ezip.ing1.pds.business.dto.Paiement;
-import edu.ezip.ing1.pds.business.dto.Paiements;
+import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.ExamenService;
+import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,13 +21,14 @@ public class PanelManipulationExamen extends JPanel {
     final String networkConfigFile = "network.yaml";
     final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
     final ExamenService examenService = new ExamenService(networkConfig);
+    final RendezVousService rdvService = new RendezVousService(networkConfig);
     private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     private InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("delete_button.png");
-    private String deleteFileNameButton = "/delete_button.png";
-    private String addFileNameButton = "add_button.png";
-    private String updateFileNameButton = "update_button.png";
-    private String informationFileNameButton = "information_button.png";
+    private String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
+    private String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
+    private String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
+    private String informationFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\information_button.png";
 
     private DefaultTableModel model;
     private JTable table;
@@ -47,7 +46,12 @@ public class PanelManipulationExamen extends JPanel {
 
         add(this.toolBar(), BorderLayout.NORTH);
         String[] columns = {"ID", "Nom", "Coût", "Durée"};
-        model = new DefaultTableModel(columns, 0);
+        model = new DefaultTableModel(columns, 0){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         chargerExamens();
         table = new JTable(model);
         table.setRowHeight(30);
@@ -151,9 +155,20 @@ public class PanelManipulationExamen extends JPanel {
 
         JLabel label = new JLabel("LISTE DES EXAMENS");
 
-        JButton addButton = new JButton(new ImageIcon(addFileNameButton));
-        JButton update = new JButton(new ImageIcon(updateFileNameButton));
-        JButton delete = new JButton(new ImageIcon(deleteFileNameButton));
+        ImageIcon addImage = new ImageIcon(addFileNameButton);
+        Image i = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        addImage = new ImageIcon(i);
+        JButton addButton = new JButton(addImage);
+
+        ImageIcon updateImage = new ImageIcon(updateFileNameButton);
+        Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        updateImage = new ImageIcon(u);
+        JButton update = new JButton(updateImage);
+
+        ImageIcon deleteImage = new ImageIcon(deleteFileNameButton);
+        Image d = deleteImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        deleteImage = new ImageIcon(d);
+        JButton delete = new JButton(deleteImage);
 
 
         delete.addActionListener(new ActionListener() {
@@ -163,14 +178,24 @@ public class PanelManipulationExamen extends JPanel {
                 try {
                     int i = table.getSelectedRow();
                     if (i >= 0) {
+
                         Examen examen = new Examen();
                         examen.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
                         examen.setNom(model.getValueAt(i, 1).toString());
                         examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
                         examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
 
-                        examenService.deleteExamen(examen);
-                        chargerExamens();
+                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(examen);
+
+                        if (rdvs != null){
+                            JOptionPane.showMessageDialog(null, "Examen PROGRAMME. Impossible de le supprimer." +
+                                    "\nVeillez supprimer les rendez-vous et les planifications consernées par l'examen avant de le supprimer ", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        }else {
+                            examenService.deleteExamen(examen);
+                            chargerExamens();
+                        }
+
+
                     }
 
                 }catch (InterruptedException ex) {
