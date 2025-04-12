@@ -18,7 +18,7 @@ public class RendezVous {
 
     private int idRendezVous;
     private int idPatient;
-    private int id;
+    private int idExamen;
     private int idSalle;
     private int numeroADELI;
     @JsonDeserialize(using = DeserialisationDate.class)
@@ -36,19 +36,19 @@ public class RendezVous {
 
     public final RendezVous build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "numeroADELI", "idPatient","id", "idSalle", "dateRendezVous", "heureDebut", "heureFin");
+        setFieldsFromResulset(resultSet, "numeroADELI", "idPatient","idExamen", "idSalle", "dateRendezVous", "heureDebut", "heureFin");
         return this;
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         return buildPreparedStatement(preparedStatement, String.valueOf(numeroADELI), String.valueOf(idPatient),
-        String.valueOf(id), String.valueOf(idSalle), dateRendezVous.format(formatDate), heureDebut.format(formatHeure), heureFin.format(formatHeure));
+        String.valueOf(idExamen), String.valueOf(idSalle), dateRendezVous.format(formatDate), heureDebut.format(formatHeure), heureFin.format(formatHeure));
     }
-    public RendezVous(int numeroADELI, int idPatient, int id, int idSalle, LocalDate dateRendezVous, LocalTime heureDebut, LocalTime heureFin) {
+    public RendezVous(int numeroADELI, int idPatient, int idExamen, int idSalle, LocalDate dateRendezVous, LocalTime heureDebut, LocalTime heureFin) {
         this.numeroADELI = numeroADELI;
         this.idPatient = idPatient;
-        this.id = id;
+        this.idExamen = idExamen;
         this.idSalle = idSalle;
         this.heureFin = heureFin;
         this.heureDebut = heureDebut;
@@ -77,8 +77,8 @@ public class RendezVous {
     public int getIdPatient() {
         return idPatient;
     }
-    public int getId() {
-        return id;
+    public int getIdExamen() {
+        return idExamen;
     }
     public int getIdRendezVous() {
         return idRendezVous;
@@ -98,7 +98,7 @@ public class RendezVous {
 
 
 
-    @JsonProperty("rendezvous_dateRedezVous")
+    @JsonProperty("rendezvous_dateRendezVous")
     public void setDateRendezVous(LocalDate dateRendezVous) {
         this.dateRendezVous = dateRendezVous;
     }
@@ -110,9 +110,9 @@ public class RendezVous {
     public void setHeureFin(LocalTime heureFin) {
         this.heureFin = heureFin;
     }
-    @JsonProperty("rendezvous_id")
-    public void setId(int id) {
-        this.id = id;
+    @JsonProperty("rendezvous_idExamen")
+    public void setIdExamen(int idExamen) {
+        this.idExamen = idExamen;
     }
     @JsonProperty("rendezvous_idPatient")
     public void setIdPatient(int idPatient) {
@@ -136,7 +136,7 @@ public class RendezVous {
         return "RendezVous{" +
                 ", heureDebut=" + heureDebut +
                 ", heureFin=" + heureFin +
-                ", id=" + id +
+                ", idExamen=" + idExamen +
                 ", idPatient=" + idPatient +
                 ", idRendezVous=" + idRendezVous +
                 ", idSalle=" + idSalle +

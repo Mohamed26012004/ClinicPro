@@ -26,7 +26,7 @@ public class RendezVousService {
     final String selectRequestOrder = "SELECT_ALL_RENDEZ_VOUS";
     final String updateRequestOrder = "UPDATE_RENDEZ_VOUS";
     final String deleteRequestOrder = "DELETE_RENDEZ_VOUS";
-    final String selectIdRendezVousAndPlanificationRequestOrder = "SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE";
+    final String selectIdRendezVousAndPlanificationRequestOrder = "SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN";
 
     private final NetworkConfig networkConfig;
     public RendezVousService(NetworkConfig networkConfig) {
@@ -72,7 +72,7 @@ public class RendezVousService {
             final RendezVous r = (RendezVous)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    r.getNumeroADELI(), r.getIdPatient(), r.getId(), r.getDateRendezVous(),
+                    r.getNumeroADELI(), r.getIdPatient(), r.getIdExamen(), r.getDateRendezVous(),
                     r.getHeureDebut(), r.getHeureFin(),
                     clientRequest2.getResult());
         }
@@ -106,11 +106,11 @@ public class RendezVousService {
         }
     }
 
-    public RendezVouss selectIdRendezVousAndPlanificationParSalle(Salle salle) throws InterruptedException, IOException {
+    public RendezVouss selectIdRendezVousAndPlanificationParExamen(Examen examen) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(salle);
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(examen);
         final String requestId = UUID.randomUUID().toString();
 
         final Request request = new Request();
@@ -122,7 +122,7 @@ public class RendezVousService {
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
         final SelectIdRendezVousAndPlanificationClientRequest clientRequest = new SelectIdRendezVousAndPlanificationClientRequest(
                 networkConfig,
-                birthdate++, request, salle, requestBytes);
+                birthdate++, request, examen, requestBytes);
         clientRequests.push(clientRequest);
 
         if(!clientRequests.isEmpty()) {

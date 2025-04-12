@@ -73,10 +73,10 @@ public class XMartCityService {
         UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
         DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_RENDEZ_VOUS("SELECT p.idRendezVous, p.numeroADELI, p.idPatient, p.id, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
-        INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, id, idSalle, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?)"),
-        UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, id = ?, idSalle = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
-        DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND id = ?  AND idSalle = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
+        SELECT_ALL_RENDEZ_VOUS("SELECT p.idRendezVous, p.numeroADELI, p.idPatient, p.idExamen, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
+        INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, idExamen, idSalle, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?)"),
+        UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
+        DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ?  AND idSalle = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
 
         INSERT_CONSULTE("INSERT into consulte (numeroADELI, id) values (?, ?)"),
         SELECT_HORAIRE_MEDECIN("SELECT h.jour, h.heureDebut, h.heureFin FROM horaire h, consulte c, medecin m WHERE m.numeroADELI = ? AND m.numeroADELI = c.numeroADELI AND h.id = c.id "),
@@ -148,10 +148,10 @@ public class XMartCityService {
         DESACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 0"),   //Important pour PERMETTRE l'insertion les planifications qui n'ont pas encore de diagnostic, traitement ...
         ACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 1"),
 
-        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE("SELECT id FROM (" +
-                "    SELECT idPlanification AS id FROM planification WHERE idSalle = ?" +
+        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN("SELECT id FROM (" +
+                "    SELECT idPlanification AS id FROM planification WHERE idExamen = ?" +
                 "    UNION" +
-                "    SELECT idRendezVous AS id FROM rendezvous WHERE idSalle = ?" +
+                "    SELECT idRendezVous AS id FROM rendezvous WHERE idExamen = ?" +
                 ") AS unionId");
         ;
         private final String query;
@@ -389,8 +389,8 @@ public class XMartCityService {
                 response = SelectAllPlanifications(request, connection);
                 break;
 
-            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE:
-                response = SelectIdRendezVousAndPlanificationParSalle(request, connection);
+            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN:
+                response = SelectIdRendezVousAndPlanificationParExamen(request, connection);
                 break;
             default:
                 break;
@@ -923,7 +923,7 @@ public class XMartCityService {
 
             stmt.setInt(1, rdv.getNumeroADELI());
             stmt.setInt(2, rdv.getIdPatient());
-            stmt.setInt(3, rdv.getId());
+            stmt.setInt(3, rdv.getIdExamen());
             stmt.setInt(4, rdv.getIdSalle());
             stmt.setDate(5,date);
             stmt.setTime(6, debut);
@@ -960,7 +960,7 @@ public class XMartCityService {
             rdv.setIdRendezVous(res.getInt(1));
             rdv.setNumeroADELI(res.getInt(2));
             rdv.setIdPatient(res.getInt(3));
-            rdv.setId(res.getInt(4));
+            rdv.setIdExamen(res.getInt(4));
             rdv.setIdSalle(res.getInt(5));
             rdv.setDateRendezVous(res.getDate(6).toLocalDate());
             rdv.setHeureDebut(res.getTime(7).toLocalTime());
@@ -979,7 +979,7 @@ public class XMartCityService {
 
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
+        stmt.setInt(3, rdv.getIdExamen());
         stmt.setInt(4, rdv.getIdSalle());
         stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
         stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
@@ -1001,7 +1001,7 @@ public class XMartCityService {
 
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
+        stmt.setInt(3, rdv.getIdExamen());
         stmt.setInt(4, rdv.getIdSalle());
         stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
         stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
@@ -1546,13 +1546,13 @@ public class XMartCityService {
     }
 
 
-    private Response SelectIdRendezVousAndPlanificationParSalle(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response SelectIdRendezVousAndPlanificationParExamen(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_SALLE.query);
-        final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN.query);
+        final Examen examen = objectMapper.readValue(request.getRequestBody(), Examen.class);
 
-        stmt.setInt(1, salle.getId());
-        stmt.setInt(2, salle.getId());
+        stmt.setInt(1, examen.getId());
+        stmt.setInt(2, examen.getId());
         final ResultSet res = stmt.executeQuery();
 
         RendezVouss rdvs = new RendezVouss();
