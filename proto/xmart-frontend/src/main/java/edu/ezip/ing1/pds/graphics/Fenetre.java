@@ -93,7 +93,13 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 contentPane.removeAll();
-                contentPane.add(PanelManipulationSalle.afficheSalle(), BorderLayout.CENTER);
+                try {
+                    contentPane.add(new PanelManipulationSalle(),BorderLayout.CENTER);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
 //                contentPane.add(menuBar(), BorderLayout.NORTH);
                 contentPane.repaint();
@@ -190,6 +196,12 @@ public class Fenetre extends JFrame{
         JLabel label = new JLabel(java.lang.String.valueOf(text));
         label.setFont(new Font("Arial", Font.PLAIN, 16));
         return label;
+    }
+
+    public static JTextField createTextField(String text){
+        JTextField t = new JTextField(text);
+        t.setFont(new Font("Arial", Font.PLAIN, 14));
+        return t;
     }
 
 //    public JMenuBar menuBar(){

@@ -26,7 +26,6 @@ public class PanelManipulationExamen extends JPanel {
     final RendezVousService rdvService = new RendezVousService(networkConfig);
     private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
-    private InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("delete_button.png");
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
     private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
     private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
@@ -128,8 +127,8 @@ public class PanelManipulationExamen extends JPanel {
                         }else {
                             examenService.deleteExamen(examen);
                             chargerExamens();
-                            PanelManipulationExamen.this.repaint();
-                            PanelManipulationExamen.this.revalidate();
+                            JOptionPane.showMessageDialog(null, "Examen supprimé.", "Message", JOptionPane.INFORMATION_MESSAGE);
+
                         }
                     }
                 }catch (InterruptedException ex) {
@@ -155,8 +154,6 @@ public class PanelManipulationExamen extends JPanel {
 
                         FrameCreationExamen f = new FrameCreationExamen(examen);
                         chargerExamens();
-                        PanelManipulationExamen.this.repaint();
-                        PanelManipulationExamen.this.revalidate();
                     }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);

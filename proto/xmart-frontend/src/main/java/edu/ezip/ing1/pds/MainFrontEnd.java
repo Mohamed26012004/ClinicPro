@@ -20,6 +20,7 @@ import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 import edu.ezip.ing1.pds.servicesplanning.CreneauService;
 import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
+import edu.ezip.ing1.pds.servicesplanning.SalleService;
 
 import javax.swing.*;
 
@@ -48,6 +49,11 @@ public class MainFrontEnd {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         final RendezVousService rdvService = new RendezVousService(networkConfig);
+        final SalleService salleService = new SalleService(networkConfig);
+
+//        Salle s = new Salle("A1234566", "Consultation", "Réservé");
+//        s.setId(2);
+//        salleService.updateSalle(s);
 //        final CreneauService creneauService = new CreneauService(networkConfig);
 //        final TraitementService traitementService = new TraitementService(networkConfig);
 //        final AntecedentMedicalService antecedentMedicalService = new AntecedentMedicalService(networkConfig);

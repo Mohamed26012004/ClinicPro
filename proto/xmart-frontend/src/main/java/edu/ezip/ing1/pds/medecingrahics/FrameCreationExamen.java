@@ -65,12 +65,10 @@ public class FrameCreationExamen extends JFrame {
             valueCout = new JTextField(String.valueOf(exam.getCout()));;
 
         }else {
-            valueId = new JLabel("######");
-            valueId.setFont(new Font("Arial", Font.PLAIN, 14));
-            valueNom = new JTextField("");
-            valueNom.setFont(new Font("Arial", Font.PLAIN, 14));
-            valueCout = new JTextField("");
-            valueCout.setFont(new Font("Arial", Font.PLAIN, 14));
+            valueId = Fenetre.createLabel("######");
+            valueNom = Fenetre.createTextField("");
+            valueCout = Fenetre.createTextField("");
+
         }
 
         panel.add(labelId);
@@ -128,6 +126,7 @@ public class FrameCreationExamen extends JFrame {
                                     examenService.updateExamen(exam);
                                     FrameCreationExamen.this.dispose();
                                     PanelManipulationExamen.chargerExamens();
+                                    JOptionPane.showMessageDialog(null, "Mise à jour effectuée.", "Message", JOptionPane.INFORMATION_MESSAGE);
                                 } catch (InterruptedException ex) {
                                     throw new RuntimeException(ex);
                                 } catch (IOException ex) {
@@ -138,6 +137,7 @@ public class FrameCreationExamen extends JFrame {
                                     examenService.insertExamen(examen);
                                     FrameCreationExamen.this.dispose();
                                     PanelManipulationExamen.chargerExamens();
+                                    JOptionPane.showMessageDialog(null, "L'examen a bien été ajouté.", "Message", JOptionPane.INFORMATION_MESSAGE);
                                 } catch (InterruptedException ex) {
                                     throw new RuntimeException(ex);
                                 } catch (IOException ex) {
@@ -148,7 +148,7 @@ public class FrameCreationExamen extends JFrame {
                         }
 
                     } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(null, "Le Coût doit être un nombre positif", "Erreur sur coût", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Le Coût doit être un nombre positif.", "Erreur sur coût", JOptionPane.ERROR_MESSAGE);
                         throw new RuntimeException(ex);
                     }
 
