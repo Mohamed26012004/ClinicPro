@@ -15,22 +15,24 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class PanelManipulationExamen extends JPanel {
 
-    final String networkConfigFile = "network.yaml";
-    final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-    final ExamenService examenService = new ExamenService(networkConfig);
+    final static String networkConfigFile = "network.yaml";
+    static final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+    static final ExamenService examenService = new ExamenService(networkConfig);
     final RendezVousService rdvService = new RendezVousService(networkConfig);
     private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     private InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("delete_button.png");
-    private String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
-    private String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
-    private String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
-    private String informationFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\information_button.png";
+    private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
+    private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
+    private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
 
-    private DefaultTableModel model;
+
+    private static DefaultTableModel model;
     private JTable table;
     private static JButton ajouter;
     private static JButton modifier;
@@ -42,10 +44,16 @@ public class PanelManipulationExamen extends JPanel {
     public PanelManipulationExamen() throws IOException, InterruptedException {
 
         setLayout(new BorderLayout());
-
-
+        setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(this.toolBar(), BorderLayout.NORTH);
-        String[] columns = {"ID", "Nom", "Coût", "Durée"};
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        JLabel l = new JLabel("LISTE DES EXAMENS");
+        l.setFont(new Font("Arial", Font.BOLD, 17));
+        panel.add(l, BorderLayout.NORTH);
+
+        String[] columns = {"ID", "Nom", "Coût (€)", "Durée"};
         model = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -57,88 +65,18 @@ public class PanelManipulationExamen extends JPanel {
         table.setRowHeight(30);
         table.setFont(new Font("Arial", Font.PLAIN, 15));
         JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        add(panel, BorderLayout.CENTER);
     }
 
-
-//    public static JPanel afficheExamens() {
-//        PanelManipulationExamen panel = new  PanelManipulationExamen();
-//        scrollPane = new JScrollPane(panel);
-//
-//        panneau.removeAll();
-//        panneau.add(scrollPane, BorderLayout.CENTER);
-//
-//        panneau.add(boutons(), BorderLayout.NORTH);
-//
-//        panneau.revalidate();
-//        panneau.repaint();
-//
-//        return panneau;
-//    }
-
-//    public static JPanel boutons(){
-//        JPanel pane = new JPanel(new FlowLayout(FlowLayout.LEFT));
-//        ajouter = new JButton("Ajouter");
-//        ajouter.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//
-//                FrameCreationExamen fen = new FrameCreationExamen(null);
-//                PanelManipulationExamen.afficheExamens().revalidate();
-//                PanelManipulationExamen.afficheExamens().repaint();
-//            }
-//        });
-//        pane.add(ajouter);
-//
-//        modifier = new JButton("Modifier");
-//        modifier.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                Examen examen = new Examen();
-//                PanelExamen p = PanelExamen.panelExamenCliquer;
-//                p.setBackground(null);
-//                examen = p.ExamenOfPanel();
-//                FrameCreationExamen fen = new FrameCreationExamen(examen);
-//                PanelManipulationExamen.afficheExamens().revalidate();
-//                PanelManipulationExamen.afficheExamens().repaint();
-//            }
-//        });
-//        pane.add(modifier);
-//        supprimer = new JButton("Supprimer");
-//        supprimer.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                Examen examen = new Examen();
-//                PanelExamen p = PanelExamen.panelExamenCliquer;
-//                p.setBackground(null);
-//                examen = p.ExamenOfPanel();
-//
-//                final String networkConfigFile = "network.yaml";
-//                final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-//                final ExamenService examenService = new ExamenService(networkConfig);
-//                try {
-//                    examenService.deleteExamen(examen);
-//                } catch (InterruptedException ex) {
-//                    throw new RuntimeException(ex);
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                }
-//                PanelManipulationExamen.afficheExamens().revalidate();
-//                PanelManipulationExamen.afficheExamens().repaint();
-//            }
-//        });
-//        pane.add(supprimer);
-//
-//        return pane;
-//    }
-
-
-    public void chargerExamens() throws IOException, InterruptedException {
+    public static void chargerExamens() throws IOException, InterruptedException {
         model.setRowCount(0);
 
         Examens examens = examenService.selectExamens();
         if (examens != null && examens.getExamens() != null) {
-            for (Examen examen : examens.getExamens()){
+            ArrayList<Examen> list = new ArrayList<>(examens.getExamens());
+            list.sort(Comparator.comparing(Examen::getNom));              //Order by nom
+            for (Examen examen : list){
                 model.addRow(new Object[]{
                         examen.getId(),
                         examen.getNom(),
@@ -152,13 +90,10 @@ public class PanelManipulationExamen extends JPanel {
     public JToolBar toolBar(){
         JToolBar bar = new JToolBar();
 
-
-        JLabel label = new JLabel("LISTE DES EXAMENS");
-
         ImageIcon addImage = new ImageIcon(addFileNameButton);
         Image i = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
         addImage = new ImageIcon(i);
-        JButton addButton = new JButton(addImage);
+        JButton addButton = new JButton("Nouvel examen", addImage);
 
         ImageIcon updateImage = new ImageIcon(updateFileNameButton);
         Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
@@ -187,17 +122,16 @@ public class PanelManipulationExamen extends JPanel {
 
                         RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(examen);
 
-                        if (rdvs != null){
+                        if (!rdvs.getRdvs().isEmpty()){
                             JOptionPane.showMessageDialog(null, "Examen PROGRAMME. Impossible de le supprimer." +
-                                    "\nVeillez supprimer les rendez-vous et les planifications consernées par l'examen avant de le supprimer ", "Erreur", JOptionPane.ERROR_MESSAGE);
+                                    "\nVeillez supprimer les rendez-vous et les planifications consernées par l'examen avant de le supprimer. ", "Erreur", JOptionPane.ERROR_MESSAGE);
                         }else {
                             examenService.deleteExamen(examen);
                             chargerExamens();
+                            PanelManipulationExamen.this.repaint();
+                            PanelManipulationExamen.this.revalidate();
                         }
-
-
                     }
-
                 }catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 } catch (IOException ex) {
@@ -206,11 +140,53 @@ public class PanelManipulationExamen extends JPanel {
 
             }
         });
+        update.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int i = table.getSelectedRow();
+                    if (i >= 0) {
 
-        bar.add(label);
+                        Examen examen = new Examen();
+                        examen.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                        examen.setNom(model.getValueAt(i, 1).toString());
+                        examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
+                        examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
+
+                        FrameCreationExamen f = new FrameCreationExamen(examen);
+                        chargerExamens();
+                        PanelManipulationExamen.this.repaint();
+                        PanelManipulationExamen.this.revalidate();
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    FrameCreationExamen f = new FrameCreationExamen(null);
+                    chargerExamens();
+                } catch (IOException | InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        addButton.setBackground(new Color(113, 70, 255));
+        update.setToolTipText("Modifier");
+        delete.setToolTipText("Supprimer");
         bar.add(addButton);
+        bar.addSeparator(new Dimension( 10, 10));
         bar.add(update);
+        bar.addSeparator(new Dimension( 10, 10));
         bar.add(delete);
         return bar;
     }
+
+
+
 }

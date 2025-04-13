@@ -21,16 +21,18 @@ public class Fenetre extends JFrame{
         private static JLabel boutonEquipement;
         private static JLabel boutonPaiement;
 
-    public Fenetre(){
-            super("Demo");
+    public Fenetre() throws IOException, InterruptedException {
+            super("ClinicPro");
             setExtendedState(JFrame.MAXIMIZED_BOTH);
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             contentPane = (JPanel)getContentPane();
             contentPane.setLayout(new BorderLayout());
+//            contentPane.add(menuBar(), BorderLayout.NORTH);
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-//            contentPane.add(PanelManipulationExamen.afficheExamens(), BorderLayout.CENTER);
+            contentPane.add(new PanelManipulationExamen(), BorderLayout.CENTER);
+
 
         }
             
@@ -56,7 +58,7 @@ public class Fenetre extends JFrame{
         }
 
         public JPanel panelBoutonExamen(){
-            boutonExamem = new JLabel("Examens");
+            boutonExamem = createLabel("Examen");
             JPanel panelExamen = new JPanel();
             panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             panelExamen.add(boutonExamem);
@@ -72,6 +74,7 @@ public class Fenetre extends JFrame{
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
+//                    contentPane.add(menuBar(), BorderLayout.NORTH);
                     contentPane.add(PanelGauche(), BorderLayout.WEST);
                     contentPane.repaint();
                     contentPane.revalidate();
@@ -81,7 +84,7 @@ public class Fenetre extends JFrame{
         }
 
     public JPanel panelBoutonSalle(){
-        boutonSalle = new JLabel("Salles");
+        boutonSalle = createLabel("Salle");
         JPanel panel = new JPanel();
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panel.add(boutonSalle);
@@ -92,6 +95,7 @@ public class Fenetre extends JFrame{
                 contentPane.removeAll();
                 contentPane.add(PanelManipulationSalle.afficheSalle(), BorderLayout.CENTER);
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
+//                contentPane.add(menuBar(), BorderLayout.NORTH);
                 contentPane.repaint();
                 contentPane.revalidate();
             }
@@ -100,7 +104,7 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonEquipement(){
-        boutonEquipement = new JLabel("Equipement");
+        boutonEquipement = createLabel("Equipement");
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
@@ -114,7 +118,7 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonPaiement(){
-        boutonExamem = new JLabel("Paiement");
+        boutonExamem = createLabel("Paiement");
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonExamem);
@@ -128,7 +132,7 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonDiagnostic(){
-        boutonExamem = new JLabel("Diagnostic");
+        boutonExamem = createLabel("Diagnostic");
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonExamem);
@@ -143,7 +147,7 @@ public class Fenetre extends JFrame{
 
 
     public JPanel panelBoutonMedecint(){
-        JLabel label = new JLabel("Médécins");
+        JLabel label = createLabel("Médecin");
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(label);
@@ -181,5 +185,21 @@ public class Fenetre extends JFrame{
             }
         });
     }
+
+    public static JLabel createLabel(String text){
+        JLabel label = new JLabel(java.lang.String.valueOf(text));
+        label.setFont(new Font("Arial", Font.PLAIN, 16));
+        return label;
+    }
+
+//    public JMenuBar menuBar(){
+//        JMenuBar bar = new JMenuBar();
+//        bar.setPreferredSize(new Dimension(0, 35));
+//        JMenu compte = new JMenu("Compte");
+//        compte.setFont(new Font("Arial", Font.PLAIN, 16));
+//        bar.add(compte);
+//
+//        return bar;
+//    }
 
 }
