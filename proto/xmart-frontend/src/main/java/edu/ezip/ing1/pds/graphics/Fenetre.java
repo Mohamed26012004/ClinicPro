@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.medecingrahics.InsertUpdateMedecinWindows;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
+import edu.ezip.ing1.pds.medecingrahics.PanelManipulationMedecin;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
 
 import java.awt.*;
@@ -39,6 +40,7 @@ public class Fenetre extends JFrame{
 
             cartePanel.add(new PanelManipulationExamen(), "Examen");
             cartePanel.add(new PanelManipulationSalle(), "Salle");
+            cartePanel.add(new PanelManipulationMedecin(), "Medecin");
             contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -56,7 +58,7 @@ public class Fenetre extends JFrame{
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonEquipement());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
-            pane.add(panelBoutonMedecint());
+            pane.add(panelBoutonMedecin());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
             pane.add(panelBoutonPaiement());
             pane.add(Box.createRigidArea(new Dimension(0, 15)));
@@ -95,7 +97,6 @@ public class Fenetre extends JFrame{
                 card.show(cartePanel, "Salle");
             }
         });
-
         return panel;
     }
 
@@ -142,7 +143,7 @@ public class Fenetre extends JFrame{
     }
 
 
-    public JPanel panelBoutonMedecint(){
+    public JPanel panelBoutonMedecin(){
         JLabel label = createLabel("Médecin");
         JPanel panelExamen = new JPanel();
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
@@ -151,13 +152,7 @@ public class Fenetre extends JFrame{
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    InsertUpdateMedecinWindows f = new InsertUpdateMedecinWindows(null);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
+               card.show(cartePanel, "Medecin");
             }
         });
         return panelExamen;
