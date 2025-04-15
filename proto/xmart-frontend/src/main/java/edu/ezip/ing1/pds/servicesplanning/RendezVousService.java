@@ -106,11 +106,11 @@ public class RendezVousService {
         }
     }
 
-    public RendezVouss selectIdRendezVousAndPlanificationParExamen(Examen examen) throws InterruptedException, IOException {
+    public RendezVouss selectIdRendezVousAndPlanificationParExamen(RendezVous rdv) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(examen);
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rdv);
         final String requestId = UUID.randomUUID().toString();
 
         final Request request = new Request();
@@ -122,7 +122,7 @@ public class RendezVousService {
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
         final SelectIdRendezVousAndPlanificationClientRequest clientRequest = new SelectIdRendezVousAndPlanificationClientRequest(
                 networkConfig,
-                birthdate++, request, examen, requestBytes);
+                birthdate++, request, rdv, requestBytes);
         clientRequests.push(clientRequest);
 
         if(!clientRequests.isEmpty()) {

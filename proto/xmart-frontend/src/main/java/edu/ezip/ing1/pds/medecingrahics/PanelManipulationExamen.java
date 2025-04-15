@@ -119,7 +119,9 @@ public class PanelManipulationExamen extends JPanel {
                         examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
                         examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
 
-                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(examen);
+                        RendezVous rdv = new RendezVous();
+                        rdv.setIdExamen(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(rdv);
 
                         if (!rdvs.getRdvs().isEmpty()){
                             JOptionPane.showMessageDialog(null, "Examen PROGRAMME. Impossible de le supprimer." +

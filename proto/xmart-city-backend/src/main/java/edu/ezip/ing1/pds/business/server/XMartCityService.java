@@ -152,8 +152,13 @@ public class XMartCityService {
                 "    SELECT idPlanification AS id FROM planification WHERE idExamen = ?" +
                 "    UNION" +
                 "    SELECT idRendezVous AS id FROM rendezvous WHERE idExamen = ?" +
+                ") AS unionId"),
+        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN("SELECT id FROM (" +
+                "    SELECT idPlanification AS id FROM planification WHERE numeroADELI = ?" +
+                "    UNION" +
+                "    SELECT idRendezVous AS id FROM rendezvous WHERE numeroADELI = ?" +
                 ") AS unionId");
-        ;
+
         private final String query;
 
         private Queries(final String query) {
@@ -250,8 +255,6 @@ public class XMartCityService {
                 response = SelectOneHoraire(request, connection);
                 break;
             case UPDATE_HORAIRE:
-
-
                 response = UpdateHoraire(request, connection);
             case INSERT_SALLE:
                 response = InsertSalle(request, connection);
@@ -391,6 +394,9 @@ public class XMartCityService {
 
             case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN:
                 response = SelectIdRendezVousAndPlanificationParExamen(request, connection);
+                break;
+            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN:
+                response = SelectIdRendezVousAndPlanificationParMedecin(request, connection);
                 break;
             default:
                 break;
@@ -1549,22 +1555,40 @@ public class XMartCityService {
     private Response SelectIdRendezVousAndPlanificationParExamen(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN.query);
-        final Examen examen = objectMapper.readValue(request.getRequestBody(), Examen.class);
+        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
 
-        stmt.setInt(1, examen.getId());
-        stmt.setInt(2, examen.getId());
+        stmt.setInt(1, rdv.getIdExamen());
+        stmt.setInt(2, rdv.getIdExamen());
         final ResultSet res = stmt.executeQuery();
 
         RendezVouss rdvs = new RendezVouss();
         while (res.next()) {
-            RendezVous rdv = new RendezVous();
-            rdv.setIdRendezVous(res.getInt(1));
+            RendezVous rdv2 = new RendezVous();
+            rdv2.setIdRendezVous(res.getInt(1));
 
-            rdvs.add(rdv);
+            rdvs.add(rdv2);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
     }
 
+    private Response SelectIdRendezVousAndPlanificationParMedecin(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN.query);
+        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+
+        stmt.setInt(1, rdv.getNumeroADELI());
+        stmt.setInt(2, rdv.getNumeroADELI());
+        final ResultSet res = stmt.executeQuery();
+
+        RendezVouss rdvs = new RendezVouss();
+        while (res.next()) {
+            RendezVous rdv2 = new RendezVous();
+            rdv2.setIdRendezVous(res.getInt(1));
+
+            rdvs.add(rdv2);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
+    }
 
 }
 
