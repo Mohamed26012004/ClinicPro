@@ -124,8 +124,8 @@ public class PanelManipulationSalle extends JPanel {
                             JOptionPane.showMessageDialog(null, msgImposSupprime, "Erreur", JOptionPane.ERROR_MESSAGE);
                        }else {
                             salleService.deleteSalle(salle);
-                            JOptionPane.showMessageDialog(null, "Salle supprimée", "Message", JOptionPane.INFORMATION_MESSAGE);
                             chargerSalles();
+                            JOptionPane.showMessageDialog(null, "Salle supprimée", "Message", JOptionPane.INFORMATION_MESSAGE);
                        }
                     }
                 }catch (InterruptedException ex) {

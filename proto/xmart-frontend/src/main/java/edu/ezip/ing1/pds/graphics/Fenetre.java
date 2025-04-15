@@ -15,11 +15,16 @@ import javax.swing.*;
 public class Fenetre extends JFrame{
 
 
-        private JPanel contentPane;
-        private static JLabel boutonExamem;
-        private static JLabel boutonSalle;
-        private static JLabel boutonEquipement;
-        private static JLabel boutonPaiement;
+    private JPanel contentPane;
+    private static JLabel boutonExamem;
+    private static JLabel boutonSalle;
+    private static JLabel boutonEquipement;
+    private static JLabel boutonPaiement;
+
+    private static CardLayout card = new CardLayout();
+    private static JPanel cartePanel = new JPanel(card);
+
+
 
     public Fenetre() throws IOException, InterruptedException {
             super("ClinicPro");
@@ -31,7 +36,12 @@ public class Fenetre extends JFrame{
             contentPane.setLayout(new BorderLayout());
 //            contentPane.add(menuBar(), BorderLayout.NORTH);
             contentPane.add(PanelGauche(), BorderLayout.WEST);
-            contentPane.add(new PanelManipulationExamen(), BorderLayout.CENTER);
+
+            cartePanel.add(new PanelManipulationExamen(), "Examen");
+            cartePanel.add(new PanelManipulationSalle(), "Salle");
+            contentPane.add(cartePanel, BorderLayout.CENTER);
+
+
 
 
         }
@@ -66,20 +76,10 @@ public class Fenetre extends JFrame{
             panelExamen.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    contentPane.removeAll();
-                    try {
-                        contentPane.add(new PanelManipulationExamen(), BorderLayout.CENTER);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-//                    contentPane.add(menuBar(), BorderLayout.NORTH);
-                    contentPane.add(PanelGauche(), BorderLayout.WEST);
-                    contentPane.repaint();
-                    contentPane.revalidate();
+                    card.show(cartePanel, "Examen");
                 }
             });
+
             return panelExamen;
         }
 
@@ -92,20 +92,10 @@ public class Fenetre extends JFrame{
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                contentPane.removeAll();
-                try {
-                    contentPane.add(new PanelManipulationSalle(),BorderLayout.CENTER);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-                contentPane.add(PanelGauche(), BorderLayout.WEST);
-//                contentPane.add(menuBar(), BorderLayout.NORTH);
-                contentPane.repaint();
-                contentPane.revalidate();
+                card.show(cartePanel, "Salle");
             }
         });
+
         return panel;
     }
 
