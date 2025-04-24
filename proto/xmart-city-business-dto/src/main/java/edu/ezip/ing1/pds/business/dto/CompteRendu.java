@@ -12,6 +12,8 @@ public class CompteRendu {
     private  int id_compteRendu;
     private  String typeSymptome;
     private  String descriptionSymptome;
+    private int idPatient;
+    private int numeroADELI;
 
 
 
@@ -21,37 +23,39 @@ public class CompteRendu {
 
     public final CompteRendu build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_antecedentMedical","typeSymptome", "descriptionSymptome");
+        setFieldsFromResulset(resultSet, "id_compteRendu", "idPatient", "numeroADELI", "typeSymptome", "descriptionSymptome");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_compteRendu),typeSymptome, descriptionSymptome);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_compteRendu), String.valueOf(idPatient), String.valueOf(numeroADELI), typeSymptome, descriptionSymptome);
     }
 
-    public CompteRendu(String typeSymptome, String descriptionSymptome) {
+    public CompteRendu(String typeSymptome, String descriptionSymptome, int idPatient, int numeroADELI) {
         this.typeSymptome = typeSymptome;
         this.descriptionSymptome = descriptionSymptome;
+        this.idPatient = idPatient;
+        this.numeroADELI = numeroADELI;
     }
 
     public int getId_compteRendu() {return id_compteRendu;}
-    public String getTypeSymptome() {
-        return typeSymptome;
-    }
-    public String getDescriptionSymptome() {
-        return descriptionSymptome;
-    }
+    public String getTypeSymptome() {return typeSymptome;}
+    public String getDescriptionSymptome() {return descriptionSymptome;}
+    public int getIdPatient() {return idPatient;}
+    public int getNumeroADELI() {return numeroADELI;}
 
     @JsonProperty("compteRendu_typeSymptome")
     public void setTypeSymptome(String typeSymptome) {this.typeSymptome = typeSymptome;}
     @JsonProperty("compteRendu_descriptionSymptome")
     public void setDescriptionSymptome(String descriptionSymptome) {this.descriptionSymptome = descriptionSymptome;}
     @JsonProperty("compteRendu_id_compteRendu")
-    public void setId_compteRendu(int id_compteRendu) {
-        this.id_compteRendu = id_compteRendu;
-    }
+    public void setId_compteRendu(int id_compteRendu) {this.id_compteRendu = id_compteRendu;}
+    @JsonProperty("compteRendu_idPatient")
+    public void setIdPatient(int idPatient) {this.idPatient = idPatient;}
+    @JsonProperty("compteRendu_numeroADELI")
+    public void setNumeroADELI(int numeroADELI) {this.numeroADELI = numeroADELI;}
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
@@ -74,6 +78,8 @@ public class CompteRendu {
     public String toString() {
         return "CompteRendu{" +
                 "id_compteRendu='" + id_compteRendu + '\'' +
+                "idPatient='" + idPatient + '\'' +
+                "numeroADELI'" + numeroADELI + '\'' +
                 ", typeSymptome='" + typeSymptome + '\'' +
                 ", descriptionSymptome='" + descriptionSymptome + '\'' +
                 '}';

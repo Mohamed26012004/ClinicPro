@@ -113,28 +113,28 @@ public class XMartCityService {
         ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
-        INSERT_ANTECEDENT_MEDICAL("INSERT into antecedentMedical (type_antecedentMedical, description_antecedentMedical, idPatient) values (?, ?, ?)"),
+        INSERT_ANTECEDENT_MEDICAL("INSERT into antecedentMedical (idPatient, type_antecedentMedical, description_antecedentMedical) values (?, ?, ?)"),
         UPDATE_ANTECEDENT_MEDICAL("UPDATE antecedentMedical SET type_antecedentMedical = ?, description_antecedentMedical = ?, idPatient = ? WHERE id_antecedentMedical = ?"),
         DELETE_ANTECEDENT_MEDICAL("DELETE FROM antecedentMedical WHERE id_antecedentMedical = ?"),
         ID_ANTECEDENT_MEDICAL("SELECT id FROM antecedentMedical WHERE type_antecedentMedical = ? AND description_antecedentMedical = ? AND idPatient = ?"),
 
-        SELECT_ALL_COMPTE_RENDUS("SELECT c.id_compteRendu, c.typeSymptome, c.descriptionSymptome FROM compteRendu c"),
-        INSERT_COMPTE_RENDU("INSERT into compteRendu (typeSymptome, descriptionSymptome) values (?, ?)"),
-        UPDATE_COMPTE_RENDU("UPDATE compteRendu SET typeSymptome = ?, descriptionSymptome = ? WHERE id_compteRendu = ?"),
+        SELECT_ALL_COMPTE_RENDUS("SELECT c.id_compteRendu, c.typeSymptome, c.descriptionSymptome, c.idPatient, c.numeroADELI FROM compteRendu c"),
+        INSERT_COMPTE_RENDU("INSERT into compteRendu (idPatient, numeroADELI, typeSymptome, descriptionSymptome) values (?, ?, ?, ?)"),
+        UPDATE_COMPTE_RENDU("UPDATE compteRendu SET typeSymptome = ?, descriptionSymptome = ?, idPatient = ?, numeroADELI = ?  WHERE id_compteRendu = ?"),
         DELETE_COMPTE_RENDU("DELETE FROM compteRendu WHERE id_compteRendu = ?"),
-        ID_COMPTE_RENDU("SELECT id FROM compteRendu WHERE typeSymptome = ? AND descriptionSymptome = ?"),
+        ID_COMPTE_RENDU("SELECT id FROM compteRendu WHERE typeSymptome = ? AND descriptionSymptome = ? AND idPatient = ? AND numeroADELI = ?"),
 
-        SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, d.codeCIM10, d.nomMaladie, d.descriptionDiagnostic FROM Diagnostic d"),
-        INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic) values (?, ?, ?)"),
-        UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ? WHERE id_Diagnostic = ?"),
+        SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, d.codeCIM10, d.nomMaladie, d.descriptionDiagnostic, d.idPatient, d.numeroADELI FROM Diagnostic d"),
+        INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic) values (?, ?, ?, ?, ?)"),
+        UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ?, idPatient = ?, numeroADELI = ? WHERE id_Diagnostic = ?"),
         DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id_Diagnostic = ?"),
-        ID_DIAGNOSTIC("SELECT id FROM Diagnostic WHERE codeCIM10 = ? AND nomMaladie = ? AND descriptionDiagnostic = ?"),
+        ID_DIAGNOSTIC("SELECT id FROM Diagnostic WHERE codeCIM10 = ? AND nomMaladie = ? AND descriptionDiagnostic = ? AND idPatient = ? AND numeroADELI = ?"),
 
-        SELECT_ALL_TRAITEMENTS("SELECT t.id_Traitement, t.typeTraitement, t.descriptionTraitement, t.debutTraitement, t.finTraitement FROM Traitement t"),
-        INSERT_TRAITEMENT("INSERT into Traitement (typeTraitement, descriptionTraitement, debutTraitement, finTraitement) values (?, ?, ?, ?)"),
-        UPDATE_TRAITEMENT("UPDATE Traitement SET typeTraitement = ?, descriptionTraitement = ?, debutTraitement = ?, finTraitement = ? WHERE id_Traitement = ?"),
+        SELECT_ALL_TRAITEMENTS("SELECT t.id_Traitement, t.typeTraitement, t.descriptionTraitement, t.debutTraitement, t.finTraitement, t.idPatient, t.numeroADELI FROM Traitement t"),
+        INSERT_TRAITEMENT("INSERT into Traitement (idPatient, numeroADELI, typeTraitement, descriptionTraitement, debutTraitement, finTraitement) values (?, ?, ?, ?)"),
+        UPDATE_TRAITEMENT("UPDATE Traitement SET typeTraitement = ?, descriptionTraitement = ?, debutTraitement = ?, finTraitement = ?, idPatient = ?, numeroADELI = ?  WHERE id_Traitement = ?"),
         DELETE_TRAITEMENT("DELETE FROM Traitement WHERE id_Traitement = ?"),
-        ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ?"),
+        ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ? AND idPatient = ? AND numeroADELI = ?"),
 
 
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
@@ -1094,8 +1094,11 @@ public class XMartCityService {
         final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_COMPTE_RENDU.query);
-        stmt.setString(1, compteRendu.getTypeSymptome());
-        stmt.setString(2, compteRendu.getDescriptionSymptome());
+        stmt.setInt(1, compteRendu.getIdPatient());
+        stmt.setInt(2, compteRendu.getNumeroADELI());
+        stmt.setString(3, compteRendu.getTypeSymptome());
+        stmt.setString(4, compteRendu.getDescriptionSymptome());
+
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
@@ -1109,8 +1112,9 @@ public class XMartCityService {
         while (res.next()) {
             CompteRendu compteRendu = new CompteRendu();
             compteRendu.setId_compteRendu(res.getInt(1));
-            compteRendu.setTypeSymptome(res.getString(2));
-            compteRendu.setDescriptionSymptome(res.getString(3));
+            compteRendu.setIdPatient(res.getInt(2));
+            compteRendu.setNumeroADELI(res.getInt(3));
+            compteRendu.setDescriptionSymptome(res.getString(4));
             compteRendus.add(compteRendu);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendus));
@@ -1121,9 +1125,11 @@ public class XMartCityService {
         final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_COMPTE_RENDU.query);
-        stmt.setString(1, compteRendu.getTypeSymptome());
-        stmt.setString(2, compteRendu.getDescriptionSymptome());
-        stmt.setInt(3, compteRendu.getId_compteRendu());
+        stmt.setInt(1, compteRendu.getIdPatient());
+        stmt.setInt(2, compteRendu.getNumeroADELI());
+        stmt.setString(3, compteRendu.getTypeSymptome());
+        stmt.setString(4, compteRendu.getDescriptionSymptome());
+        stmt.setInt(5, compteRendu.getId_compteRendu());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
@@ -1148,9 +1154,11 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getCodeCIM10());
-        stmt.setString(2, diagnostic.getNomMaladie());
-        stmt.setString(3, diagnostic.getDescription_Diagnostic());
+        stmt.setInt(1, diagnostic.getIdPatient());
+        stmt.setInt(2, diagnostic.getNumeroADELI());
+        stmt.setString(3, diagnostic.getCodeCIM10());
+        stmt.setString(4, diagnostic.getNomMaladie());
+        stmt.setString(5, diagnostic.getDescription_Diagnostic());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
@@ -1163,10 +1171,12 @@ public class XMartCityService {
         Diagnostics diagnostics = new Diagnostics();
         while (res.next()) {
             Diagnostic diagnostic = new Diagnostic();
-            diagnostic.setId_Diagnostic(res.getInt(1));
-            diagnostic.setCodeCIM10(res.getString(2));
-            diagnostic.setNomMaladie(res.getString(3));
-            diagnostic.setDescription_Diagnostic(res.getString(4));
+            diagnostic.setIdPatient(res.getInt(1));
+            diagnostic.setNumeroADELI(res.getInt(2));
+            diagnostic.setId_Diagnostic(res.getInt(3));
+            diagnostic.setCodeCIM10(res.getString(4));
+            diagnostic.setNomMaladie(res.getString(5));
+            diagnostic.setDescription_Diagnostic(res.getString(6));
             diagnostics.add(diagnostic);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostics));
@@ -1177,10 +1187,12 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getCodeCIM10());
-        stmt.setString(2, diagnostic.getNomMaladie());
-        stmt.setString(3, diagnostic.getDescription_Diagnostic());
-        stmt.setInt(4, diagnostic.getId_Diagnostic());
+        stmt.setInt(1, diagnostic.getId_Diagnostic());
+        stmt.setInt(2, diagnostic.getIdPatient());
+        stmt.setInt(3, diagnostic.getNumeroADELI());
+        stmt.setString(4, diagnostic.getCodeCIM10());
+        stmt.setString(5, diagnostic.getNomMaladie());
+        stmt.setString(6, diagnostic.getDescription_Diagnostic());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
@@ -1205,10 +1217,12 @@ public class XMartCityService {
         final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_TRAITEMENT.query);
-        stmt.setString(1, traitement.getType_Traitement());
-        stmt.setString(2, traitement.getDescription_Traitement());
-        stmt.setString(3, traitement.getDebut_Traitement());
-        stmt.setString(3, traitement.getFin_Traitement());
+        stmt.setInt(1, traitement.getIdPatient());
+        stmt.setInt(2, traitement.getNumeroADELI());
+        stmt.setString(3, traitement.getType_Traitement());
+        stmt.setString(4, traitement.getDescription_Traitement());
+        stmt.setString(5, traitement.getDebut_Traitement());
+        stmt.setString(6, traitement.getFin_Traitement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
@@ -1221,11 +1235,13 @@ public class XMartCityService {
         Traitements traitements = new Traitements();
         while (res.next()) {
             Traitement traitement = new Traitement();
-            traitement.setId_Traitement(res.getInt(1));
-            traitement.setType_Traitement(res.getString(2));
-            traitement.setDescription_Traitement(res.getString(3));
-            traitement.setDebut_Traitement(res.getString(4));
-            traitement.setFin_Traitement(res.getString(5));
+            traitement.setIdPatient(res.getInt(1));
+            traitement.setNumeroADELI(res.getInt(2));
+            traitement.setId_Traitement(res.getInt(3));
+            traitement.setType_Traitement(res.getString(4));
+            traitement.setDescription_Traitement(res.getString(5));
+            traitement.setDebut_Traitement(res.getString(6));
+            traitement.setFin_Traitement(res.getString(7));
             traitements.add(traitement);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitements));
@@ -1236,11 +1252,13 @@ public class XMartCityService {
         final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_TRAITEMENT.query);
-        stmt.setString(1, traitement.getType_Traitement());
-        stmt.setString(2, traitement.getDescription_Traitement());
-        stmt.setString(3, traitement.getDebut_Traitement());
-        stmt.setString(4, traitement.getFin_Traitement());
-        stmt.setInt(5, traitement.getId_Traitement());
+        stmt.setInt(1, traitement.getIdPatient());
+        stmt.setInt(2, traitement.getNumeroADELI());
+        stmt.setString(3, traitement.getType_Traitement());
+        stmt.setString(4, traitement.getDescription_Traitement());
+        stmt.setString(5, traitement.getDebut_Traitement());
+        stmt.setString(6, traitement.getFin_Traitement());
+        stmt.setInt(7, traitement.getId_Traitement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
