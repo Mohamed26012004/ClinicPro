@@ -5,9 +5,11 @@ import java.awt.Color;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.EquipementService;
@@ -19,82 +21,85 @@ public class TotalCoutFront {
     private JTable table;
     private final EquipementService equipementService;
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    // Déclarer le champ pour afficher l'estimation des coûts
-    private JLabel estimationLabel;
+    private JTextField dateField;
 
     public TotalCoutFront() {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.equipementService = new EquipementService(networkConfig);
 
-        // Création de la fenêtre
-        JFrame frame = new JFrame("Coût Total par Jour");
-        frame.setSize(600, 400);
+        JFrame frame = new JFrame("Coûts Totaux des Equipements par Jour");
+        frame.setSize(700, 450);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        // Création du tableau
         String[] columns = {"Date Achat", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Bouton pour actualiser
-        JButton boutonActualiser = new JButton("Actualiser");
-        boutonActualiser.addActionListener(e -> {
+
+        dateField = new JTextField(10);
+
+        JButton boutonAfficherParDate = new JButton("Afficher par Date");
+        boutonAfficherParDate.addActionListener(e -> {
+            try {
+                LocalDate selectedDate = LocalDate.parse(dateField.getText(), formatter);
+                chargerCoutsPourDate(selectedDate);
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton boutonReinitialiser = new JButton("Réinitialiser");
+        boutonReinitialiser.addActionListener(e -> {
             try {
                 chargerTotalCouts();
                 frame.revalidate();
                 frame.repaint();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des coûts: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement des données: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         JPanel panelSud = new JPanel();
-        panelSud.add(boutonActualiser);
+        panelSud.add(new JLabel("Date (yyyy-MM-dd): "));
+        panelSud.add(dateField);
+        panelSud.add(boutonAfficherParDate);
+        panelSud.add(boutonReinitialiser);
+
         frame.add(panelSud, BorderLayout.SOUTH);
 
         try {
             chargerTotalCouts();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des coûts: " + ex.getMessage(),
-                    "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
         frame.setVisible(true);
     }
 
-    // Méthode pour charger les données dans le tableau
     private void chargerTotalCouts() throws IOException, InterruptedException {
-        model.setRowCount(0); // Réinitialiser le tableau avant de le remplir
+        model.setRowCount(0);
 
         TotalCouts totalCouts = equipementService.getTotalCoutParJour();
         if (totalCouts != null && totalCouts.getTotalCouts() != null) {
-            // Trier par date d'achat
+
             totalCouts.getTotalCouts().sort(Comparator.comparing(TotalCout::getDateAchat));
 
             LocalDate lastDate = null;
             for (TotalCout tc : totalCouts.getTotalCouts()) {
-                model.addRow(new Object[]{
-                        tc.getDateAchat().format(formatter),
-                        tc.getTotalCout()
-                });
+                model.addRow(new Object[]{tc.getDateAchat().format(formatter), tc.getTotalCout()});
                 lastDate = tc.getDateAchat();
             }
 
-            // Si on a une dernière date, on ajoute une seule prévision pour le jour suivant
             if (lastDate != null) {
                 double totalCoutMoyen = calculerCoutMoyen(totalCouts);
                 LocalDate nextDay = lastDate.plusDays(1);
-                model.addRow(new Object[]{
-                        nextDay.format(formatter),
-                        totalCoutMoyen
-                });
+                model.addRow(new Object[]{nextDay.format(formatter), totalCoutMoyen});
 
-                // Appliquer une couleur bleue à la ligne estimée
                 table.setRowSelectionAllowed(false);
                 table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
                     @Override
@@ -102,9 +107,9 @@ public class TotalCoutFront {
                                                                             boolean hasFocus, int row, int column) {
                         java.awt.Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                         if (row == totalCouts.getTotalCouts().size()) {
-                            cell.setBackground(Color.CYAN); // Couleur bleue pour la ligne estimée
+                            cell.setBackground(Color.CYAN);
                         } else {
-                            cell.setBackground(Color.WHITE); // Couleur blanche pour les données réelles
+                            cell.setBackground(Color.WHITE);
                         }
                         return cell;
                     }
@@ -113,8 +118,16 @@ public class TotalCoutFront {
         }
     }
 
+    private void chargerCoutsPourDate(LocalDate date) throws IOException, InterruptedException {
+        model.setRowCount(0);
+        TotalCouts totalCouts = equipementService.getTotalCoutParJour();
+        for (TotalCout tc : totalCouts.getTotalCouts()) {
+            if (tc.getDateAchat().equals(date)) {
+                model.addRow(new Object[]{tc.getDateAchat().format(formatter), tc.getTotalCout()});
+            }
+        }
+    }
 
-    // Calcul du coût moyen des données réelles pour l'estimation
     private double calculerCoutMoyen(TotalCouts totalCouts) {
         double total = 0;
         int count = 0;
@@ -124,7 +137,7 @@ public class TotalCoutFront {
             count++;
         }
 
-        return count > 0 ? total / count : 0; // Retourne 0 si aucune donnée réelle
+        return count > 0 ? total / count : 0;
     }
 
     public static void main(String[] args) {

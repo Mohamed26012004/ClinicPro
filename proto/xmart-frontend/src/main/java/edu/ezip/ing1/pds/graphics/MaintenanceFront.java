@@ -15,7 +15,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.MaintenanceService;
 
 public class MaintenanceFront {
-    private JTextField idMaintenanceChamp, coutMaintenancechamp, typeMaintenancechamp, dateMaintenanceChamp;
+    private JTextField idMaintenanceChamp, coutMaintenancechamp, typeMaintenancechamp, dateMaintenanceChamp, filtreDateChamp;
     private DefaultTableModel model;
     private JTable table;
     private final MaintenanceService maintenanceService;
@@ -27,19 +27,20 @@ public class MaintenanceFront {
         this.maintenanceService = new MaintenanceService(networkConfig);
 
         JFrame frame = new JFrame("Gestion des Maintenances");
-        frame.setSize(700, 400);
+        frame.setSize(800, 500);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
         idMaintenanceChamp = new JTextField();
         coutMaintenancechamp = new JTextField();
         typeMaintenancechamp = new JTextField();
-        typeMaintenancechamp.setEditable(false); // Rend non modifiable manuellement
+        typeMaintenancechamp.setEditable(false);
         dateMaintenanceChamp = new JTextField();
+        filtreDateChamp = new JTextField();
 
-        // Liste déroulante personnalisée
+
         String[] typesMaintenancePredefinis = {
                 "Nettoyage quotidien",
                 "Désinfection régulière",
@@ -77,6 +78,8 @@ public class MaintenanceFront {
         panelNord.add(typeMaintenancechamp);
         panelNord.add(new JLabel("Date Maintenance :"));
         panelNord.add(dateMaintenanceChamp);
+        panelNord.add(new JLabel("Filtrer par date (yyyy-MM-dd) :"));
+        panelNord.add(filtreDateChamp);
 
         frame.add(panelNord, BorderLayout.NORTH);
 
@@ -89,10 +92,14 @@ public class MaintenanceFront {
         JButton boutonAjouter = new JButton("Ajouter");
         JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
+        JButton boutonFiltrer = new JButton("Filtrer par date");
+        JButton boutonReset = new JButton("Réinitialiser");
 
         panelSud.add(boutonAjouter);
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
+        panelSud.add(boutonFiltrer);
+        panelSud.add(boutonReset);
         frame.add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
@@ -116,7 +123,6 @@ public class MaintenanceFront {
                 maintenanceService.insertMaintenance(maintenance);
                 chargerMaintenances();
                 viderChamps();
-
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(frame, "Le coût doit être un nombre valide", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
@@ -138,15 +144,22 @@ public class MaintenanceFront {
             try {
                 int i = table.getSelectedRow();
                 if (i >= 0) {
+                    int id = Integer.parseInt(idMaintenanceChamp.getText().trim());
+                    int cout = Integer.parseInt(coutMaintenancechamp.getText().trim());
+                    String type = typeMaintenancechamp.getText().trim();
+                    LocalDate date = LocalDate.parse(dateMaintenanceChamp.getText().trim(), formattage);
+
                     Maintenance maintenance = new Maintenance();
-                    maintenance.setIdMaintenance(Integer.parseInt(idMaintenanceChamp.getText().trim()));
-                    maintenance.setCoutMaintenance(Integer.parseInt(coutMaintenancechamp.getText().trim()));
-                    maintenance.setTypeMaintenance(typeMaintenancechamp.getText().trim());
-                    maintenance.setDateMaintenance(LocalDate.parse(dateMaintenanceChamp.getText().trim(), formattage));
+                    maintenance.setIdMaintenance(id);
+                    maintenance.setCoutMaintenance(cout);
+                    maintenance.setTypeMaintenance(type);
+                    maintenance.setDateMaintenance(date);
 
                     maintenanceService.updateMaintenance(maintenance);
                     chargerMaintenances();
                     viderChamps();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Veuillez sélectionner une ligne à modifier.", "Information", JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -172,6 +185,39 @@ public class MaintenanceFront {
             }
         });
 
+        boutonFiltrer.addActionListener(e -> {
+            String dateStr = filtreDateChamp.getText().trim();
+            if (!dateStr.isEmpty()) {
+                try {
+                    LocalDate dateFiltre = LocalDate.parse(dateStr, formattage);
+                    model.setRowCount(0); // Vider tableau
+                    Maintenances maintenances = maintenanceService.selectMaintenances();
+                    if (maintenances != null && maintenances.getMaintenances() != null) {
+                        maintenances.getMaintenances().stream()
+                                .filter(m -> m.getDateMaintenance().equals(dateFiltre))
+                                .forEach(m -> model.addRow(new Object[]{
+                                        m.getIdMaintenance(),
+                                        m.getCoutMaintenance(),
+                                        m.getTypeMaintenance(),
+                                        m.getDateMaintenance().toString()
+                                }));
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Date invalide. Format attendu : yyyy-MM-dd", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        boutonReset.addActionListener(e -> {
+            try {
+                chargerMaintenances();
+                filtreDateChamp.setText("");
+                viderChamps();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         try {
             chargerMaintenances();
         } catch (Exception ex) {
@@ -182,24 +228,19 @@ public class MaintenanceFront {
     }
 
     private void chargerMaintenances() throws IOException, InterruptedException {
-        model.setRowCount(0);  // Vider le tableau actuel
-
-        // Récupérer les maintenances depuis le service
+        model.setRowCount(0);
         Maintenances maintenances = maintenanceService.selectMaintenances();
-
-        // Si les maintenances ne sont pas vides, on les trie par date (de la plus ancienne à la plus récente)
         if (maintenances != null && maintenances.getMaintenances() != null) {
             maintenances.getMaintenances().stream()
-                    .sorted((m1, m2) -> m1.getDateMaintenance().compareTo(m2.getDateMaintenance()))  // Tri par date
+                    .sorted((m1, m2) -> m1.getDateMaintenance().compareTo(m2.getDateMaintenance()))
                     .forEach(m -> model.addRow(new Object[]{
-                            m.getIdMaintenance(),                 // ID de la maintenance
-                            m.getCoutMaintenance(),               // Coût de la maintenance
-                            m.getTypeMaintenance(),               // Type de maintenance
-                            m.getDateMaintenance().toString()     // Date de la maintenance (format String)
+                            m.getIdMaintenance(),
+                            m.getCoutMaintenance(),
+                            m.getTypeMaintenance(),
+                            m.getDateMaintenance().toString()
                     }));
         }
     }
-
 
     private void viderChamps() {
         idMaintenanceChamp.setText("");

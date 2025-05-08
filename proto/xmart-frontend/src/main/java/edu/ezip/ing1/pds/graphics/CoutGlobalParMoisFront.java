@@ -30,19 +30,19 @@ public class CoutGlobalParMoisFront {
         this.equipementService = new EquipementService(networkConfig);
         this.maintenanceService = new MaintenanceService(networkConfig);
 
-        // Fenêtre principale
+
         JFrame frame = new JFrame("Coût Global (par Mois)");
         frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        // Tableau
+
         String[] columns = {"Mois", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Bouton actualiser
+
         JButton boutonActualiser = new JButton("Actualiser");
         boutonActualiser.addActionListener(e -> {
             try {
@@ -74,7 +74,7 @@ public class CoutGlobalParMoisFront {
         Map<YearMonth, Double> coutMaintenanceParMois = new HashMap<>();
         Set<YearMonth> tousLesMois = new TreeSet<>();
 
-        // Charger coûts équipements
+
         TotalCouts totalCouts = equipementService.getTotalCoutParJour();
         if (totalCouts != null && totalCouts.getTotalCouts() != null) {
             for (TotalCout tc : totalCouts.getTotalCouts()) {
@@ -84,7 +84,7 @@ public class CoutGlobalParMoisFront {
             }
         }
 
-        // Charger coûts maintenances
+
         TotalMaintenances totalMaintenances = maintenanceService.getTotalMaintenanceParJour();
         if (totalMaintenances != null && totalMaintenances.getTotalMaintenances() != null) {
             for (TotalMaintenance tm : totalMaintenances.getTotalMaintenances()) {
@@ -94,7 +94,7 @@ public class CoutGlobalParMoisFront {
             }
         }
 
-        // Fusionner et afficher les données par mois
+
         for (YearMonth mois : tousLesMois) {
             double coutEq = coutEquipementParMois.getOrDefault(mois, 0.0);
             double coutMaint = coutMaintenanceParMois.getOrDefault(mois, 0.0);

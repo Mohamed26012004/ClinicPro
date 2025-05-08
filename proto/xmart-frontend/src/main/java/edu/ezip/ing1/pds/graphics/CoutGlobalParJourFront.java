@@ -30,19 +30,19 @@ public class CoutGlobalParJourFront {
         this.equipementService = new EquipementService(networkConfig);
         this.maintenanceService = new MaintenanceService(networkConfig);
 
-        // Fenêtre principale
+
         JFrame frame = new JFrame("Coût Global (Équipements + Maintenances) par Jour");
         frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        // Tableau
+
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
-        // Bouton actualiser
+
         JButton boutonActualiser = new JButton("Actualiser");
         boutonActualiser.addActionListener(e -> {
             try {
@@ -74,7 +74,7 @@ public class CoutGlobalParJourFront {
         Map<LocalDate, Double> coutMaintenanceParJour = new HashMap<>();
         Set<LocalDate> toutesLesDates = new TreeSet<>();
 
-        // Charger coûts équipements
+
         TotalCouts totalCouts = equipementService.getTotalCoutParJour();
         if (totalCouts != null && totalCouts.getTotalCouts() != null) {
             for (TotalCout tc : totalCouts.getTotalCouts()) {
@@ -84,7 +84,7 @@ public class CoutGlobalParJourFront {
             }
         }
 
-        // Charger coûts maintenances
+
         TotalMaintenances totalMaintenances = maintenanceService.getTotalMaintenanceParJour();
         if (totalMaintenances != null && totalMaintenances.getTotalMaintenances() != null) {
             for (TotalMaintenance tm : totalMaintenances.getTotalMaintenances()) {
@@ -94,7 +94,7 @@ public class CoutGlobalParJourFront {
             }
         }
 
-        // Fusionner les données par date
+
         for (LocalDate date : toutesLesDates) {
             double coutEq = coutEquipementParJour.getOrDefault(date, 0.0);
             double coutMaint = coutMaintenanceParJour.getOrDefault(date, 0.0);

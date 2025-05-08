@@ -13,7 +13,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.EquipementService;
 
 public class EquipementFront {
-    private JTextField idEquipementChamp, coutEquipementchamp, nomEquipementchamp, dateEquipementChamp;
+    private JTextField idEquipementChamp, coutEquipementchamp, nomEquipementchamp, dateEquipementChamp, filtreDateChamp;
     private DefaultTableModel model;
     private JTable table;
     private final EquipementService equipementService;
@@ -29,15 +29,16 @@ public class EquipementFront {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
+        JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
         idEquipementChamp = new JTextField();
         coutEquipementchamp = new JTextField();
         nomEquipementchamp = new JTextField();
         nomEquipementchamp.setEditable(false); // Empêche la saisie manuelle
         dateEquipementChamp = new JTextField();
+        filtreDateChamp = new JTextField();
 
-        // Liste déroulante personnalisée pour le champ de nom
+
         String[] nomsEquipementPredefinis = {
                 "Stéthoscope", "Tensiomètre", "Thermomètre", "Lit", "Gants", "Seringue", "Autoclave"
         };
@@ -70,6 +71,8 @@ public class EquipementFront {
         panelNord.add(nomEquipementchamp);
         panelNord.add(new JLabel("Date Achat :"));
         panelNord.add(dateEquipementChamp);
+        panelNord.add(new JLabel("Filtrer par date (yyyy-MM-dd) :"));
+        panelNord.add(filtreDateChamp);
 
         frame.add(panelNord, BorderLayout.NORTH);
 
@@ -82,10 +85,14 @@ public class EquipementFront {
         JButton boutonAjouter = new JButton("Ajouter");
         JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
+        JButton boutonFiltrer = new JButton("Filtrer par date");
+        JButton boutonReset = new JButton("Réinitialiser");
 
         panelSud.add(boutonAjouter);
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
+        panelSud.add(boutonFiltrer);
+        panelSud.add(boutonReset);
         frame.add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
@@ -170,6 +177,39 @@ public class EquipementFront {
             }
         });
 
+        boutonFiltrer.addActionListener(e -> {
+            String dateStr = filtreDateChamp.getText().trim();
+            if (!dateStr.isEmpty()) {
+                try {
+                    LocalDate dateFiltre = LocalDate.parse(dateStr, formattage);
+                    model.setRowCount(0); // Vider tableau
+                    Equipements equipements = equipementService.selectEquipements();
+                    if (equipements != null && equipements.getEquipements() != null) {
+                        equipements.getEquipements().stream()
+                                .filter(c -> c.getDateEquipement().equals(dateFiltre))
+                                .forEach(c -> model.addRow(new Object[]{
+                                        c.getIdEquipement(),
+                                        c.getCoutEquipement(),
+                                        c.getNomEquipement(),
+                                        c.getDateEquipement().toString()
+                                }));
+                    }
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Date invalide. Format attendu : yyyy-MM-dd", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        boutonReset.addActionListener(e -> {
+            try {
+                chargerEquipements();
+                filtreDateChamp.setText("");
+                viderChamps();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
         try {
             chargerEquipements();
         } catch (Exception ex) {
@@ -181,31 +221,30 @@ public class EquipementFront {
     }
 
     private void chargerEquipements() throws IOException, InterruptedException {
-        model.setRowCount(0);  // Vider le tableau actuel
+        model.setRowCount(0);
 
-        // Récupérer les équipements
+
         Equipements equipements = equipementService.selectEquipements();
 
-        // Si les équipements ne sont pas vides, on trie par date (de la plus ancienne à la plus récente)
+
         if (equipements != null && equipements.getEquipements() != null) {
             equipements.getEquipements().stream()
-                    .sorted((e1, e2) -> e1.getDateEquipement().compareTo(e2.getDateEquipement()))  // Tri par date
+                    .sorted((e1, e2) -> e1.getDateEquipement().compareTo(e2.getDateEquipement()))
                     .forEach(e -> model.addRow(new Object[]{
                             e.getIdEquipement(),
                             e.getCoutEquipement(),
                             e.getNomEquipement(),
-                            e.getDateEquipement()  // Afficher la date d'achat
+                            e.getDateEquipement()
                     }));
         }
     }
-
-
 
     private void viderChamps() {
         idEquipementChamp.setText("");
         coutEquipementchamp.setText("");
         nomEquipementchamp.setText("");
         dateEquipementChamp.setText("");
+        filtreDateChamp.setText("");
     }
 
     public static void main(String[] args) {

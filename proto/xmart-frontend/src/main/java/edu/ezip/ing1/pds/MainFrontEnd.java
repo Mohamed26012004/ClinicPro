@@ -33,8 +33,10 @@ public class MainFrontEnd {
 //        maintenanceService.deleteMaintenance(maintenance);
 
 
-          TotalMaintenanceFront fen = new TotalMaintenanceFront();
-          MaintenanceFront p= new MaintenanceFront();
+          //TotalCoutFront fen = new TotalCoutFront();
+          //EquipementFront p= new EquipementFront();
+          MaintenanceFront mf = new MaintenanceFront();
+          TotalMaintenanceFront tmf = new TotalMaintenanceFront();
           //TotalCoutFront tc = new TotalCoutFront();
           ///EquipementFront ef = new EquipementFront();
           CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
