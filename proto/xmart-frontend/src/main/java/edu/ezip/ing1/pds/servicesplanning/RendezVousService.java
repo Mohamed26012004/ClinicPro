@@ -3,17 +3,11 @@ package edu.ezip.ing1.pds.servicesplanning;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
-import edu.ezip.ing1.pds.business.dto.Horaires;
-import edu.ezip.ing1.pds.business.dto.Patient;
-import edu.ezip.ing1.pds.business.dto.RendezVous;
-import edu.ezip.ing1.pds.business.dto.RendezVouss;
+import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requestsplanning.InsertPatientClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.InsertRendezVousClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllMedecinsClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllRendezVousClientRequest;
+import edu.ezip.ing1.pds.requestsplanning.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -32,6 +26,7 @@ public class RendezVousService {
     final String selectRequestOrder = "SELECT_ALL_RENDEZ_VOUS";
     final String updateRequestOrder = "UPDATE_RENDEZ_VOUS";
     final String deleteRequestOrder = "DELETE_RENDEZ_VOUS";
+    final String selectIdRendezVousAndPlanificationRequestOrder = "SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN";
 
     private final NetworkConfig networkConfig;
     public RendezVousService(NetworkConfig networkConfig) {
@@ -77,7 +72,7 @@ public class RendezVousService {
             final RendezVous r = (RendezVous)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    r.getNumeroADELI(), r.getIdPatient(), r.getId(), r.getDateRendezVous(),
+                    r.getNumeroADELI(), r.getIdPatient(), r.getIdExamen(), r.getDateRendezVous(),
                     r.getHeureDebut(), r.getHeureFin(),
                     clientRequest2.getResult());
         }
@@ -97,6 +92,37 @@ public class RendezVousService {
         final SelectAllRendezVousClientRequest clientRequest = new SelectAllRendezVousClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if(!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            return (RendezVouss) joinedClientRequest.getResult();
+        }
+        else {
+            logger.error("No horaires found");
+            return null;
+        }
+    }
+
+    public RendezVouss selectIdRendezVousAndPlanificationParExamen(Examen examen) throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(examen);
+        final String requestId = UUID.randomUUID().toString();
+
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestContent(jsonifiedGuy);
+        request.setRequestOrder(selectIdRendezVousAndPlanificationRequestOrder);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectIdRendezVousAndPlanificationClientRequest clientRequest = new SelectIdRendezVousAndPlanificationClientRequest(
+                networkConfig,
+                birthdate++, request, examen, requestBytes);
         clientRequests.push(clientRequest);
 
         if(!clientRequests.isEmpty()) {
