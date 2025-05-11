@@ -1,29 +1,19 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.medecin;
 
-import edu.ezip.ing1.pds.business.dto.Consulte;
 import edu.ezip.ing1.pds.business.dto.Horaire;
 import edu.ezip.ing1.pds.business.dto.Horaires;
 import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.graphics.Fenetre;
 import edu.ezip.ing1.pds.servicesplanning.HoraireService;
-import edu.ezip.ing1.pds.servicesplanning.MedecinService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Objects;
 
 public class PanelInformationMedecin extends JFrame{
 

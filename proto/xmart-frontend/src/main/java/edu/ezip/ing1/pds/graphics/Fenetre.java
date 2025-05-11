@@ -1,8 +1,8 @@
 package edu.ezip.ing1.pds.graphics;
 
-import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
-import edu.ezip.ing1.pds.medecingrahics.PanelManipulationMedecin;
-import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
+import edu.ezip.ing1.pds.graphics.examen.PanelManipulationExamen;
+import edu.ezip.ing1.pds.graphics.medecin.PanelManipulationMedecin;
+import edu.ezip.ing1.pds.graphics.salle.PanelManipulationSalle;
 
 import java.awt.*;
 

@@ -1,11 +1,10 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.medecin;
 
 import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesplanning.MedecinService;
 import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
-import edu.ezip.ing1.pds.servicesplanning.SalleService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

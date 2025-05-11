@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.examen;
 
 import edu.ezip.ing1.pds.business.dto.Examen;
 

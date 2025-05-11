@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.medecin;
 
 import edu.ezip.ing1.pds.business.dto.Consulte;
 import edu.ezip.ing1.pds.business.dto.Horaire;
@@ -261,8 +261,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         supprimer.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                PanelHoraire panelHoraire = PanelHoraire.panelHoraireCliquer;
-                listHoraireAajouter.remove(panelHoraire);
+
                 int i = tableHoraireAajouter.getSelectedRow();
                 if(i >= 0){
                     Horaire h = new Horaire();
@@ -271,7 +270,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
                     h.setHeureFin(LocalTime.parse(modelHoraireAajouter.getValueAt(i, 2).toString(), formatter));
 
                     try {
-                        horaireService.deleteHoraire(panelHoraire.horaireOfPanel());
+                        horaireService.deleteHoraire(h);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     } catch (IOException ex) {
@@ -404,8 +403,6 @@ public class PanelInsertUpdateMedecin extends JFrame{
         ajouter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PanelHoraire panelHoraire = (PanelHoraire) PanelHoraire.panelHoraireCliquer;
-
                 int i = tableHoraireExistant.getSelectedRow();
                 if(i >= 0){
                     Horaire h = new Horaire();
