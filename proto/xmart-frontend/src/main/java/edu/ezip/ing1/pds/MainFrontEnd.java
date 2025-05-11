@@ -4,33 +4,47 @@ import java.io.IOException;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
 import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.Maintenance;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 
-import edu.ezip.ing1.pds.graphics.DiagnosticFront;
-import edu.ezip.ing1.pds.graphics.EquipementFront;
-import edu.ezip.ing1.pds.graphics.Fenetre;
-import edu.ezip.ing1.pds.graphics.PaiementFront;
+import edu.ezip.ing1.pds.graphics.*;
+import edu.ezip.ing1.pds.services.EquipementService;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
+import edu.ezip.ing1.pds.services.MaintenanceService;
 
 public class MainFrontEnd {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
+//        final String networkConfigFile = "network.yaml";
+//        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+//        final EquipementService equipementService = new EquipementService(networkConfig);
+//        System.out.println(equipementService.selectEquipements());
+//       System.out.println(equipementService.getTotalCoutParJour());
+//        final MaintenanceService maintenanceService = new MaintenanceService(networkConfig);
+//        Maintenance maintenance = new Maintenance(2324, "dfsdsfsd", LocalDate.now(), 23);
+//        maintenanceService.deleteMaintenance(maintenance);
 
-        Fenetre fen = new Fenetre();
-        fen.setVisible(true);
 
-//        EquipementFront f = new EquipementFront();
-
-       // Fenetre fen = new Fenetre();
-        //fen.setVisible(true);
-//        EquipementFront f = new EquipementFront();
+          //TotalCoutFront fen = new TotalCoutFront();
+          //EquipementFront p= new EquipementFront();
+          MaintenanceFront mf = new MaintenanceFront();
+          TotalMaintenanceFront tmf = new TotalMaintenanceFront();
+          //TotalCoutFront tc = new TotalCoutFront();
+          ///EquipementFront ef = new EquipementFront();
+          CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
+          CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
+////
+        //Fenetre fene = new Fenetre();
+        //fene.setVisible(true);
+        //EquipementFront f = new EquipementFront();
 //        DiagnosticFront d = new DiagnosticFront();
 //        EquipementFront f = new EquipementFront();
 

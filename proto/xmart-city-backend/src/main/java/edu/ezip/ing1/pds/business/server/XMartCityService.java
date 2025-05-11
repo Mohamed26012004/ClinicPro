@@ -11,39 +11,13 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.time.format.DateTimeFormatter;
 
+import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.ezip.ing1.pds.business.dto.AntecedentMedical;
-import edu.ezip.ing1.pds.business.dto.AntecedentMedicals;
-import edu.ezip.ing1.pds.business.dto.CompteRendu;
-import edu.ezip.ing1.pds.business.dto.CompteRendus;
-import edu.ezip.ing1.pds.business.dto.Consulte;
-import edu.ezip.ing1.pds.business.dto.Diagnostic;
-import edu.ezip.ing1.pds.business.dto.Diagnostics;
-import edu.ezip.ing1.pds.business.dto.Equipement;
-import edu.ezip.ing1.pds.business.dto.Equipements;
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
-import edu.ezip.ing1.pds.business.dto.Facture;
-import edu.ezip.ing1.pds.business.dto.Factures;
-import edu.ezip.ing1.pds.business.dto.Horaire;
-import edu.ezip.ing1.pds.business.dto.Horaires;
-import edu.ezip.ing1.pds.business.dto.Medecin;
-import edu.ezip.ing1.pds.business.dto.Medecins;
-import edu.ezip.ing1.pds.business.dto.Paiement;
-import edu.ezip.ing1.pds.business.dto.Paiements;
-import edu.ezip.ing1.pds.business.dto.Patient;
-import edu.ezip.ing1.pds.business.dto.Patients;
-import edu.ezip.ing1.pds.business.dto.RendezVous;
-import edu.ezip.ing1.pds.business.dto.RendezVouss;
-import edu.ezip.ing1.pds.business.dto.Salle;
-import edu.ezip.ing1.pds.business.dto.Salles;
-import edu.ezip.ing1.pds.business.dto.Traitement;
-import edu.ezip.ing1.pds.business.dto.Traitements;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.commons.Response;
 
@@ -137,12 +111,19 @@ public class XMartCityService {
         ID_TRAITEMENT("SELECT id FROM Traitement WHERE typeTraitement = ? AND descriptionTraitement = ? AND debutTraitement = ? AND finTraitement = ? AND idPatient = ? AND numeroADELI = ?"),
 
 
-        SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
+        SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e ORDER BY idEquipement "),
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
         UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
+        TOTAL_COUT_PAR_JOUR("SELECT dateAchat, SUM(coutEquipement) AS totalCout FROM equipement GROUP BY dateAchat ORDER BY dateAchat"),
+        ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
 
-        ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?");
+        SELECT_ALL_MAINTENANCES("SELECT m.idMaintenance, m.coutMaintenance, m.dateMaintenance, m.typeMaintenance FROM maintenance m ORDER BY idMaintenance "),
+        INSERT_MAINTENANCE("INSERT into maintenance (idMaintenance, typeMaintenance, dateMaintenance, coutMaintenance) values (?, ?, ?, ?)"),
+        UPDATE_MAINTENANCE("UPDATE maintenance SET coutMaintenance = ?, dateMaintenance = ?, typeMaintenance = ? WHERE idMaintenance = ?"),
+        DELETE_MAINTENANCE("DELETE FROM maintenance WHERE idMaintenance = ? AND coutMaintenance = ? AND typeMaintenance = ? AND dateMaintenance = ? "),
+        TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance");
+
 
         private final String query;
 
@@ -367,6 +348,25 @@ public class XMartCityService {
             case DELETE_EQUIPEMENT:
                 response = DeleteEquipement(request, connection);
                 break;
+            case TOTAL_COUT_PAR_JOUR:
+                response = getTotalCoutParJour(request, connection);
+                break;
+            case SELECT_ALL_MAINTENANCES:
+                response = SelectAllMaintenance(request,connection);
+                break;
+            case INSERT_MAINTENANCE :
+                response = InsertMaintenance(request, connection);
+                break;
+            case UPDATE_MAINTENANCE:
+                response = UpdateMaintenance(request, connection);
+                break;
+            case DELETE_MAINTENANCE:
+                response = DeleteMaintenance(request, connection);
+                break;
+            case TOTAL_MAINTENANCE_PAR_JOUR:
+                response = getTotalMaintenanceParJour(request, connection);
+                break;
+
 
             default:
                 break;
@@ -1374,7 +1374,97 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));
     }
+    private Response getTotalCoutParJour(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.TOTAL_COUT_PAR_JOUR.query);
 
+        TotalCouts totalCouts = new TotalCouts(); // Liste des résultats
+
+        while (res.next()) {
+            TotalCout totalCout = new TotalCout();
+            totalCout.setDateAchat(res.getDate(1).toLocalDate());
+            totalCout.setTotalCout(res.getInt(2));
+            totalCouts.add(totalCout);
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalCouts));
+    }
+    private Response SelectAllMaintenance(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_MAINTENANCES.query);
+        Maintenances maintenances = new Maintenances();
+        while (res.next()) {
+            Maintenance maintenance = new Maintenance();
+            maintenance.setIdMaintenance(res.getInt(1));
+            maintenance.setCoutMaintenance(res.getInt(2));
+            maintenance.setDateMaintenance(res.getDate(3).toLocalDate());
+            maintenance.setTypeMaintenance(res.getString(4));
+            maintenances.add(maintenance);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenances));
+    }
+
+    private Response InsertMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_MAINTENANCE.query);
+        stmt.setInt(1,maintenance.getIdMaintenance());
+        stmt.setString(2, maintenance.getTypeMaintenance());
+        stmt.setDate(3, Date.valueOf(maintenance.getDateMaintenance()));
+        stmt.setInt(4, maintenance.getCoutMaintenance());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+    }
+
+    private Response UpdateMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_MAINTENANCE.query);
+        stmt.setDate(2, Date.valueOf(maintenance.getDateMaintenance()));
+        stmt.setString(3, maintenance.getTypeMaintenance());
+        stmt.setInt(1, maintenance.getCoutMaintenance());
+        stmt.setInt(4, maintenance.getIdMaintenance());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+    }
+
+    private Response DeleteMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_MAINTENANCE.query);
+        stmt.setInt(1, maintenance.getIdMaintenance());
+        stmt.setInt(2, maintenance.getCoutMaintenance());
+        stmt.setString(3, maintenance.getTypeMaintenance());
+        stmt.setDate(4, Date.valueOf(maintenance.getDateMaintenance()));;
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+    }
+    private Response getTotalMaintenanceParJour(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.TOTAL_MAINTENANCE_PAR_JOUR.query);
+
+        TotalMaintenances totalMaintenances = new TotalMaintenances(); // Liste des résultats
+
+        while (res.next()) {
+            TotalMaintenance totalMaintenance = new TotalMaintenance();
+            totalMaintenance.setDateMaintenance(res.getDate(1).toLocalDate());
+            totalMaintenance.setTotalMaintenance(res.getInt(2));
+            totalMaintenances.add(totalMaintenance);
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalMaintenances));
+    }
 
 
 }

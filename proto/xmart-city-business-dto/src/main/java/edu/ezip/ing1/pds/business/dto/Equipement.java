@@ -17,7 +17,7 @@ public class Equipement {
     private  int idEquipement;
     private  int coutEquipement;
     private  String nomEquipement;
-    @JsonDeserialize(using = DeserialisationDate2.class) // doit etre au dessus des dates
+    @JsonDeserialize(using = DeserialisationDate.class) // doit etre au dessus des dates
     private LocalDate dateEquipement;
 
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");

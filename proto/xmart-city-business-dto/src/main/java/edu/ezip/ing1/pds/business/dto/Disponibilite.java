@@ -23,6 +23,7 @@ public class Disponibilite {
     @JsonDeserialize(using = DeserialisationDate.class)
     private LocalDate date;
     private String statut;
+    private int numeroADELI;
     private final DateTimeFormatter formatHeure = DateTimeFormatter.ofPattern("HH:mm");
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
@@ -30,16 +31,17 @@ public class Disponibilite {
 
     public final Disponibilite build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "date", "heureDebut", "heureFin", "status");
+        setFieldsFromResulset(resultSet, "idDisponibilite", "numéroADELI", "date", "heureDebut", "heureFin", "status");
         return this;
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idDisponibilite),
+        return buildPreparedStatement(preparedStatement, String.valueOf(idDisponibilite), String.valueOf(numeroADELI),
                 date.format(formatDate), heureDebut.format(formatHeure), heureFin.format(formatHeure), statut);
     }
-    public Disponibilite(LocalDate date, LocalTime heureDebut, LocalTime heureFin, String statut) {
+    public Disponibilite(int numeroADELI, LocalDate date, LocalTime heureDebut, LocalTime heureFin, String statut) {
+        this.numeroADELI = numeroADELI;
         this.date = date;
         this.heureDebut = heureDebut;
         this.heureFin = heureFin;
@@ -60,6 +62,14 @@ public class Disponibilite {
             preparedStatement.setString(++ix, fieldName);
         }
         return preparedStatement;
+    }
+
+    public int getNumeroADELI() {
+        return numeroADELI;
+    }
+    @JsonProperty("disponibilite_numeroADELI")
+    public void setNumeroADELI(int numeroADELI) {
+        this.numeroADELI = numeroADELI;
     }
 
     public LocalDate getDate() {
@@ -105,11 +115,11 @@ public class Disponibilite {
     @Override
     public String toString() {
         return "Disponibilite{" +
-                "statut='" + statut + '\'' +
-                ", idDisponibilite=" + idDisponibilite +
-                ", heureFin=" + heureFin +
+                "idDisponibilite=" + idDisponibilite +
                 ", heureDebut=" + heureDebut +
-                ", date=" + date +
+                ", heureFin=" + heureFin +
+                ", statut='" + statut + '\'' +
+                ", numeroADELI=" + numeroADELI +
                 '}';
     }
 }
