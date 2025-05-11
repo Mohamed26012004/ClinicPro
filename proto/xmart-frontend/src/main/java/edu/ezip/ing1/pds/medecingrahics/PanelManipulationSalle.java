@@ -150,7 +150,6 @@ public class PanelManipulationSalle extends JPanel {
                         salle.setStatut(model.getValueAt(i, 3).toString());
 
                         FrameCreationSalle f = new FrameCreationSalle(salle);
-                        JOptionPane.showMessageDialog(null, "Mise à jour effectuée.", "Message", JOptionPane.INFORMATION_MESSAGE);
                         chargerSalles();
                     }
                 } catch (Exception ex) {

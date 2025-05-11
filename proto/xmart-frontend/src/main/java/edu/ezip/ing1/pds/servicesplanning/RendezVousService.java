@@ -27,6 +27,8 @@ public class RendezVousService {
     final String updateRequestOrder = "UPDATE_RENDEZ_VOUS";
     final String deleteRequestOrder = "DELETE_RENDEZ_VOUS";
     final String selectIdRendezVousAndPlanificationRequestOrder = "SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN";
+    final String selectIdRDVAndPlanMedecinRequestOrder = "SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN";
+
 
     private final NetworkConfig networkConfig;
     public RendezVousService(NetworkConfig networkConfig) {
@@ -107,6 +109,14 @@ public class RendezVousService {
     }
 
     public RendezVouss selectIdRendezVousAndPlanificationParExamen(RendezVous rdv) throws InterruptedException, IOException {
+       return selectIdRendezVousAndPlanification(rdv,selectIdRendezVousAndPlanificationRequestOrder);
+    }
+
+    public RendezVouss selectIdRendezVousAndPlanificationParMedecin(RendezVous rdv) throws InterruptedException, IOException {
+        return selectIdRendezVousAndPlanification(rdv,selectIdRDVAndPlanMedecinRequestOrder);
+    }
+
+    public RendezVouss selectIdRendezVousAndPlanification(RendezVous rdv,String requestOrder) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -116,7 +126,7 @@ public class RendezVousService {
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestContent(jsonifiedGuy);
-        request.setRequestOrder(selectIdRendezVousAndPlanificationRequestOrder);
+        request.setRequestOrder(requestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
@@ -135,6 +145,9 @@ public class RendezVousService {
             logger.error("No horaires found");
             return null;
         }
+
     }
+
+
 
 }

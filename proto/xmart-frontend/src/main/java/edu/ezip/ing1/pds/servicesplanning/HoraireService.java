@@ -28,7 +28,7 @@ public class HoraireService {
     final String selectRequestOrder = "SELECT_ALL_HORAIRES";
     final String updateRequestOrder = "UPDATE_HORAIRE";
     final String deleteRequestOrder = "DELETE_HORAIRE";
-    final String selectHoraireMedecinResquetOrder = "SELECT_HORAIRE_MEDECIN";
+    final String selectHoraireMedecinRequestOrder = "SELECT_HORAIRE_MEDECIN";
     final String selectOneHoraireRequestOrder = "SELECT_ONE_HORAIRE";
 
     private final NetworkConfig networkConfig;
@@ -118,7 +118,7 @@ public class HoraireService {
         final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(medecin);
         final Request request = new Request();
         request.setRequestId(requestId);
-        request.setRequestOrder(selectHoraireMedecinResquetOrder);
+        request.setRequestOrder(selectHoraireMedecinRequestOrder);
         request.setRequestContent(jsonifiedGuy);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);

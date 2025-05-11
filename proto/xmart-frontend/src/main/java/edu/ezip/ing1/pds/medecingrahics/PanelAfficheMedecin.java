@@ -1,12 +1,10 @@
 package edu.ezip.ing1.pds.medecingrahics;
 
-import edu.ezip.ing1.pds.business.dto.Medecin;
-import edu.ezip.ing1.pds.business.dto.Medecins;
-import edu.ezip.ing1.pds.business.dto.Salle;
-import edu.ezip.ing1.pds.business.dto.Salles;
+import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesplanning.MedecinService;
+import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
 import edu.ezip.ing1.pds.servicesplanning.SalleService;
 
 import javax.swing.*;
@@ -25,13 +23,14 @@ public class PanelAfficheMedecin extends JPanel {
     final static String networkConfigFile = "network.yaml";
     final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
     final static MedecinService medecinService = new MedecinService(networkConfig);
+    final static RendezVousService rdvService = new RendezVousService(networkConfig);
 
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
     private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
     private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
     private final String informationFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\information_button.png";
 
-    private final String msgImposSupprime = "";
+    private final String msgImposSupprime = "Impossible de supprimer ce médecin.\nVeuillez d'abord supprimer les rendez-vous et les examens qui lui ont été attribués.";
 
     private static JButton addButton;
     private static JButton update;
@@ -56,7 +55,7 @@ public class PanelAfficheMedecin extends JPanel {
         l.setFont(new Font("Arial", Font.BOLD, 17));
         panel.add(l, BorderLayout.NORTH);
 
-        String[] columns = {"Numéro ADELI", "Nom", "Prénom", "Téléphone", "Spécialité", "Salaire"};
+        String[] columns = {"Numéro ADELI", "Nom", "Prénom", "Téléphone", "Spécialité", "Salaire (€)"};
         model = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -118,11 +117,46 @@ public class PanelAfficheMedecin extends JPanel {
         deleteImage = new ImageIcon(i);
         JButton information = new JButton(deleteImage);
 
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
 
+                    PanelInsertUpdateMedecin p = new PanelInsertUpdateMedecin(null);
+                } catch (IOException | InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                try {
+                    int i = table.getSelectedRow();
+                    if (i >= 0) {
 
+                        Medecin medecin = new Medecin();
+                        medecin.setNumeroADELI(Integer.parseInt(model.getValueAt(i,0).toString()));
+                        medecin.setNom(model.getValueAt(i,1).toString());
+                        medecin.setPrenom(model.getValueAt(i,2).toString());
+                        medecin.setTelephone(model.getValueAt(i,3).toString());
+                        medecin.setSpecialite(model.getValueAt(i,4).toString());
+                        medecin.setSalaire(Integer.parseInt(model.getValueAt(i,5).toString()));
+
+                        RendezVous rdv = new RendezVous();
+                        rdv.setNumeroADELI(medecin.getNumeroADELI());
+                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParMedecin(rdv);
+                        if (!rdvs.getRdvs().isEmpty()){
+                            JOptionPane.showMessageDialog(null, msgImposSupprime, "Erreur", JOptionPane.ERROR_MESSAGE);
+                        }else{
+                            medecinService.deleteMedecin(medecin);
+                            chargerMedecins();
+                        }
+
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
         update.addActionListener(new ActionListener() {
@@ -132,15 +166,17 @@ public class PanelAfficheMedecin extends JPanel {
                     int i = table.getSelectedRow();
                     if (i >= 0) {
 
-                        Salle salle = new Salle();
-                        salle.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                        salle.setNumeroSalle(model.getValueAt(i, 1).toString());
-                        salle.setTypeSalle(model.getValueAt(i, 2).toString());
-                        salle.setStatut(model.getValueAt(i, 3).toString());
+                        Medecin medecin = new Medecin();
+                        medecin.setNumeroADELI(Integer.parseInt(model.getValueAt(i,0).toString()));
+                        medecin.setNom(model.getValueAt(i,1).toString());
+                        medecin.setPrenom(model.getValueAt(i,2).toString());
+                        medecin.setTelephone(model.getValueAt(i,3).toString());
+                        medecin.setSpecialite(model.getValueAt(i,4).toString());
+                        medecin.setSalaire(Integer.parseInt(model.getValueAt(i,5).toString()));
 
-                        FrameCreationSalle f = new FrameCreationSalle(salle);
-                        JOptionPane.showMessageDialog(null, "Mise à jour effectuée.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                        chargerMedecins();
+                        PanelManipulationMedecin.setMedecinToUpdate(medecin);
+                        PanelInsertUpdateMedecin p = new PanelInsertUpdateMedecin(medecin);
+
                     }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
@@ -148,17 +184,35 @@ public class PanelAfficheMedecin extends JPanel {
             }
         });
 
-        addButton.addActionListener(new ActionListener() {
+        information.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                try {
+                    int i = table.getSelectedRow();
+                    if (i >= 0) {
 
+                        Medecin medecin = new Medecin();
+                        medecin.setNumeroADELI(Integer.parseInt(model.getValueAt(i,0).toString()));
+                        medecin.setNom(model.getValueAt(i,1).toString());
+                        medecin.setPrenom(model.getValueAt(i,2).toString());
+                        medecin.setTelephone(model.getValueAt(i,3).toString());
+                        medecin.setSpecialite(model.getValueAt(i,4).toString());
+                        medecin.setSalaire(Integer.parseInt(model.getValueAt(i,5).toString()));
+
+                        PanelManipulationMedecin.setMedecinToUpdate(medecin);
+                        PanelInformationMedecin p = new PanelInformationMedecin(medecin);
+
+                    }
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
         addButton.setBackground(new Color(113, 70, 255));
         update.setToolTipText("Modifier");
         delete.setToolTipText("Supprimer");
-        information.setToolTipText("Information");
+        information.setToolTipText("Plus d'information");
         bar.add(addButton);
         bar.addSeparator(new Dimension( 10, 10));
         bar.add(information);

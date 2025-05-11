@@ -1,6 +1,5 @@
 package edu.ezip.ing1.pds.graphics;
 
-import edu.ezip.ing1.pds.medecingrahics.InsertUpdateMedecinWindows;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationMedecin;
 import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
@@ -72,6 +71,7 @@ public class Fenetre extends JFrame{
         public JPanel panelBoutonExamen(){
             boutonExamem = createLabel("Examen");
             JPanel panelExamen = new JPanel();
+            panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
             panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             panelExamen.add(boutonExamem);
             effetSurBouton(panelExamen);
@@ -88,6 +88,7 @@ public class Fenetre extends JFrame{
     public JPanel panelBoutonSalle(){
         boutonSalle = createLabel("Salle");
         JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panel.add(boutonSalle);
         effetSurBouton(panel);
@@ -103,6 +104,7 @@ public class Fenetre extends JFrame{
     public JPanel panelBoutonEquipement(){
         boutonEquipement = createLabel("Equipement");
         JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
         panelExamen.addMouseListener(new MouseAdapter() {
@@ -117,6 +119,7 @@ public class Fenetre extends JFrame{
     public JPanel panelBoutonPaiement(){
         boutonExamem = createLabel("Paiement");
         JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonExamem);
         panelExamen.addMouseListener(new MouseAdapter() {
@@ -131,6 +134,7 @@ public class Fenetre extends JFrame{
     public JPanel panelBoutonDiagnostic(){
         boutonExamem = createLabel("Diagnostic");
         JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonExamem);
         panelExamen.addMouseListener(new MouseAdapter() {
@@ -145,17 +149,18 @@ public class Fenetre extends JFrame{
 
     public JPanel panelBoutonMedecin(){
         JLabel label = createLabel("Médecin");
-        JPanel panelExamen = new JPanel();
-        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(label);
-        effetSurBouton(panelExamen);
-        panelExamen.addMouseListener(new MouseAdapter() {
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                card.show(cartePanel, "Medecin");
             }
         });
-        return panelExamen;
+        return panel;
     }
 
     public static void effetSurBouton(JPanel p){
