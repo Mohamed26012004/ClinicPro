@@ -6,7 +6,6 @@ import java.io.IOException;
 
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,7 +21,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.DiagnosticService;
 
-public class DiagnosticFront {
+public class DiagnosticFront extends JPanel{
     private JTextField id_DiagnosticChamp, id_PatientChamp, numeroADELIChamp, codeCIM10Champ, nomMaladieChamp, descriptionDiagnosticChamp;
     private DefaultTableModel model;
     private JTable table;
@@ -33,11 +32,12 @@ public class DiagnosticFront {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.diagnosticService = new DiagnosticService (networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Gestion des diagnostics");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+//        Jthis this = new Jthis("Gestion des diagnostics");
+//        this.setSize(700, 400);
+//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
+//        this.setLocationRelativeTo(null);
 
         JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
 
@@ -54,12 +54,12 @@ public class DiagnosticFront {
         panelNord.add(new JLabel("Description diagnostic :"));
         panelNord.add(descriptionDiagnosticChamp);
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID_Diagnostic", "ID Patient", "Numéro ADELI", "Code CIM10", "Nom maladie", "Description diagnostic"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -70,7 +70,7 @@ public class DiagnosticFront {
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -82,7 +82,7 @@ public class DiagnosticFront {
 
 
                 if (descriptionDiagnostic.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Veuillez svp insérer une description du diagnostic",
+                    JOptionPane.showMessageDialog(this, "Veuillez svp insérer une description du diagnostic",
                             "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -97,7 +97,7 @@ public class DiagnosticFront {
                 viderChamps();
 
             }catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -127,7 +127,7 @@ public class DiagnosticFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -145,7 +145,7 @@ public class DiagnosticFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -153,11 +153,11 @@ public class DiagnosticFront {
         try {
             chargerDiagnostics();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des diagnostics: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des diagnostics: " + ex.getMessage(),
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+//        this.setVisible(true);
     }
 
     private void chargerDiagnostics() throws IOException, InterruptedException {

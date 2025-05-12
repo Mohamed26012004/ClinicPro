@@ -6,7 +6,6 @@ import java.io.IOException;
 
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,7 +21,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.TraitementService;
 
-public class TraitementFront {
+public class TraitementFront extends JPanel {
     private JTextField id_TraitementChamp, idPatientChamp, numeroADELIChamp, typeTraitementChamp, descriptionTraitementChamp, debutTraitementChamp, finTraitementChamp;
     private DefaultTableModel model;
     private JTable table;
@@ -33,11 +32,13 @@ public class TraitementFront {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.TraitementService = new TraitementService (networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Gestion des traitements");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+
+//        Jthis this = new Jthis("Gestion des traitements");
+//        this.setSize(700, 400);
+//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
+//        this.setLocationRelativeTo(null);
 
         JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
 
@@ -58,12 +59,12 @@ public class TraitementFront {
         panelNord.add(finTraitementChamp);
 
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID Traitement", "Id Patient", "Numéro ADELI", "Type de traitement", "Description", "Début", "Fin"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -74,7 +75,7 @@ public class TraitementFront {
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -93,7 +94,7 @@ public class TraitementFront {
                 viderChamps();
 
             }catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -127,7 +128,7 @@ public class TraitementFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -144,7 +145,7 @@ public class TraitementFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -152,11 +153,11 @@ public class TraitementFront {
         try {
             chargerTraitements();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des Traitements: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des Traitements: " + ex.getMessage(),
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+//        this.setVisible(true);
     }
 
     private void chargerTraitements() throws IOException, InterruptedException {

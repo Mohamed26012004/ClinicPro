@@ -2,9 +2,9 @@ package edu.ezip.ing1.pds;
 
 import java.io.IOException;
 
+import edu.ezip.ing1.pds.business.dto.Diagnostic;
 import edu.ezip.ing1.pds.business.dto.Facture;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -15,6 +15,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 
 import edu.ezip.ing1.pds.graphics.*;
 import edu.ezip.ing1.pds.services.EquipementService;
+import edu.ezip.ing1.pds.graphics.*;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 import edu.ezip.ing1.pds.services.MaintenanceService;
@@ -35,18 +36,27 @@ public class MainFrontEnd {
 
           //TotalCoutFront fen = new TotalCoutFront();
           //EquipementFront p= new EquipementFront();
-          MaintenanceFront mf = new MaintenanceFront();
-          TotalMaintenanceFront tmf = new TotalMaintenanceFront();
-          //TotalCoutFront tc = new TotalCoutFront();
-          ///EquipementFront ef = new EquipementFront();
-          CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
-          CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
+//          MaintenanceFront mf = new MaintenanceFront();
+//          TotalMaintenanceFront tmf = new TotalMaintenanceFront();
+//          //TotalCoutFront tc = new TotalCoutFront();
+//          ///EquipementFront ef = new EquipementFront();
+//          CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
+//          CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
 ////
-        //Fenetre fene = new Fenetre();
-        //fene.setVisible(true);
+//        Fenetre fene = new Fenetre();
+//        fene.setVisible(true);
         //EquipementFront f = new EquipementFront();
 //        DiagnosticFront d = new DiagnosticFront();
-//        EquipementFront f = new EquipementFront();
+////        EquipementFront f = new EquipementFront();
+//        AntecedentMedicalFront a = new AntecedentMedicalFront();
+//        CompteRenduFront c = new CompteRenduFront();
+//        TraitementFront t = new TraitementFront();
+
+//        DPIFront dpi = new DPIFront();
+//        dpi.setVisible(true);
+
+        FenetreMedecin fm = new FenetreMedecin();
+        fm.setVisible(true);
 
 
 //        Date dat = new Date();

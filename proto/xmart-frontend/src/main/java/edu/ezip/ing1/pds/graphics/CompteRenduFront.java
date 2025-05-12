@@ -6,7 +6,6 @@ import java.io.IOException;
 
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,7 +21,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.CompteRenduService;
 
-public class CompteRenduFront {
+public class CompteRenduFront extends JPanel {
     private JTextField id_compteRenduChamp, idPatientChamp, numeroADELIChamp, typeSymptomeChamp, descriptionSymptomeChamp;
     private DefaultTableModel model;
     private JTable table;
@@ -33,11 +32,12 @@ public class CompteRenduFront {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.compteRenduService = new CompteRenduService (networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Gestion des compte-rendus");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+//        Jthis this = new Jthis("Gestion des compte-rendus");
+//        this.setSize(700, 400);
+//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
+//        this.setLocationRelativeTo(null);
 
         JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
 
@@ -52,12 +52,12 @@ public class CompteRenduFront {
         panelNord.add(descriptionSymptomeChamp);
 
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID CompteRendu", "Id Patient", "Numéro ADELI", "Symptôme", "Description"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -68,7 +68,7 @@ public class CompteRenduFront {
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -88,7 +88,7 @@ public class CompteRenduFront {
                 viderChamps();
 
             }catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -115,7 +115,7 @@ public class CompteRenduFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -132,7 +132,7 @@ public class CompteRenduFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -140,11 +140,11 @@ public class CompteRenduFront {
         try {
             chargerCompteRendus();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des CompteRendus: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des CompteRendus: " + ex.getMessage(),
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+//        this.setVisible(true);
     }
 
     private void chargerCompteRendus() throws IOException, InterruptedException {

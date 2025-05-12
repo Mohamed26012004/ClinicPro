@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName(value = "totalCout")
 public class TotalCout {
-    @JsonDeserialize(using = DeserialisationDate2.class)
+//    @JsonDeserialize(using = DeserialisationDate2.class)
     private LocalDate dateAchat;
     private int totalCout;
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");

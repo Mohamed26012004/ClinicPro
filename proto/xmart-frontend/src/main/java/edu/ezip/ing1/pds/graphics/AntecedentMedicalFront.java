@@ -6,7 +6,6 @@ import java.io.IOException;
 
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,22 +21,24 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.AntecedentMedicalService;
 
-public class AntecedentMedicalFront {
+public class AntecedentMedicalFront extends JPanel {
     private JTextField id_AntecedentMedicalChamp, idPatientChamp, type_antecedentMedicalChamp, description_antecedentMedicalChamp;
     private DefaultTableModel model;
     private JTable table;
     private final AntecedentMedicalService antecedentMedicalService;
 
 
-    public AntecedentMedicalFront() {
+    public AntecedentMedicalFront(){
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.antecedentMedicalService = new AntecedentMedicalService (networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Gestion des antécédents médicaux");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+
+//        Jthis this = new Jthis("Gestion des antécédents médicaux");
+//        this.setSize(700, 400);
+//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
+//        this.setLocationRelativeTo(null);
 
         JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
 
@@ -52,12 +53,12 @@ public class AntecedentMedicalFront {
         panelNord.add(description_antecedentMedicalChamp);
 
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID AntecedentMedical", "Id Patient", "Type antécédent médical", "Description antécédent médical"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -68,7 +69,7 @@ public class AntecedentMedicalFront {
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -88,7 +89,7 @@ public class AntecedentMedicalFront {
                 viderChamps();
 
             }catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -115,7 +116,7 @@ public class AntecedentMedicalFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -133,7 +134,7 @@ public class AntecedentMedicalFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression: " + ex.getMessage(),
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -141,11 +142,11 @@ public class AntecedentMedicalFront {
         try {
             chargerAntecedentMedicals();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des AntecedentMedicals: " + ex.getMessage(),
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des AntecedentMedicals: " + ex.getMessage(),
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+//        this.setVisible(true);
     }
 
     private void chargerAntecedentMedicals() throws IOException, InterruptedException {
