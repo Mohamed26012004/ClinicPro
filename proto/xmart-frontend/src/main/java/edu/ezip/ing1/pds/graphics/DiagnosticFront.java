@@ -23,7 +23,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.DiagnosticService;
 
 public class DiagnosticFront {
-    private JTextField id_DiagnosticChamp, codeCIM10Champ, nomMaladieChamp, descriptionDiagnosticChamp;
+    private JTextField id_DiagnosticChamp, id_PatientChamp, numeroADELIChamp, codeCIM10Champ, nomMaladieChamp, descriptionDiagnosticChamp;
     private DefaultTableModel model;
     private JTable table;
     private final DiagnosticService diagnosticService;
@@ -56,7 +56,7 @@ public class DiagnosticFront {
 
         frame.add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID_Diagnostic", "Code CIM10", "Nom maladie", "Description diagnostic"};
+        String[] columns = {"ID_Diagnostic", "ID Patient", "Numéro ADELI", "Code CIM10", "Nom maladie", "Description diagnostic"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -117,7 +117,8 @@ public class DiagnosticFront {
                 int i = table.getSelectedRow();
                 if (i >= 0) {
                     Diagnostic Diagnostic = new Diagnostic();
-                    Diagnostic.setId_Diagnostic(Integer.parseInt(model.getValueAt(i, 0).toString()));                    Diagnostic.setCodeCIM10(codeCIM10Champ.getText().trim());
+                    Diagnostic.setId_Diagnostic(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                    Diagnostic.setCodeCIM10(codeCIM10Champ.getText().trim());
                     Diagnostic.setNomMaladie(nomMaladieChamp.getText().trim());
                     Diagnostic.setDescription_Diagnostic(descriptionDiagnosticChamp.getText().trim());
 
@@ -175,6 +176,9 @@ public class DiagnosticFront {
     }
 
     private void viderChamps() {
+        id_DiagnosticChamp.setText("");
+        id_PatientChamp.setText("");
+        numeroADELIChamp.setText("");
         codeCIM10Champ.setText("");
         nomMaladieChamp.setText("");
         descriptionDiagnosticChamp.setText("");

@@ -34,6 +34,14 @@ public class MainFrontEnd {
           //PaiementFront pf= new PaiementFront();
 
 
+        // Pour un jolie look and feel.
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
+        Fenetre fene = new Fenetre();
+        fene.setVisible(true);
           //TotalCoutFront fen = new TotalCoutFront();
           EquipementFront p= new EquipementFront();
           //MaintenanceFront mf = new MaintenanceFront();
