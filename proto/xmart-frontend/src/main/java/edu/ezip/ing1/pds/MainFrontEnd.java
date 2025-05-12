@@ -31,16 +31,17 @@ public class MainFrontEnd {
 //        final MaintenanceService maintenanceService = new MaintenanceService(networkConfig);
 //        Maintenance maintenance = new Maintenance(2324, "dfsdsfsd", LocalDate.now(), 23);
 //        maintenanceService.deleteMaintenance(maintenance);
+          //PaiementFront pf= new PaiementFront();
 
 
           //TotalCoutFront fen = new TotalCoutFront();
-          //EquipementFront p= new EquipementFront();
-          MaintenanceFront mf = new MaintenanceFront();
-          TotalMaintenanceFront tmf = new TotalMaintenanceFront();
+          EquipementFront p= new EquipementFront();
+          //MaintenanceFront mf = new MaintenanceFront();
+          //TotalMaintenanceFront tmf = new TotalMaintenanceFront();
           //TotalCoutFront tc = new TotalCoutFront();
           ///EquipementFront ef = new EquipementFront();
-          CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
-          CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
+          //CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
+          //CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
 ////
         //Fenetre fene = new Fenetre();
         //fene.setVisible(true);

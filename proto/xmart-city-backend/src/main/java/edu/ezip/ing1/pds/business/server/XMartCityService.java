@@ -897,7 +897,7 @@ public class XMartCityService {
 
             stmt.setInt(1, rdv.getNumeroADELI());
             stmt.setInt(2, rdv.getIdPatient());
-            stmt.setInt(3, rdv.getId());
+            stmt.setInt(3, rdv.getIdRendezVous());
             stmt.setInt(4, rdv.getIdSalle());
             stmt.setDate(5,date);
             stmt.setTime(6, debut);
@@ -980,7 +980,7 @@ public class XMartCityService {
             RendezVous rdv = new RendezVous();
             rdv.setNumeroADELI(res.getInt(1));
             rdv.setIdPatient(res.getInt(2));
-            rdv.setId(res.getInt(3));
+            rdv.setIdRendezVous(res.getInt(3));
             rdv.setIdSalle(res.getInt(4));
             rdv.setDateRendezVous(res.getDate(5).toLocalDate());
             rdv.setHeureDebut(res.getTime(6).toLocalTime());
@@ -999,7 +999,7 @@ public class XMartCityService {
 
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
+        stmt.setInt(3, rdv.getIdRendezVous());
         stmt.setInt(4, rdv.getIdSalle());
         stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
         stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
@@ -1019,7 +1019,7 @@ public class XMartCityService {
 
         stmt.setInt(1, rdv.getNumeroADELI());
         stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
+        stmt.setInt(3, rdv.getIdRendezVous());
         stmt.setInt(4, rdv.getIdSalle());
         stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
         stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));

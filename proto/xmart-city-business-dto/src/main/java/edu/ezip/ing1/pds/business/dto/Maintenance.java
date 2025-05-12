@@ -17,7 +17,7 @@ public class Maintenance {
     private  int idMaintenance;
     private  int coutMaintenance;
     private  String typeMaintenance;
-    @JsonDeserialize(using = DeserialisationDate2.class) //
+    @JsonDeserialize(using = DeserialisationDate.class) //
     private LocalDate dateMaintenance;
 
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
