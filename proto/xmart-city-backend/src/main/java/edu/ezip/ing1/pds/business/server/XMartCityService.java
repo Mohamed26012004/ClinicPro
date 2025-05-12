@@ -118,6 +118,7 @@ public class XMartCityService {
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
         UPDATE_EQUIPEMENT("UPDATE eq QSDTY890S8__uipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
+        TOTAL_COUT_PAR_JOUR("SELECT dateAchat, SUM(coutEquipement) AS totalCout FROM equipement GROUP BY dateAchat ORDER BY dateAchat"),
         ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
 
         INSERT_DISPONIBILITE("INSERT into disponibilite (numeroADELI, dateDisponibilite, heureDebut, heureFin, statut) values (?, ?, ?, ?, ?)"),
@@ -157,7 +158,15 @@ public class XMartCityService {
                 "    SELECT idPlanification AS id FROM planification WHERE numeroADELI = ?" +
                 "    UNION" +
                 "    SELECT idRendezVous AS id FROM rendezvous WHERE numeroADELI = ?" +
-                ") AS unionId");
+                ") AS unionId"),
+
+
+        SELECT_ALL_MAINTENANCES("SELECT m.idMaintenance, m.coutMaintenance, m.dateMaintenance, m.typeMaintenance FROM maintenance m ORDER BY idMaintenance "),
+        INSERT_MAINTENANCE("INSERT into maintenance (idMaintenance, typeMaintenance, dateMaintenance, coutMaintenance) values (?, ?, ?, ?)"),
+        UPDATE_MAINTENANCE("UPDATE maintenance SET coutMaintenance = ?, dateMaintenance = ?, typeMaintenance = ? WHERE idMaintenance = ?"),
+        DELETE_MAINTENANCE("DELETE FROM maintenance WHERE idMaintenance = ? AND coutMaintenance = ? AND typeMaintenance = ? AND dateMaintenance = ? "),
+        TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance");
+
 
         private final String query;
 
@@ -255,8 +264,6 @@ public class XMartCityService {
                 response = SelectOneHoraire(request, connection);
                 break;
             case UPDATE_HORAIRE:
-
-
                 response = UpdateHoraire(request, connection);
             case INSERT_SALLE:
                 response = InsertSalle(request, connection);
@@ -390,7 +397,25 @@ public class XMartCityService {
                 response = SelectIdRendezVousAndPlanificationParMedecin(request, connection);
                 break;
 
+            case TOTAL_COUT_PAR_JOUR:
+                response = getTotalCoutParJour(request, connection);
+                break;
 
+            case SELECT_ALL_MAINTENANCES:
+                response = SelectAllMaintenance(request,connection);
+                    break;
+            case INSERT_MAINTENANCE :
+                response = InsertMaintenance(request, connection);
+                        break;
+            case UPDATE_MAINTENANCE:
+                response = UpdateMaintenance(request, connection);
+                break;
+            case DELETE_MAINTENANCE:
+                response = DeleteMaintenance(request, connection);
+                break;
+            case TOTAL_MAINTENANCE_PAR_JOUR:
+                    response = getTotalMaintenanceParJour(request, connection);
+                    break;
             default:
                 break;
         }
@@ -1426,6 +1451,147 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(equipement));
     }
+
+    private Response getTotalCoutParJour(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.TOTAL_COUT_PAR_JOUR.query);
+
+        TotalCouts totalCouts = new TotalCouts(); // Liste des résultats
+
+        while (res.next()) {
+            TotalCout totalCout = new TotalCout();
+            totalCout.setDateAchat(res.getDate(1).toLocalDate());
+            totalCout.setTotalCout(res.getInt(2));
+            totalCouts.add(totalCout);
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalCouts));
+    }
+
+    private Response SelectAllMaintenance(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Statement stmt = connection.createStatement();
+
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_MAINTENANCES.query);
+
+        Maintenances maintenances = new Maintenances();
+
+        while (res.next()) {
+
+            Maintenance maintenance = new Maintenance();
+
+            maintenance.setIdMaintenance(res.getInt(1));
+
+            maintenance.setCoutMaintenance(res.getInt(2));
+
+            maintenance.setDateMaintenance(res.getDate(3).toLocalDate());
+
+            maintenance.setTypeMaintenance(res.getString(4));
+
+            maintenances.add(maintenance);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenances));
+
+    }
+
+    private Response InsertMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_MAINTENANCE.query);
+
+        stmt.setInt(1,maintenance.getIdMaintenance());
+
+        stmt.setString(2, maintenance.getTypeMaintenance());
+
+        stmt.setDate(3, Date.valueOf(maintenance.getDateMaintenance()));
+
+        stmt.setInt(4, maintenance.getCoutMaintenance());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+
+    }
+
+    private Response UpdateMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_MAINTENANCE.query);
+
+        stmt.setDate(2, Date.valueOf(maintenance.getDateMaintenance()));
+
+        stmt.setString(3, maintenance.getTypeMaintenance());
+
+        stmt.setInt(1, maintenance.getCoutMaintenance());
+
+        stmt.setInt(4, maintenance.getIdMaintenance());
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+
+    }
+
+    private Response DeleteMaintenance(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Maintenance maintenance = objectMapper.readValue(request.getRequestBody(), Maintenance.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_MAINTENANCE.query);
+
+        stmt.setInt(1, maintenance.getIdMaintenance());
+
+        stmt.setInt(2, maintenance.getCoutMaintenance());
+
+        stmt.setString(3, maintenance.getTypeMaintenance());
+
+        stmt.setDate(4, Date.valueOf(maintenance.getDateMaintenance()));;
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(maintenance));
+
+    }
+
+    private Response getTotalMaintenanceParJour(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Statement stmt = connection.createStatement();
+
+        final ResultSet res = stmt.executeQuery(Queries.TOTAL_MAINTENANCE_PAR_JOUR.query);
+
+        TotalMaintenances totalMaintenances = new TotalMaintenances(); // Liste des résultats
+
+        while (res.next()) {
+
+            TotalMaintenance totalMaintenance = new TotalMaintenance();
+
+            totalMaintenance.setDateMaintenance(res.getDate(1).toLocalDate());
+
+            totalMaintenance.setTotalMaintenance(res.getInt(2));
+
+            totalMaintenances.add(totalMaintenance);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalMaintenances));
+
+    }
+
+
 
     // Méthodes des requêtes sur la table disponibilité
 
