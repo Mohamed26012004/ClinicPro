@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
@@ -73,12 +74,9 @@ public class XMartCityService {
         UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
         DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_RENDEZ_VOUS("SELECT p.idRendezVous, p.numeroADELI, p.idPatient, p.idExamen, p.idSalle, p.dateRendezVous, p.heureDebut, p.heureFin FROM rendezvous p"),
-        INSERT_RENDEZ_VOUS("INSERT into rendezvous (numeroADELI, idPatient, idExamen, idSalle, dateRendezVous, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?)"),
-        UPDATE_RENDEZ_VOUS("UPDATE rendezvous SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, dateRendezVous = ?, heureDebut = ?, heureFin = ? WHERE idRendezVous = ?"),
-        DELETE_RENDEZ_VOUS("DELETE FROM rendezvous WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ?  AND idSalle = ? AND dateRendezVous = ? AND heureDebut = ? AND heureFin = ?"),
 
         INSERT_CONSULTE("INSERT into consulte (numeroADELI, id) values (?, ?)"),
+        DELETE_CONSULTE("DELETE FROM consulte WHERE numeroADELI = ?"),
         SELECT_HORAIRE_MEDECIN("SELECT h.jour, h.heureDebut, h.heureFin FROM horaire h, consulte c, medecin m WHERE m.numeroADELI = ? AND m.numeroADELI = c.numeroADELI AND h.id = c.id "),
 
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
@@ -142,23 +140,22 @@ public class XMartCityService {
                 "    AND d.statut = 'Réservé' " +
                 ")"),
 
+        SELECT_PLANIFICATION_WITH_NAME("SELECT plan.idPlanification, m.nom AS nomMedecin, m.prenom AS prenomMedecin, " +
+                "p.nom AS nomPatient, p.prenom AS prenomPatient, e.nom AS nomExamen, s.numeroSalle, " +
+                "plan.datePlanification, plan.heureDebut, plan.heureFin " +
+                "FROM planification plan " +
+                "JOIN medecin m ON plan.numeroADELI = m.numeroADELI " +
+                "JOIN patient p ON plan.idPatient = p.idPatient " +
+                "JOIN examen e ON plan.idExamen = e.id " +
+                "JOIN salle s ON plan.idSalle = s.id;"),
+
         SELECT_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p"),
-        INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin, id_Diagnostic, Id_Traitement, id_compteRendu) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "),
+        INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?) "),
         DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
         UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
-        DESACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 0"),   //Important pour PERMETTRE l'insertion les planifications qui n'ont pas encore de diagnostic, traitement ...
-        ACTIVATION_FK("SET FOREIGN_KEY_CHECKS = 1"),
 
-        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN("SELECT id FROM (" +
-                "    SELECT idPlanification AS id FROM planification WHERE idExamen = ?" +
-                "    UNION" +
-                "    SELECT idRendezVous AS id FROM rendezvous WHERE idExamen = ?" +
-                ") AS unionId"),
-        SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN("SELECT id FROM (" +
-                "    SELECT idPlanification AS id FROM planification WHERE numeroADELI = ?" +
-                "    UNION" +
-                "    SELECT idRendezVous AS id FROM rendezvous WHERE numeroADELI = ?" +
-                ") AS unionId"),
+        SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT idPlanification FROM planification WHERE idExamen = ?"),
+        SELECT_ID_PLANIFICATION_PAR_MEDECIN("SELECT idPlanification FROM planification WHERE numeroADELI = ?"),
 
 
         SELECT_ALL_MAINTENANCES("SELECT m.idMaintenance, m.coutMaintenance, m.dateMaintenance, m.typeMaintenance FROM maintenance m ORDER BY idMaintenance "),
@@ -361,6 +358,10 @@ public class XMartCityService {
             case INSERT_CONSULTE:
                 response = InsertConsulte(request, connection);
                 break;
+
+            case DELETE_CONSULTE:
+                response = DeleteConsulte(request, connection);
+                break;
             case SELECT_HORAIRE_MEDECIN:
                 response = SelectHoraireMedecin(request, connection);
                 break;
@@ -390,11 +391,11 @@ public class XMartCityService {
                 response = SelectAllPlanifications(request, connection);
                 break;
 
-            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN:
-                response = SelectIdRendezVousAndPlanificationParExamen(request, connection);
+            case SELECT_ID_PLANIFICATION_PAR_EXAMEN:
+                response = SelectIdPlanificationParExamen(request, connection);
                 break;
-            case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN:
-                response = SelectIdRendezVousAndPlanificationParMedecin(request, connection);
+            case SELECT_ID_PLANIFICATION_PAR_MEDECIN:
+                response = SelectIdPlanificationParMedecin(request, connection);
                 break;
 
             case TOTAL_COUT_PAR_JOUR:
@@ -416,6 +417,10 @@ public class XMartCityService {
             case TOTAL_MAINTENANCE_PAR_JOUR:
                     response = getTotalMaintenanceParJour(request, connection);
                     break;
+
+            case SELECT_PLANIFICATION_WITH_NAME:
+                response = SelectPlanificationWithName(request, connection);
+                break;
             default:
                 break;
         }
@@ -929,123 +934,6 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(patient));
     }
 
-    // Méthodes liées à la table RendezVous
-
-    private Response InsertRendezVous(final Request request, final Connection connection) throws IOException {
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
-
-        final PreparedStatement stmt;
-        final PreparedStatement stmt2;
-        final PreparedStatement stmt3;
-        try {
-            stmt = connection.prepareStatement(Queries.INSERT_RENDEZ_VOUS.query);
-            Time debut = Time.valueOf(rdv.getHeureDebut());
-            Time fin = Time.valueOf(rdv.getHeureFin());
-            Date date = Date.valueOf(rdv.getDateRendezVous());
-
-            stmt.setInt(1, rdv.getNumeroADELI());
-            stmt.setInt(2, rdv.getIdPatient());
-            stmt.setInt(3, rdv.getIdExamen());
-            stmt.setInt(4, rdv.getIdSalle());
-            stmt.setDate(5,date);
-            stmt.setTime(6, debut);
-            stmt.setTime(7, fin);
-            stmt.executeUpdate();
-
-            stmt2 = connection.prepareStatement(Queries.INSERT_DISPONIBILITE.query);
-            stmt2.setInt(1, rdv.getNumeroADELI());
-            stmt2.setDate(2, date);
-            stmt2.setTime(3, debut);
-            stmt2.setTime(4, fin);
-            stmt2.setString(5, indisponible);
-            stmt2.executeUpdate();
-
-            stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_RESERVATION.query);
-            stmt3.setInt(1, rdv.getIdSalle());
-            stmt3.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        }
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
-    }
-
-    private Response SelectAllRendezVous(final Request request, final Connection connection) throws Exception {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RENDEZ_VOUS.query);
-        RendezVouss rdvs = new RendezVouss();
-        while (res.next()) {
-            RendezVous rdv = new RendezVous();
-            rdv.setIdRendezVous(res.getInt(1));
-            rdv.setNumeroADELI(res.getInt(2));
-            rdv.setIdPatient(res.getInt(3));
-            rdv.setIdExamen(res.getInt(4));
-            rdv.setIdSalle(res.getInt(5));
-            rdv.setDateRendezVous(res.getDate(6).toLocalDate());
-            rdv.setHeureDebut(res.getTime(7).toLocalTime());
-            rdv.setHeureFin(res.getTime(8).toLocalTime());
-            rdvs.add(rdv);
-        }
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
-    }
-
-    private Response UpdateRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
-
-        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_RENDEZ_VOUS.query);
-
-        stmt.setInt(1, rdv.getNumeroADELI());
-        stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getIdExamen());
-        stmt.setInt(4, rdv.getIdSalle());
-        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
-        stmt.setInt(8, rdv.getIdRendezVous());
-        stmt.executeUpdate();
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
-    }
-
-    private Response DeleteRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
-
-        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RENDEZ_VOUS.query);
-        final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
-        final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_DELETE_RESERVATION.query);
-
-        stmt.setInt(1, rdv.getNumeroADELI());
-        stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getIdExamen());
-        stmt.setInt(4, rdv.getIdSalle());
-        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
-
-        stmt.executeUpdate();
-
-        stmt2.setInt(1, rdv.getNumeroADELI());
-        stmt2.setDate(2, Date.valueOf(rdv.getDateRendezVous()));
-        stmt2.setTime(3, Time.valueOf(rdv.getHeureDebut()));
-        stmt2.setTime(4, Time.valueOf(rdv.getHeureFin()));
-        stmt2.executeUpdate();
-
-        stmt3.setInt(1, rdv.getIdSalle());
-        stmt3.executeUpdate();
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
-    }
-
-
     // Méthodes liées à la table Paiement
 
     private Response InsertPaiement ( final Request request, final Connection connection) throws
@@ -1373,6 +1261,17 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(consulte));
     }
 
+    private Response DeleteConsulte(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Consulte consulte = objectMapper.readValue(request.getRequestBody(), Consulte.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_CONSULTE.query);
+        stmt.setInt(1, consulte.getNumeroADELI());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(consulte));
+    }
+
     private Response SelectHoraireMedecin(final Request request, final Connection connection) throws SQLException, JsonProcessingException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Medecin medecin = objectMapper.readValue(request.getRequestBody(), Medecin.class);
@@ -1622,14 +1521,10 @@ public class XMartCityService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
 
-        final Statement statement1;
-        final Statement statement2;
         final PreparedStatement stmt;
         final PreparedStatement stmt2;
         final PreparedStatement stmt3;
         try {
-            statement1 = connection.createStatement();
-            statement2 = connection.createStatement();
             stmt = connection.prepareStatement(Queries.INSERT_PLANIFICATION.query);
             Time debut = Time.valueOf(planification.getHeureDebut());
             Time fin = Time.valueOf(planification.getHeureFin());
@@ -1642,13 +1537,8 @@ public class XMartCityService {
             stmt.setDate(5,date);
             stmt.setTime(6, debut);
             stmt.setTime(7, fin);
-            stmt.setInt(8, planification.getIdDiagnostic());
-            stmt.setInt(9, planification.getIdTraitement());
-            stmt.setInt(10, planification.getIdCompteRendu());
 
-            statement1.executeUpdate(Queries.DESACTIVATION_FK.query); //Désactive les contraintes de clés étrangères
             stmt.executeUpdate();
-            statement2.executeUpdate(Queries.ACTIVATION_FK.query);    //Réactive les contraintes de clés étrangères
 
             stmt2 = connection.prepareStatement(Queries.INSERT_DISPONIBILITE.query);
             stmt2.setInt(1, planification.getNumeroADELI());
@@ -1679,11 +1569,6 @@ public class XMartCityService {
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
         final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_DELETE_RESERVATION.query);
 
-        final Statement statement1;
-        final Statement statement2;
-        statement1 = connection.createStatement();
-        statement2 = connection.createStatement();
-
         stmt.setInt(1, planification.getNumeroADELI());
         stmt.setInt(2, planification.getIdPatient());
         stmt.setInt(3, planification.getIdExamen());
@@ -1692,9 +1577,7 @@ public class XMartCityService {
         stmt.setTime(6, Time.valueOf(planification.getHeureDebut()));
         stmt.setTime(7, Time.valueOf(planification.getHeureFin()));
 
-        statement1.executeUpdate(Queries.DESACTIVATION_FK.query);
         stmt.executeUpdate();
-        statement2.executeUpdate(Queries.ACTIVATION_FK.query);
 
         stmt2.setInt(1, planification.getNumeroADELI());
         stmt2.setDate(2, Date.valueOf(planification.getDatePlanification()));
@@ -1729,42 +1612,60 @@ public class XMartCityService {
     }
 
 
-    private Response SelectIdRendezVousAndPlanificationParExamen(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response SelectIdPlanificationParExamen(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_EXAMEN.query);
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_PLANIFICATION_PAR_EXAMEN.query);
+        final PlanificationExamen planificationExamen = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
 
-        stmt.setInt(1, rdv.getIdExamen());
-        stmt.setInt(2, rdv.getIdExamen());
+        stmt.setInt(1, planificationExamen.getNumeroADELI());
         final ResultSet res = stmt.executeQuery();
 
-        RendezVouss rdvs = new RendezVouss();
+        PlanificationExamens planificationExamens = new PlanificationExamens();
         while (res.next()) {
-            RendezVous rdv2 = new RendezVous();
-            rdv2.setIdRendezVous(res.getInt(1));
-
-            rdvs.add(rdv2);
+            PlanificationExamen plan = new PlanificationExamen();
+            plan.setIdPlanification(res.getInt(1));
+            planificationExamens.add(plan);
         }
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
     }
 
-    private Response SelectIdRendezVousAndPlanificationParMedecin(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response SelectIdPlanificationParMedecin(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN.query);
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_PLANIFICATION_PAR_MEDECIN.query);
+        final PlanificationExamen planificationExamen = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
 
-        stmt.setInt(1, rdv.getNumeroADELI());
-        stmt.setInt(2, rdv.getNumeroADELI());
+        stmt.setInt(1, planificationExamen.getNumeroADELI());
         final ResultSet res = stmt.executeQuery();
 
-        RendezVouss rdvs = new RendezVouss();
+        PlanificationExamens planificationExamens = new PlanificationExamens();
         while (res.next()) {
-            RendezVous rdv2 = new RendezVous();
-            rdv2.setIdRendezVous(res.getInt(1));
-
-            rdvs.add(rdv2);
+            PlanificationExamen plan = new PlanificationExamen();
+            plan.setIdPlanification(res.getInt(1));
+            planificationExamens.add(plan);
         }
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
+    }
+
+    private Response SelectPlanificationWithName(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_PLANIFICATION_WITH_NAME.query);
+        PlanificationWithNames planificationWithNames = new PlanificationWithNames();
+        while (res.next()) {
+            PlanificationWithName pwn = new PlanificationWithName();
+            pwn.setIdPlanification(res.getInt(1));
+            pwn.setNomMedecin(res.getString(2));
+            pwn.setPrenomMedecin(res.getString(3));
+            pwn.setNomPatient(res.getString(4));
+            pwn.setPrenomPatient(res.getString(5));
+            pwn.setNomExamen(res.getString(6));
+            pwn.setNumeroSalle(res.getString(7));
+            pwn.setDatePlanification(res.getDate(8).toLocalDate());
+            pwn.setHeureDebut(res.getTime(9).toLocalTime());
+            pwn.setHeureFin(res.getTime(10).toLocalTime());
+            planificationWithNames.add(pwn);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationWithNames));
     }
 
 }

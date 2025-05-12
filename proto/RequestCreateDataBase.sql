@@ -66,22 +66,6 @@ CREATE TABLE paiement (
     moyenDePaiement VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE rendezvous(
-   idRendezVous INT AUTO_INCREMENT,
-   idSalle INT,
-   dateRendezVous DATE NOT NULL,
-   heureDebut TIME NOT NULL,
-   heureFin TIME NOT NULL,
-   idPatient INT NOT NULL,
-   id INT NOT NULL,
-   numeroADELI INT NOT NULL,
-   PRIMARY KEY(idRendezVous),
-   FOREIGN KEY(idSalle) REFERENCES salle(id),
-   FOREIGN KEY(idPatient) REFERENCES patient(idPatient),
-   FOREIGN KEY(id) REFERENCES examen(id),
-   FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
-);
-
 CREATE TABLE consulte(
    numeroADELI INT,
    id INT,
@@ -96,4 +80,20 @@ CREATE TABLE equipement(
    dateAchat DATE NOT NULL,
    coutEquipement DECIMAL(15,2) NOT NULL,
    PRIMARY KEY(idEquipement)
+);
+
+CREATE TABLE planification(
+   idPlanification INT AUTO_INCREMENT,
+   numeroADELI INT NOT NULL,
+   idPatient INT NOT NULL,
+   idExamen INT NOT NULL,
+   idSalle INT,
+   dateRendezVous DATE NOT NULL,
+   heureDebut TIME NOT NULL,
+   heureFin TIME NOT NULL,
+   PRIMARY KEY(idPlanification),
+   FOREIGN KEY(idSalle) REFERENCES salle(id),
+   FOREIGN KEY(idExamen) REFERENCES examen(id),
+   FOREIGN KEY(idPatient) REFERENCES patient(idPatient),
+   FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
 );
