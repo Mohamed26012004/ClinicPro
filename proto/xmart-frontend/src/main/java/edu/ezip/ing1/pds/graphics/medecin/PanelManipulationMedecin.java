@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 
 public class PanelManipulationMedecin extends JPanel {
@@ -61,6 +62,7 @@ public class PanelManipulationMedecin extends JPanel {
 //        }
 
         cardPanel.add(new PanelAfficheMedecin(), "AfficheMedecin");
+        cardPanel.add(new PanelPlanningMedecin(), "PlanningMedecin");
 
 
         setLayout(new BorderLayout());
@@ -89,6 +91,12 @@ public class PanelManipulationMedecin extends JPanel {
         boutonPlanning = Fenetre.createLabel("Planning");
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panel.add(boutonPlanning);
+        panel.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                cardLayout.show(cardPanel, "PlanningMedecin");
+            }
+        });
         return panel;
     }
     public JPanel panelBoutonDisponibilite(){
