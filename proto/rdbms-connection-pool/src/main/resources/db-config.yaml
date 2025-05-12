@@ -1,13 +1,13 @@
-databaseName: "ESSAI"
-host: "127.0.0.1"
-port: 3306
-username : "root"
-password: ""
-poolSize: 4
-
-#databaseName: "clinicprodatabase"
+databaseName: "clinicprodatabase"
 #host: "172.31.253.249"
 #port: 3306
 #username : "toto"
 #password: "toto"
-#poolSize: 4
+#poolSize: 1
+host: "172.31.253.249"
+port: 3306
+username : "toto"
+password: "toto"
+poolSize: 1
+
+

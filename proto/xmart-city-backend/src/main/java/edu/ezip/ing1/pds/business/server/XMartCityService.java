@@ -255,6 +255,8 @@ public class XMartCityService {
                 response = SelectOneHoraire(request, connection);
                 break;
             case UPDATE_HORAIRE:
+
+
                 response = UpdateHoraire(request, connection);
             case INSERT_SALLE:
                 response = InsertSalle(request, connection);
@@ -398,6 +400,8 @@ public class XMartCityService {
             case SELECT_ID_RENDEZ_VOUS_AND_PLANIFICATION_PAR_MEDECIN:
                 response = SelectIdRendezVousAndPlanificationParMedecin(request, connection);
                 break;
+
+
             default:
                 break;
         }
@@ -1087,6 +1091,64 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
+    private Response SelectAllRendezVous(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RENDEZ_VOUS.query);
+        RendezVouss rdvs = new RendezVouss();
+        while (res.next()) {
+            RendezVous rdv = new RendezVous();
+            rdv.setNumeroADELI(res.getInt(1));
+            rdv.setIdPatient(res.getInt(2));
+            rdv.setId(res.getInt(3));
+            rdv.setIdSalle(res.getInt(4));
+            rdv.setDateRendezVous(res.getDate(5).toLocalDate());
+            rdv.setHeureDebut(res.getTime(6).toLocalTime());
+            rdv.setHeureFin(res.getTime(7).toLocalTime());
+            rdvs.add(rdv);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
+    }
+
+    private Response UpdateRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_RENDEZ_VOUS.query);
+
+        stmt.setInt(1, rdv.getNumeroADELI());
+        stmt.setInt(2, rdv.getIdPatient());
+        stmt.setInt(3, rdv.getId());
+        stmt.setInt(4, rdv.getIdSalle());
+        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
+        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
+        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
+        stmt.setInt(8, rdv.getIdRendezVous());
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
+    }
+
+    private Response DeleteRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RENDEZ_VOUS.query);
+
+        stmt.setInt(1, rdv.getNumeroADELI());
+        stmt.setInt(2, rdv.getIdPatient());
+        stmt.setInt(3, rdv.getId());
+        stmt.setInt(4, rdv.getIdSalle());
+        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
+        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
+        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
+    }
 
     // Méthodes de CRUD de la table AntecedentMedical
 
@@ -1152,8 +1214,11 @@ public class XMartCityService {
         final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_COMPTE_RENDU.query);
-        stmt.setString(1, compteRendu.getTypeSymptome());
-        stmt.setString(2, compteRendu.getDescriptionSymptome());
+        stmt.setInt(1, compteRendu.getIdPatient());
+        stmt.setInt(2, compteRendu.getNumeroADELI());
+        stmt.setString(3, compteRendu.getTypeSymptome());
+        stmt.setString(4, compteRendu.getDescriptionSymptome());
+
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
@@ -1167,8 +1232,9 @@ public class XMartCityService {
         while (res.next()) {
             CompteRendu compteRendu = new CompteRendu();
             compteRendu.setId_compteRendu(res.getInt(1));
-            compteRendu.setTypeSymptome(res.getString(2));
-            compteRendu.setDescriptionSymptome(res.getString(3));
+            compteRendu.setIdPatient(res.getInt(2));
+            compteRendu.setNumeroADELI(res.getInt(3));
+            compteRendu.setDescriptionSymptome(res.getString(4));
             compteRendus.add(compteRendu);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendus));
@@ -1179,9 +1245,11 @@ public class XMartCityService {
         final CompteRendu compteRendu = objectMapper.readValue(request.getRequestBody(), CompteRendu.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_COMPTE_RENDU.query);
-        stmt.setString(1, compteRendu.getTypeSymptome());
-        stmt.setString(2, compteRendu.getDescriptionSymptome());
-        stmt.setInt(3, compteRendu.getId_compteRendu());
+        stmt.setInt(1, compteRendu.getIdPatient());
+        stmt.setInt(2, compteRendu.getNumeroADELI());
+        stmt.setString(3, compteRendu.getTypeSymptome());
+        stmt.setString(4, compteRendu.getDescriptionSymptome());
+        stmt.setInt(5, compteRendu.getId_compteRendu());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(compteRendu));
@@ -1206,9 +1274,11 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getCodeCIM10());
-        stmt.setString(2, diagnostic.getNomMaladie());
-        stmt.setString(3, diagnostic.getDescription_Diagnostic());
+        stmt.setInt(1, diagnostic.getIdPatient());
+        stmt.setInt(2, diagnostic.getNumeroADELI());
+        stmt.setString(3, diagnostic.getCodeCIM10());
+        stmt.setString(4, diagnostic.getNomMaladie());
+        stmt.setString(5, diagnostic.getDescription_Diagnostic());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
@@ -1221,10 +1291,12 @@ public class XMartCityService {
         Diagnostics diagnostics = new Diagnostics();
         while (res.next()) {
             Diagnostic diagnostic = new Diagnostic();
-            diagnostic.setId_Diagnostic(res.getInt(1));
-            diagnostic.setCodeCIM10(res.getString(2));
-            diagnostic.setNomMaladie(res.getString(3));
-            diagnostic.setDescription_Diagnostic(res.getString(4));
+            diagnostic.setIdPatient(res.getInt(1));
+            diagnostic.setNumeroADELI(res.getInt(2));
+            diagnostic.setId_Diagnostic(res.getInt(3));
+            diagnostic.setCodeCIM10(res.getString(4));
+            diagnostic.setNomMaladie(res.getString(5));
+            diagnostic.setDescription_Diagnostic(res.getString(6));
             diagnostics.add(diagnostic);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostics));
@@ -1235,10 +1307,12 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_DIAGNOSTIC.query);
-        stmt.setString(1, diagnostic.getCodeCIM10());
-        stmt.setString(2, diagnostic.getNomMaladie());
-        stmt.setString(3, diagnostic.getDescription_Diagnostic());
-        stmt.setInt(4, diagnostic.getId_Diagnostic());
+        stmt.setInt(1, diagnostic.getId_Diagnostic());
+        stmt.setInt(2, diagnostic.getIdPatient());
+        stmt.setInt(3, diagnostic.getNumeroADELI());
+        stmt.setString(4, diagnostic.getCodeCIM10());
+        stmt.setString(5, diagnostic.getNomMaladie());
+        stmt.setString(6, diagnostic.getDescription_Diagnostic());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
@@ -1263,10 +1337,12 @@ public class XMartCityService {
         final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_TRAITEMENT.query);
-        stmt.setString(1, traitement.getType_Traitement());
-        stmt.setString(2, traitement.getDescription_Traitement());
-        stmt.setString(3, traitement.getDebut_Traitement());
-        stmt.setString(3, traitement.getFin_Traitement());
+        stmt.setInt(1, traitement.getIdPatient());
+        stmt.setInt(2, traitement.getNumeroADELI());
+        stmt.setString(3, traitement.getType_Traitement());
+        stmt.setString(4, traitement.getDescription_Traitement());
+        stmt.setString(5, traitement.getDebut_Traitement());
+        stmt.setString(6, traitement.getFin_Traitement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
@@ -1279,11 +1355,13 @@ public class XMartCityService {
         Traitements traitements = new Traitements();
         while (res.next()) {
             Traitement traitement = new Traitement();
-            traitement.setId_Traitement(res.getInt(1));
-            traitement.setType_Traitement(res.getString(2));
-            traitement.setDescription_Traitement(res.getString(3));
-            traitement.setDebut_Traitement(res.getString(4));
-            traitement.setFin_Traitement(res.getString(5));
+            traitement.setIdPatient(res.getInt(1));
+            traitement.setNumeroADELI(res.getInt(2));
+            traitement.setId_Traitement(res.getInt(3));
+            traitement.setType_Traitement(res.getString(4));
+            traitement.setDescription_Traitement(res.getString(5));
+            traitement.setDebut_Traitement(res.getString(6));
+            traitement.setFin_Traitement(res.getString(7));
             traitements.add(traitement);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitements));
@@ -1294,11 +1372,13 @@ public class XMartCityService {
         final Traitement traitement = objectMapper.readValue(request.getRequestBody(), Traitement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_TRAITEMENT.query);
-        stmt.setString(1, traitement.getType_Traitement());
-        stmt.setString(2, traitement.getDescription_Traitement());
-        stmt.setString(3, traitement.getDebut_Traitement());
-        stmt.setString(4, traitement.getFin_Traitement());
-        stmt.setInt(5, traitement.getId_Traitement());
+        stmt.setInt(1, traitement.getIdPatient());
+        stmt.setInt(2, traitement.getNumeroADELI());
+        stmt.setString(3, traitement.getType_Traitement());
+        stmt.setString(4, traitement.getDescription_Traitement());
+        stmt.setString(5, traitement.getDebut_Traitement());
+        stmt.setString(6, traitement.getFin_Traitement());
+        stmt.setInt(7, traitement.getId_Traitement());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(traitement));
@@ -1316,7 +1396,7 @@ public class XMartCityService {
     }
 
 
-    // Méthodes liées à la table Consulte (Classe liant un médecin à ses horaires)
+    // Méthodes liées à la table Consulete (Classe liant un médecin à ses horaires)
 
     private Response InsertConsulte(final Request request, final Connection connection) throws IOException {
 

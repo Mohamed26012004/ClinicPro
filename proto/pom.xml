@@ -17,6 +17,14 @@
         <module>xmart-city-backend</module>
         <module>xmart-frontend</module>
     </modules>
+    <dependencies>
+        <!-- Dépendance JFreeChart pour les graphiques -->
+        <dependency>
+            <groupId>org.jfree</groupId>
+            <artifactId>jfreechart</artifactId>
+            <version>1.5.3</version> <!-- Dernière version stable -->
+        </dependency>
+    </dependencies>
 
 
 </project>

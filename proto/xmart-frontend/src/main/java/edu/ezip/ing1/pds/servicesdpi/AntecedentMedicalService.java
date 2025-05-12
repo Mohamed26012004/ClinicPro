@@ -78,9 +78,9 @@ public class AntecedentMedicalService {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
             final AntecedentMedical am = (AntecedentMedical)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {}  --> {}",
+            logger.debug("Thread {} complete : {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    am.getType_antecedentMedical(), am.getDescription_antecedentMedical(),
+                    am.getIdPatient(), am.getType_antecedentMedical(), am.getDescription_antecedentMedical(),
                     clientRequest2.getResult());
         }
     }

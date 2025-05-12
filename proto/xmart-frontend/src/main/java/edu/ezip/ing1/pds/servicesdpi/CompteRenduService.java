@@ -78,15 +78,15 @@ public class CompteRenduService {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
             final CompteRendu cr = (CompteRendu)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {}  --> {}",
+            logger.debug("Thread {} complete : {} {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    cr.getTypeSymptome(), cr.getDescriptionSymptome(),
+                    cr.getIdPatient(), cr.getNumeroADELI(), cr.getTypeSymptome(), cr.getDescriptionSymptome(),
                     clientRequest2.getResult());
         }
     }
 
 
-    public CompteRendus selectcompteRendus() throws InterruptedException, IOException {
+    public CompteRendus selectCompteRendus() throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
