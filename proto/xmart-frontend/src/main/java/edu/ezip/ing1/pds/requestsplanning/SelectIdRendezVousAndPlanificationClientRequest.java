@@ -8,9 +8,9 @@ import edu.ezip.ing1.pds.commons.Request;
 
 import java.io.IOException;
 
-public class SelectIdRendezVousAndPlanificationClientRequest extends ClientRequest<Examen, RendezVouss> {
+public class SelectIdRendezVousAndPlanificationClientRequest extends ClientRequest<RendezVous, RendezVouss> {
 
-    public SelectIdRendezVousAndPlanificationClientRequest(NetworkConfig networkConfig, int myBirthDate, Request request, Examen info, byte[] bytes) throws IOException {
+    public SelectIdRendezVousAndPlanificationClientRequest(NetworkConfig networkConfig, int myBirthDate, Request request, RendezVous info, byte[] bytes) throws IOException {
         super(networkConfig, myBirthDate, request, info, bytes);
     }
 

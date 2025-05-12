@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 @JsonRootName(value = "totalMaintenance")
 
 public class TotalMaintenance {
-//    @JsonDeserialize(using = DeserialisationDate2.class)
+    @JsonDeserialize(using = DeserialisationDate.class)
     private LocalDate dateMaintenance;
     private int totalMaintenance;
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");

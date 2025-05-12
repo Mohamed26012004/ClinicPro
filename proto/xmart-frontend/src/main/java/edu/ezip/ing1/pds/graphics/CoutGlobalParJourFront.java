@@ -4,6 +4,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,6 +24,7 @@ public class CoutGlobalParJourFront {
     private final EquipementService equipementService;
     private final MaintenanceService maintenanceService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private JTextField dateField;
 
     public CoutGlobalParJourFront() {
         final String networkConfigFile = "network.yaml";
@@ -30,50 +32,63 @@ public class CoutGlobalParJourFront {
         this.equipementService = new EquipementService(networkConfig);
         this.maintenanceService = new MaintenanceService(networkConfig);
 
-
         JFrame frame = new JFrame("Coût Global (Équipements + Maintenances) par Jour");
-        frame.setSize(700, 400);
+        frame.setSize(700, 450);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-
 
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
+        dateField = new JTextField(10);
 
-        JButton boutonActualiser = new JButton("Actualiser");
-        boutonActualiser.addActionListener(e -> {
+        JButton boutonFiltrer = new JButton("Filtrer");
+        boutonFiltrer.addActionListener(e -> {
+            try {
+                LocalDate selectedDate = LocalDate.parse(dateField.getText(), formatter);
+                chargerCoutsPourDate(selectedDate);
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JButton boutonReinitialiser = new JButton("Réinitialiser");
+        boutonReinitialiser.addActionListener(e -> {
             try {
                 chargerCoutsGlobaux();
+                dateField.setText("");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du chargement: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         JPanel panelSud = new JPanel();
-        panelSud.add(boutonActualiser);
+        panelSud.add(new JLabel("Date (yyyy-MM-dd): "));
+        panelSud.add(dateField);
+        panelSud.add(boutonFiltrer);
+        panelSud.add(boutonReinitialiser);
+
         frame.add(panelSud, BorderLayout.SOUTH);
 
         try {
             chargerCoutsGlobaux();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement: " + ex.getMessage(),
-                    "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
         frame.setVisible(true);
     }
 
     private void chargerCoutsGlobaux() throws IOException, InterruptedException {
-        model.setRowCount(0); // Reset tableau
+        model.setRowCount(0);
 
         Map<LocalDate, Double> coutEquipementParJour = new HashMap<>();
         Map<LocalDate, Double> coutMaintenanceParJour = new HashMap<>();
         Set<LocalDate> toutesLesDates = new TreeSet<>();
-
 
         TotalCouts totalCouts = equipementService.getTotalCoutParJour();
         if (totalCouts != null && totalCouts.getTotalCouts() != null) {
@@ -84,7 +99,6 @@ public class CoutGlobalParJourFront {
             }
         }
 
-
         TotalMaintenances totalMaintenances = maintenanceService.getTotalMaintenanceParJour();
         if (totalMaintenances != null && totalMaintenances.getTotalMaintenances() != null) {
             for (TotalMaintenance tm : totalMaintenances.getTotalMaintenances()) {
@@ -93,7 +107,6 @@ public class CoutGlobalParJourFront {
                 toutesLesDates.add(date);
             }
         }
-
 
         for (LocalDate date : toutesLesDates) {
             double coutEq = coutEquipementParJour.getOrDefault(date, 0.0);
@@ -107,6 +120,42 @@ public class CoutGlobalParJourFront {
                     total
             });
         }
+    }
+
+    private void chargerCoutsPourDate(LocalDate date) throws IOException, InterruptedException {
+        model.setRowCount(0);
+
+        double coutEq = 0.0;
+        double coutMaint = 0.0;
+
+        TotalCouts totalCouts = equipementService.getTotalCoutParJour();
+        if (totalCouts != null && totalCouts.getTotalCouts() != null) {
+            for (TotalCout tc : totalCouts.getTotalCouts()) {
+                if (tc.getDateAchat().equals(date)) {
+                    coutEq = tc.getTotalCout();
+                    break;
+                }
+            }
+        }
+
+        TotalMaintenances totalMaintenances = maintenanceService.getTotalMaintenanceParJour();
+        if (totalMaintenances != null && totalMaintenances.getTotalMaintenances() != null) {
+            for (TotalMaintenance tm : totalMaintenances.getTotalMaintenances()) {
+                if (tm.getDateMaintenance().equals(date)) {
+                    coutMaint = tm.getTotalMaintenance();
+                    break;
+                }
+            }
+        }
+
+        double total = coutEq + coutMaint;
+
+        model.addRow(new Object[]{
+                date.format(formatter),
+                coutEq,
+                coutMaint,
+                total
+        });
     }
 
     public static void main(String[] args) {

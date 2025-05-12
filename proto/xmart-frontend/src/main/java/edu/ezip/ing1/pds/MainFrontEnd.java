@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds;
 
 import java.io.IOException;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import edu.ezip.ing1.pds.business.dto.Diagnostic;
 import edu.ezip.ing1.pds.business.dto.Facture;
 
@@ -20,6 +21,8 @@ import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 import edu.ezip.ing1.pds.services.MaintenanceService;
 
+import javax.swing.*;
+
 public class MainFrontEnd {
 
 
@@ -32,8 +35,17 @@ public class MainFrontEnd {
 //        final MaintenanceService maintenanceService = new MaintenanceService(networkConfig);
 //        Maintenance maintenance = new Maintenance(2324, "dfsdsfsd", LocalDate.now(), 23);
 //        maintenanceService.deleteMaintenance(maintenance);
+          //PaiementFront pf= new PaiementFront();
 
 
+        // Pour un jolie look and feel.
+        try {
+            UIManager.setLookAndFeel(new FlatLightLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
+//        Fenetre fene = new Fenetre();
+//        fene.setVisible(true);
           //TotalCoutFront fen = new TotalCoutFront();
           //EquipementFront p= new EquipementFront();
 //          MaintenanceFront mf = new MaintenanceFront();

@@ -1,9 +1,10 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.examen;
 
 import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.servicesplanning.SalleService;
+import edu.ezip.ing1.pds.services.ExamenService;
+import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -12,76 +13,73 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-
-public class PanelManipulationSalle extends JPanel {
+public class PanelManipulationExamen extends JPanel {
 
     final static String networkConfigFile = "network.yaml";
-    final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-    final static SalleService salleService = new SalleService(networkConfig);
+    static final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+    static final ExamenService examenService = new ExamenService(networkConfig);
+    final RendezVousService rdvService = new RendezVousService(networkConfig);
+    private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
     private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
     private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
-    private final String statutReserve = "Réservé";
-    private final String msgImposSupprime = "Salle Réservée !!!!!\nImpossiblle de la supprimer\nSupprimer le rendez-vous ou la planification qui a réservé la salle.";
-
-    private static JButton addButton;
-    private static JButton update;
-    private static JButton delete;
-    private static JScrollPane scrollPane;
-    private static JPanel panneau = new JPanel(new BorderLayout());
 
 
     private static DefaultTableModel model;
     private JTable table;
+    private static JButton ajouter;
+    private static JButton modifier;
+    private static JButton supprimer;
+    private static JScrollPane scrollPane;
+    private static JPanel panneau = new JPanel(new BorderLayout());
 
 
-    public PanelManipulationSalle() throws IOException, InterruptedException {
+    public PanelManipulationExamen() throws IOException, InterruptedException {
+
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(this.toolBar(), BorderLayout.NORTH);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        JLabel l = new JLabel("LISTE DES SALLES");
+        JLabel l = new JLabel("LISTE DES EXAMENS");
         l.setFont(new Font("Arial", Font.BOLD, 17));
         panel.add(l, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "Numéro de la Salle", "Type de salle", "Statut"};
+        String[] columns = {"ID", "Nom", "Coût (€)", "Durée"};
         model = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-        chargerSalles();
+        chargerExamens();
         table = new JTable(model);
         table.setRowHeight(30);
         table.setFont(new Font("Arial", Font.PLAIN, 15));
         JScrollPane scrollPane = new JScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
         add(panel, BorderLayout.CENTER);
-
     }
 
-
-    public static void chargerSalles() throws IOException, InterruptedException {
+    public static void chargerExamens() throws IOException, InterruptedException {
         model.setRowCount(0);
 
-        Salles salles = salleService.selectSalles();
-
-        if (salles != null && salles.getSalles() != null) {
-            ArrayList<Salle> list = new ArrayList<>(salles.getSalles());
-            list.sort(Comparator.comparing(Salle::getNumeroSalle));              //Order by nom
-            for (Salle salle : list){
+        Examens examens = examenService.selectExamens();
+        if (examens != null && examens.getExamens() != null) {
+            ArrayList<Examen> list = new ArrayList<>(examens.getExamens());
+            list.sort(Comparator.comparing(Examen::getNom));              //Order by nom
+            for (Examen examen : list){
                 model.addRow(new Object[]{
-                        salle.getId(),
-                        salle.getNumeroSalle(),
-                        salle.getTypeSalle(),
-                        salle.getStatut()
+                        examen.getId(),
+                        examen.getNom(),
+                        examen.getCout(),
+                        examen.getDuree(),
                 });
             }
         }
@@ -93,7 +91,7 @@ public class PanelManipulationSalle extends JPanel {
         ImageIcon addImage = new ImageIcon(addFileNameButton);
         Image i = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
         addImage = new ImageIcon(i);
-        JButton addButton = new JButton("Nouvelle Salle", addImage);
+        JButton addButton = new JButton("Nouvel examen", addImage);
 
         ImageIcon updateImage = new ImageIcon(updateFileNameButton);
         Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
@@ -114,19 +112,25 @@ public class PanelManipulationSalle extends JPanel {
                     int i = table.getSelectedRow();
                     if (i >= 0) {
 
-                       Salle salle = new Salle();
-                       salle.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                       salle.setNumeroSalle(model.getValueAt(i, 1).toString());
-                       salle.setTypeSalle(model.getValueAt(i, 2).toString());
-                       salle.setStatut(model.getValueAt(i, 3).toString());
+                        Examen examen = new Examen();
+                        examen.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                        examen.setNom(model.getValueAt(i, 1).toString());
+                        examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
+                        examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
 
-                       if (salle.getStatut().equals(statutReserve)){
-                            JOptionPane.showMessageDialog(null, msgImposSupprime, "Erreur", JOptionPane.ERROR_MESSAGE);
-                       }else {
-                            salleService.deleteSalle(salle);
-                            JOptionPane.showMessageDialog(null, "Salle supprimée", "Message", JOptionPane.INFORMATION_MESSAGE);
-                            chargerSalles();
-                       }
+                        RendezVous rdv = new RendezVous();
+                        rdv.setIdExamen(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(rdv);
+
+                        if (!rdvs.getRdvs().isEmpty()){
+                            JOptionPane.showMessageDialog(null, "Examen PROGRAMME. Impossible de le supprimer." +
+                                    "\nVeillez supprimer les rendez-vous et les planifications consernées par l'examen avant de le supprimer. ", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        }else {
+                            examenService.deleteExamen(examen);
+                            chargerExamens();
+                            JOptionPane.showMessageDialog(null, "Examen supprimé.", "Message", JOptionPane.INFORMATION_MESSAGE);
+
+                        }
                     }
                 }catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
@@ -143,15 +147,14 @@ public class PanelManipulationSalle extends JPanel {
                     int i = table.getSelectedRow();
                     if (i >= 0) {
 
-                        Salle salle = new Salle();
-                        salle.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                        salle.setNumeroSalle(model.getValueAt(i, 1).toString());
-                        salle.setTypeSalle(model.getValueAt(i, 2).toString());
-                        salle.setStatut(model.getValueAt(i, 3).toString());
+                        Examen examen = new Examen();
+                        examen.setId(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                        examen.setNom(model.getValueAt(i, 1).toString());
+                        examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
+                        examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
 
-                        FrameCreationSalle f = new FrameCreationSalle(salle);
-                        JOptionPane.showMessageDialog(null, "Mise à jour effectuée.", "Message", JOptionPane.INFORMATION_MESSAGE);
-                        chargerSalles();
+                        FrameCreationExamen f = new FrameCreationExamen(examen);
+                        chargerExamens();
                     }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
@@ -163,8 +166,8 @@ public class PanelManipulationSalle extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    FrameCreationSalle f = new FrameCreationSalle(null);
-                    chargerSalles();
+                    FrameCreationExamen f = new FrameCreationExamen(null);
+                    chargerExamens();
                 } catch (IOException | InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -182,5 +185,6 @@ public class PanelManipulationSalle extends JPanel {
         return bar;
     }
 
-}
 
+
+}

@@ -1,12 +1,10 @@
-package edu.ezip.ing1.pds.medecingrahics;
+package edu.ezip.ing1.pds.graphics.examen;
 
 import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Salle;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
 import edu.ezip.ing1.pds.services.ExamenService;
-import edu.ezip.ing1.pds.servicesplanning.SalleService;
 
 import javax.swing.*;
 import java.awt.*;
