@@ -5,7 +5,7 @@ import edu.ezip.ing1.pds.business.dto.Horaires;
 import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.servicesplanning.HoraireService;
+import edu.ezip.ing1.pds.services.planning.HoraireService;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

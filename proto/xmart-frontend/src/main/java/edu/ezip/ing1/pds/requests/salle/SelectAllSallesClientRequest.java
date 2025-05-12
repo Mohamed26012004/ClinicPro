@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.requestsplanning;
+package edu.ezip.ing1.pds.requests.salle;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;

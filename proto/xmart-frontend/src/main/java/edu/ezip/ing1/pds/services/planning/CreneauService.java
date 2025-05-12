@@ -1,16 +1,14 @@
-package edu.ezip.ing1.pds.servicesplanning;
+package edu.ezip.ing1.pds.services.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.Creneaux;
-import edu.ezip.ing1.pds.business.dto.Horaires;
 import edu.ezip.ing1.pds.business.dto.RendezVous;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllHorairesClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectDisponibiliteParDateClientRequest;
+import edu.ezip.ing1.pds.requests.planning.SelectDisponibiliteParDateClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;

@@ -3,8 +3,8 @@ package edu.ezip.ing1.pds.graphics.examen;
 import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.ExamenService;
-import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
+import edu.ezip.ing1.pds.services.planning.ExamenService;
+import edu.ezip.ing1.pds.services.planning.PlanificationService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +22,7 @@ public class PanelManipulationExamen extends JPanel {
     final static String networkConfigFile = "network.yaml";
     static final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
     static final ExamenService examenService = new ExamenService(networkConfig);
-    final RendezVousService rdvService = new RendezVousService(networkConfig);
+    final PlanificationService planificationService = new PlanificationService(networkConfig);
     private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
@@ -118,11 +118,11 @@ public class PanelManipulationExamen extends JPanel {
                         examen.setCout(Double.parseDouble(model.getValueAt(i,2).toString()));
                         examen.setDuree(LocalTime.parse(model.getValueAt(i, 3).toString(), formattage));
 
-                        RendezVous rdv = new RendezVous();
-                        rdv.setIdExamen(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParExamen(rdv);
+                        PlanificationExamen planificationExamen = new PlanificationExamen();
+                        planificationExamen.setIdExamen(Integer.parseInt(model.getValueAt(i, 0).toString()));
 
-                        if (!rdvs.getRdvs().isEmpty()){
+                        PlanificationExamens plans = planificationService.selectIdPlanificationParExamen(planificationExamen);
+                        if (!plans.getPlanifications().isEmpty()){
                             JOptionPane.showMessageDialog(null, "Examen PROGRAMME. Impossible de le supprimer." +
                                     "\nVeillez supprimer les rendez-vous et les planifications consernées par l'examen avant de le supprimer. ", "Erreur", JOptionPane.ERROR_MESSAGE);
                         }else {

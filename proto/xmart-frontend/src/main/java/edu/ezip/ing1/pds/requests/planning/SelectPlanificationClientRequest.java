@@ -1,8 +1,7 @@
-package edu.ezip.ing1.pds.requestsplanning;
+package edu.ezip.ing1.pds.requests.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
-import edu.ezip.ing1.pds.business.dto.Salles;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;

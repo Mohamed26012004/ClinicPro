@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.requests;
+package edu.ezip.ing1.pds.requests.examen;
 
 import java.io.IOException;
 import java.util.Map;

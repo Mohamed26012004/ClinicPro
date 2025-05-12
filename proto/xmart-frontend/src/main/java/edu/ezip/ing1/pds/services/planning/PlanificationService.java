@@ -1,19 +1,17 @@
-package edu.ezip.ing1.pds.servicesplanning;
+package edu.ezip.ing1.pds.services.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
+import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
-import edu.ezip.ing1.pds.business.dto.Salle;
-import edu.ezip.ing1.pds.business.dto.Salles;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requestsplanning.InsertPlanificationClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.InsertSalleClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllSallesClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectPlanificationClientRequest;
+import edu.ezip.ing1.pds.requests.planning.InsertPlanificationClientRequest;
+import edu.ezip.ing1.pds.requests.planning.SelectIdPlanificationClientRequest;
+import edu.ezip.ing1.pds.requests.planning.SelectPlanificationClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -33,6 +31,8 @@ public class PlanificationService {
     final String selectRequestOrder = "SELECT_PLANIFICATION";
     final String updateRequestOrder = "UPDATE_PLANIFICATION";
     final String deleteRequestOrder = "DELETE_PLANIFICATION";
+    final String selectIdPlanParMedecin = "SELECT_ID_PLANIFICATION_PAR_MEDECIN";
+    final String selectIdPlanParExamen = "SELECT_ID_PLANIFICATION_PAR_EXAMEN";
 
 
     private final NetworkConfig networkConfig;
@@ -113,4 +113,41 @@ public class PlanificationService {
             return null;
         }
     }
+
+    public PlanificationExamens selectIdPlanification(PlanificationExamen planificationExamen, String requestOrder) throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(requestOrder);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectIdPlanificationClientRequest clientRequest = new SelectIdPlanificationClientRequest(
+                networkConfig,
+                birthdate++, request, planificationExamen, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if (!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            return (PlanificationExamens) joinedClientRequest.getResult();
+        } else {
+            logger.error("No Salles found");
+            return null;
+        }
+    }
+
+    public PlanificationExamens selectIdPlanificationParExamen(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+        return selectIdPlanification(planificationExamen, selectIdPlanParExamen);
+    }
+    public PlanificationExamens selectIdPlanificationParMedecin(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+        return selectIdPlanification(planificationExamen, selectIdPlanParMedecin);
+    }
+
 }

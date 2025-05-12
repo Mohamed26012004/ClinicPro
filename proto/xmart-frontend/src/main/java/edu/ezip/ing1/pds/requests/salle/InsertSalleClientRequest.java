@@ -1,7 +1,8 @@
-package edu.ezip.ing1.pds.requestsplanning;
+package edu.ezip.ing1.pds.requests.salle;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ezip.ing1.pds.business.dto.Medecin;
+import edu.ezip.ing1.pds.business.dto.Salle;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
@@ -9,10 +10,10 @@ import edu.ezip.ing1.pds.commons.Request;
 import java.io.IOException;
 import java.util.Map;
 
-public class InsertMedecinClientRequest extends ClientRequest<Medecin, String> {
+public class InsertSalleClientRequest extends ClientRequest<Salle, String> {
 
-    public InsertMedecinClientRequest(
-            NetworkConfig networkConfig, int myBirthDate, Request request, Medecin info, byte[] bytes)
+    public InsertSalleClientRequest(
+            NetworkConfig networkConfig, int myBirthDate, Request request, Salle info, byte[] bytes)
             throws IOException {
         super(networkConfig, myBirthDate, request, info, bytes);
 
@@ -21,8 +22,8 @@ public class InsertMedecinClientRequest extends ClientRequest<Medecin, String> {
     @Override
     public String readResult(String body) throws IOException {
         final ObjectMapper mapper = new ObjectMapper();
-        final Map<String, Integer> medecinNumeroADELIMap = mapper.readValue(body, Map.class);
-        final String result  = medecinNumeroADELIMap.get("medecin_numeroADELI").toString();
+        final Map<String, Integer> salleIdMap = mapper.readValue(body, Map.class);
+        final String result  = salleIdMap.get("salle_id").toString();
         return result;
     }
 }

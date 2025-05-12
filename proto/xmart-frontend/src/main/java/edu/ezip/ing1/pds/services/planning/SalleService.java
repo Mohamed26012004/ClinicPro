@@ -1,16 +1,19 @@
-package edu.ezip.ing1.pds.servicesplanning;
+package edu.ezip.ing1.pds.services.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+
 import edu.ezip.commons.LoggingUtils;
-import edu.ezip.ing1.pds.business.dto.Medecins;
-import edu.ezip.ing1.pds.business.dto.Patient;
-import edu.ezip.ing1.pds.business.dto.Patients;
+
+import edu.ezip.ing1.pds.business.dto.Salle;
+import edu.ezip.ing1.pds.business.dto.Salles;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requestsplanning.InsertPatientClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.SelectAllPatientsClientRequest;
+
+import edu.ezip.ing1.pds.requests.salle.InsertSalleClientRequest;
+
+import edu.ezip.ing1.pds.requests.salle.SelectAllSallesClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -20,69 +23,69 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.UUID;
 
-public class PatientService {
+public class SalleService {
 
-    private final static String LoggingLabel = "FrontEnd - PatientService";
+    private final static String LoggingLabel = "FrontEnd - SalleService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
 
-    final String insertRequestOrder = "INSERT_PATIENT";
-    final String selectRequestOrder = "SELECT_ALL_PATIENTS";
-    final String updateRequestOrder = "UPDATE_PATIENT";
-    final String deleteRequestOrder = "DELETE_PATIENT";
+    final String insertRequestOrder = "INSERT_SALLE";
+    final String selectRequestOrder = "SELECT_ALL_SALLES";
+    final String updateRequestOrder = "UPDATE_SALLE";
+    final String deleteRequestOrder = "DELETE_SALLE";
 
 
     private final NetworkConfig networkConfig;
 
-    public PatientService(NetworkConfig networkConfig) {
+    public SalleService(NetworkConfig networkConfig) {
         this.networkConfig = networkConfig;
     }
 
-    public void insertPatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, insertRequestOrder);
+    public void insertSalle(Salle salle) throws InterruptedException, IOException {
+        insertDeleteUpdateSalle(salle, insertRequestOrder);
     }
 
-    public void updatePatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, updateRequestOrder);
+    public void updateSalle(Salle salle) throws InterruptedException, IOException {
+        insertDeleteUpdateSalle(salle, updateRequestOrder);
     }
 
-    public void deletePatient(Patient patient)throws InterruptedException, IOException {
-        insertDeleteUpdatePatient(patient, deleteRequestOrder);
+    public void deleteSalle(Salle salle) throws InterruptedException, IOException {
+        insertDeleteUpdateSalle(salle, deleteRequestOrder);
     }
-    public void insertDeleteUpdatePatient(Patient patient, String requestOrder) throws InterruptedException, IOException {
+
+    public void insertDeleteUpdateSalle(Salle salle, String requestOrder) throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
 
         int birthdate = 0;
 
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(patient);
-        logger.trace("Patient with its JSON face : {}", jsonifiedGuy);
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(salle);
+        logger.trace("Salle with its JSON face : {}", jsonifiedGuy);
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestOrder(requestOrder);
         request.setRequestContent(jsonifiedGuy);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        final InsertPatientClientRequest clientRequest = new InsertPatientClientRequest(
+        final InsertSalleClientRequest clientRequest = new InsertSalleClientRequest(
                 networkConfig,
-                birthdate++, request, patient, requestBytes);
+                birthdate++, request, salle, requestBytes);
         clientRequests.push(clientRequest);
 
 
         while (!clientRequests.isEmpty()) {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
-            final Patient p = (Patient)clientRequest2.getInfo();
+            final Salle s = (Salle) clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    p.getNom(), p.getPrenom(), p.getTelephone(),
-                    p.getAdresse(),
+                    s.getId(), s.getNumeroSalle(), s.getTypeSalle(), s.getStatut(),
                     clientRequest2.getResult());
         }
     }
 
-    public Patients selectPatients() throws InterruptedException, IOException {
+    public Salles selectSalles() throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -91,21 +94,20 @@ public class PatientService {
         request.setRequestId(requestId);
         request.setRequestOrder(selectRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectAllPatientsClientRequest clientRequest = new SelectAllPatientsClientRequest(
+        final SelectAllSallesClientRequest clientRequest = new SelectAllSallesClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
         clientRequests.push(clientRequest);
 
-        if(!clientRequests.isEmpty()) {
+        if (!clientRequests.isEmpty()) {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (Patients) joinedClientRequest.getResult();
-        }
-        else {
-            logger.error("No Medecins found");
+            return (Salles) joinedClientRequest.getResult();
+        } else {
+            logger.error("No Salles found");
             return null;
         }
     }

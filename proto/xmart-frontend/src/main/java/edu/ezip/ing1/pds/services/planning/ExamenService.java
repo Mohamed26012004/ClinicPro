@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.services;
+package edu.ezip.ing1.pds.services.planning;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -19,8 +19,8 @@ import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.InsertExamenClientRequest;
-import edu.ezip.ing1.pds.requests.SelectAllExamensClientRequest;
+import edu.ezip.ing1.pds.requests.examen.InsertExamenClientRequest;
+import edu.ezip.ing1.pds.requests.examen.SelectAllExamensClientRequest;
 
 
 public class ExamenService {

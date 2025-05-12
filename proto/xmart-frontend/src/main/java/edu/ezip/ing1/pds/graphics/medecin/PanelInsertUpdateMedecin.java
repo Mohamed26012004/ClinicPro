@@ -7,8 +7,8 @@ import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
-import edu.ezip.ing1.pds.servicesplanning.HoraireService;
-import edu.ezip.ing1.pds.servicesplanning.MedecinService;
+import edu.ezip.ing1.pds.services.planning.HoraireService;
+import edu.ezip.ing1.pds.services.planning.MedecinService;
 
 import javax.swing.*;
 

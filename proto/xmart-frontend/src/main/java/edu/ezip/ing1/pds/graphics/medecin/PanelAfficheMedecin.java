@@ -3,8 +3,8 @@ package edu.ezip.ing1.pds.graphics.medecin;
 import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.servicesplanning.MedecinService;
-import edu.ezip.ing1.pds.servicesplanning.RendezVousService;
+import edu.ezip.ing1.pds.services.planning.MedecinService;
+import edu.ezip.ing1.pds.services.planning.PlanificationService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +22,7 @@ public class PanelAfficheMedecin extends JPanel {
     final static String networkConfigFile = "network.yaml";
     final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
     final static MedecinService medecinService = new MedecinService(networkConfig);
-    final static RendezVousService rdvService = new RendezVousService(networkConfig);
+    final static PlanificationService planificationService = new PlanificationService(networkConfig);
 
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
     private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
@@ -142,12 +142,15 @@ public class PanelAfficheMedecin extends JPanel {
                         medecin.setSpecialite(model.getValueAt(i,4).toString());
                         medecin.setSalaire(Integer.parseInt(model.getValueAt(i,5).toString()));
 
-                        RendezVous rdv = new RendezVous();
-                        rdv.setNumeroADELI(medecin.getNumeroADELI());
-                        RendezVouss rdvs = rdvService.selectIdRendezVousAndPlanificationParMedecin(rdv);
-                        if (!rdvs.getRdvs().isEmpty()){
+                        PlanificationExamen plan = new PlanificationExamen();
+                        plan.setNumeroADELI(medecin.getNumeroADELI());
+                        PlanificationExamens planificationExamens = planificationService.selectIdPlanificationParMedecin(plan);
+                        if (!planificationExamens.getPlanifications().isEmpty() || planificationExamens.getPlanifications() == null){
                             JOptionPane.showMessageDialog(null, msgImposSupprime, "Erreur", JOptionPane.ERROR_MESSAGE);
                         }else{
+                            Consulte consulte = new Consulte();
+                            consulte.setNumeroADELI(medecin.getNumeroADELI());
+                            medecinService.deleteConsulte(consulte);
                             medecinService.deleteMedecin(medecin);
                             chargerMedecins();
                         }

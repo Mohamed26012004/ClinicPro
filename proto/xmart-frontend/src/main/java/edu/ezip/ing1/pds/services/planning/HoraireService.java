@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.servicesplanning;
+package edu.ezip.ing1.pds.services.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -9,6 +9,7 @@ import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
+import edu.ezip.ing1.pds.requests.medecin.SelectHoraireMedecinClientRequest;
 import edu.ezip.ing1.pds.requestsplanning.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

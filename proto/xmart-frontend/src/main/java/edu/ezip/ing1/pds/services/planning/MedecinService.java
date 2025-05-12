@@ -1,16 +1,18 @@
-package edu.ezip.ing1.pds.servicesplanning;
+package edu.ezip.ing1.pds.services.planning;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.Consulte;
-import edu.ezip.ing1.pds.business.dto.Horaires;
 import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.business.dto.Medecins;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requestsplanning.*;
+import edu.ezip.ing1.pds.requests.medecin.InsertConsulteClientRequest;
+import edu.ezip.ing1.pds.requests.medecin.InsertMedecinClientRequest;
+import edu.ezip.ing1.pds.requests.medecin.SelectAllMedecinsClientRequest;
+import edu.ezip.ing1.pds.requests.medecin.SelectInfoMedecinClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -33,6 +35,7 @@ public class MedecinService {
     final String selectSpecialiteRequestOrder = "SELECT_SPECIALITE_MEDECIN";
     final String selectMedecinParSpecialiteRequestOrder = "SELECT_MEDECIN_PAR_SPECIALITE";
     final String insertConsulteRequestOrder = "INSERT_CONSULTE";
+    final String deleteConsulteRequestOrder = "DELETE_CONSULTE";
 
 
 
@@ -166,7 +169,7 @@ public class MedecinService {
         return list;
     }
 
-    public void insertConsulte(Consulte consulte) throws InterruptedException, IOException {
+    public void insertDeleteConsulte(Consulte consulte, String requestOrder) throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
 
         int birthdate = 0;
@@ -177,7 +180,7 @@ public class MedecinService {
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
-        request.setRequestOrder(insertConsulteRequestOrder);
+        request.setRequestOrder(requestOrder);
         request.setRequestContent(jsonifiedGuy);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
@@ -197,6 +200,17 @@ public class MedecinService {
                     clientRequest2.getResult());
         }
     }
+
+    public void insertConsulte(Consulte consulte) throws IOException, InterruptedException {
+        insertDeleteConsulte(consulte, insertConsulteRequestOrder);
+    }
+
+    public void deleteConsulte(Consulte consulte) throws IOException, InterruptedException {
+        insertDeleteConsulte(consulte, deleteConsulteRequestOrder);
+    }
+
+
+
 
 }
 
