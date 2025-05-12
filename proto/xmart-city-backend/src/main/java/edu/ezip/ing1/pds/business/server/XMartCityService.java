@@ -116,7 +116,7 @@ public class XMartCityService {
 
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
-        UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
+        UPDATE_EQUIPEMENT("UPDATE eq QSDTY890S8__uipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
         ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
 
@@ -350,18 +350,7 @@ public class XMartCityService {
             case DELETE_TRAITEMENT:
                 response = DeleteTraitement(request, connection);
                 break;
-            case INSERT_RENDEZ_VOUS:
-                response = InsertRendezVous(request, connection);
-                break;
-            case DELETE_RENDEZ_VOUS:
-                response = DeleteRendezVous(request, connection);
-                break;
-            case UPDATE_RENDEZ_VOUS:
-                response = UpdateRendezVous(request, connection);
-                break;
-            case SELECT_ALL_RENDEZ_VOUS:
-                response = SelectAllRendezVous(request, connection);
-                break;
+
             case INSERT_CONSULTE:
                 response = InsertConsulte(request, connection);
                 break;
@@ -960,7 +949,7 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
     }
 
-    private Response SelectAllRendezVous(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+    private Response SelectAllRendezVous(final Request request, final Connection connection) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
         final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RENDEZ_VOUS.query);
@@ -1090,64 +1079,6 @@ public class XMartCityService {
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
-    }
-    private Response SelectAllRendezVous(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RENDEZ_VOUS.query);
-        RendezVouss rdvs = new RendezVouss();
-        while (res.next()) {
-            RendezVous rdv = new RendezVous();
-            rdv.setNumeroADELI(res.getInt(1));
-            rdv.setIdPatient(res.getInt(2));
-            rdv.setId(res.getInt(3));
-            rdv.setIdSalle(res.getInt(4));
-            rdv.setDateRendezVous(res.getDate(5).toLocalDate());
-            rdv.setHeureDebut(res.getTime(6).toLocalTime());
-            rdv.setHeureFin(res.getTime(7).toLocalTime());
-            rdvs.add(rdv);
-        }
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdvs));
-    }
-
-    private Response UpdateRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
-
-        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_RENDEZ_VOUS.query);
-
-        stmt.setInt(1, rdv.getNumeroADELI());
-        stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
-        stmt.setInt(4, rdv.getIdSalle());
-        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
-        stmt.setInt(8, rdv.getIdRendezVous());
-        stmt.executeUpdate();
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
-    }
-
-    private Response DeleteRendezVous(final Request request, final Connection connection) throws SQLException, IOException {
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
-
-        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RENDEZ_VOUS.query);
-
-        stmt.setInt(1, rdv.getNumeroADELI());
-        stmt.setInt(2, rdv.getIdPatient());
-        stmt.setInt(3, rdv.getId());
-        stmt.setInt(4, rdv.getIdSalle());
-        stmt.setDate(5, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setTime(6, Time.valueOf(rdv.getHeureDebut()));
-        stmt.setTime(7, Time.valueOf(rdv.getHeureFin()));
-
-        stmt.executeUpdate();
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(rdv));
     }
 
     // Méthodes de CRUD de la table AntecedentMedical
