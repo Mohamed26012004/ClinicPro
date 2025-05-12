@@ -5,11 +5,11 @@
 #password: "toto"
 #poolSize: 1
 
-databaseName: "essai"
+databaseName: "clinicprodatabase"
 host: "127.0.0.1"
 port: 3306
-username : "root"
-password: ""
+username : "raslene"
+password: "Tibertiber@11"
 poolSize: 1
 
 

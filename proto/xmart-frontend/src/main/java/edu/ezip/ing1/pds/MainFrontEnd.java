@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds;
 
 import java.io.IOException;
 
+import com.formdev.flatlaf.FlatLightLaf;
 import edu.ezip.ing1.pds.business.dto.Facture;
 
 import java.time.LocalDate;
@@ -18,6 +19,8 @@ import edu.ezip.ing1.pds.services.EquipementService;
 import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
 import edu.ezip.ing1.pds.services.MaintenanceService;
+
+import javax.swing.*;
 
 public class MainFrontEnd {
 
@@ -40,17 +43,15 @@ public class MainFrontEnd {
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         }
-        Fenetre fene = new Fenetre();
-        fene.setVisible(true);
+//        Fenetre fene = new Fenetre();
+//        fene.setVisible(true);
           //TotalCoutFront fen = new TotalCoutFront();
           EquipementFront p= new EquipementFront();
           //MaintenanceFront mf = new MaintenanceFront();
           //TotalMaintenanceFront tmf = new TotalMaintenanceFront();
-          //TotalCoutFront tc = new TotalCoutFront();
-          ///EquipementFront ef = new EquipementFront();
-          //CoutGlobalParJourFront cj = new CoutGlobalParJourFront();
-          //CoutGlobalParMoisFront cg = new CoutGlobalParMoisFront();
-////
+          CoutGlobalParJourFront gcj = new CoutGlobalParJourFront();
+          //CoutGlobalParMoisFront cgcm = new CoutGlobalParMoisFront();
+
         //Fenetre fene = new Fenetre();
         //fene.setVisible(true);
         //EquipementFront f = new EquipementFront();
