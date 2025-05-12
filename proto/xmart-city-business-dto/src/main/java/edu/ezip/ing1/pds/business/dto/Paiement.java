@@ -22,27 +22,23 @@ public class Paiement {
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
  
     private  String moyenDePaiement;
-    private int idFacture;
-    private int idPatient;
  
     public Paiement() {
     }
     public final Paiement build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idPaiement", "montant", "datePaiement", "moyenDePaiement", "idFacture", "idPatient");
+        setFieldsFromResulset(resultSet, "idPaiement", "montant", "datePaiement", "moyenDePaiement");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idPaiement), String.valueOf(montant), datePaiement.format(formatDate), moyenDePaiement, String.valueOf(idFacture), String.valueOf(idPatient));
+        return buildPreparedStatement(preparedStatement, String.valueOf(idPaiement), String.valueOf(montant), datePaiement.format(formatDate), moyenDePaiement);
     }
  
-    public Paiement(double montant, LocalDate datePaiement, String moyenDePaiement, int idFacture, int idPatient) {
+    public Paiement(double montant, LocalDate datePaiement, String moyenDePaiement) {
         this.montant = montant;
         this.datePaiement = datePaiement;
         this.moyenDePaiement = moyenDePaiement;
-        this.idFacture = idFacture;
-        this.idPatient = idPatient;
     }
  
     public int getidPaiement() {
@@ -56,12 +52,6 @@ public class Paiement {
     }
     public String getmoyenDePaiement() {
         return moyenDePaiement;
-    }
-    public int getidFacture() {
-        return idFacture;
-    }
-    public int getidPatient() {
-        return idPatient;
     }
    
     @JsonProperty("idPaiement")
@@ -82,16 +72,6 @@ public class Paiement {
     @JsonProperty("moyenDePaiement")
     public void setmoyenDePaiement(String moyenDePaiement) {
         this.moyenDePaiement = moyenDePaiement;
-    }
- 
-    @JsonProperty("idFacture")
-    public void setidFacture(int idFacture) {
-        this.idFacture = idFacture;
-    }
- 
-    @JsonProperty("idPatient")
-    public void setidPatient(int idPatient) {
-        this.idPatient = idPatient;
     }
  
  
@@ -118,8 +98,6 @@ public class Paiement {
                 ", montant='" + montant + '\'' +
                 ", datePaiement='" + datePaiement + '\'' +
                 ", moyenDePaiement='" + moyenDePaiement + '\'' +
-                ", idFacture=" + idFacture +
-                ", idPatient=" + idPatient +
                 '}';
     }
 }
