@@ -83,11 +83,11 @@ public class XMartCityService {
 
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement FROM paiement p"),
-        INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement) values (?, ?, ?)"),
-        UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
+        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement, p.idFacture, p.idPatient FROM paiement p"),
+        INSERT_PAIEMENT("INSERT INTO paiement (montant, datePaiement, moyenDePaiement, idFacture, idPatient) VALUES (?, ?, ?, ?, ?)"),
+        UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ?, idFacture = ?, idPatient = ? WHERE idPaiement = ?"),
         DELETE_PAIEMENT("DELETE FROM paiement WHERE idPaiement = ?"),
-        ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ? AND idFacture = ? AND idPatient = ?"),
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
         INSERT_ANTECEDENT_MEDICAL("INSERT into antecedentMedical (type_antecedentMedical, description_antecedentMedical, idPatient) values (?, ?, ?)"),
@@ -1062,21 +1062,23 @@ public class XMartCityService {
 
 
     // Méthodes liées à la table Paiement
-
+ 
     private Response InsertPaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_PAIEMENT.query);
         stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
+        stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
+        stmt.setInt(4, paiement.getidFacture());
+        stmt.setInt(5, paiement.getidPatient());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-
+ 
     private Response SelectAllPaiements ( final Request request, final Connection connection) throws
             SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -1086,38 +1088,43 @@ public class XMartCityService {
         while (res.next()) {
             Paiement paiement = new Paiement();
             paiement.setidPaiement(res.getInt(1));
-            paiement.setmontant(res.getDouble(2));
-            paiement.setdatePaiement(res.getString(3));
+            paiement.setmontant(res.getDouble(2));                        
+            paiement.setdatePaiement(res.getDate(3).toLocalDate());      
             paiement.setmoyenDePaiement(res.getString(4));
+            paiement.setidFacture(res.getInt(5));
+            paiement.setidPatient(res.getInt(6));
             paiements.add(paiement);
         }
+   
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiements));
     }
-
+ 
     private Response UpdatePaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_PAIEMENT.query);
         stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
+        stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
         stmt.setInt(4, paiement.getidPaiement());
+        stmt.setInt(5, paiement.getidFacture());
+        stmt.setInt(6, paiement.getidPatient());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-
+ 
     private Response DeletePaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PAIEMENT.query);
         stmt.setInt(1, paiement.getidPaiement());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
 
