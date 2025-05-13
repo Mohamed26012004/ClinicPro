@@ -64,22 +64,22 @@ public class Facture {
         return regle;
     }
  
-    @JsonProperty("facture_idFacture")
+    @JsonProperty("idFacture")
     public void setIdFacture(int idFacture) {
         this.idFacture = idFacture;
     }
  
-    @JsonProperty("facture_date")
+    @JsonProperty("dateFacture")
     public void setDateFacture(LocalDate dateFacture) {
         this.dateFacture = dateFacture;
     }
  
-    @JsonProperty("facture_montant")
+    @JsonProperty("montantFacture")
     public void setMontantFacture(double montantFacture) {
         this.montantFacture = montantFacture;
     }
  
-    @JsonProperty("facture_regle")
+    @JsonProperty("regle")
     public void setRegle(boolean regle) {
         this.regle = regle;
     }
@@ -104,10 +104,10 @@ public class Facture {
     @Override
     public String toString() {
         return "facture{" +
-    "facture_idFacture='" + idFacture + '\'' +
-    ", facture_date=" + dateFacture +
-    ", facture_montant=" + montantFacture +
-    ", facture_regle=" + regle +
+    "idFacture='" + idFacture + '\'' +
+    ", dateFacture=" + dateFacture +
+    ", montantFacture=" + montantFacture +
+    ", regle=" + regle +
     '}';
  
     }
