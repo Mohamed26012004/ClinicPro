@@ -37,11 +37,11 @@ public class XMartCityService {
         SELECT_ONE_EXAMEN("SELECT t.id, t.nom, t.cout, t.duree FROM examen t WHERE nom = ? AND cout = ? AND duree = ?"),
         ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND duree = ?"),
 
-        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle FROM facture t"),
-        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle) values (?, ?, ?)"),
-        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ? WHERE idFacture = ?"),
+        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle, t.idExamen FROM facture t"),
+        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle, idExamen) values (?, ?, ?, ?)"),
+        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ?, idExamen = ? WHERE idFacture = ?"),
         DELETE_FACTURE("DELETE FROM facture WHERE idFacture = ?"),
-        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle =?"),
+        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle = ? AND idExamen = ?"),
 
         FACTURES_PAYEES("SELECT t.idFacture, t.dateFacture FROM facture t WHERE t.regle=true"),
         FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?"),
@@ -526,6 +526,7 @@ public class XMartCityService {
             facture.setDateFacture(res.getDate(2).toLocalDate());
             facture.setMontantFacture(res.getDouble(3));
             facture.setRegle(res.getBoolean(4));
+            facture.setIdExamen(res.getInt(5));
             factures.add(facture);
         }        
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
@@ -534,11 +535,12 @@ public class XMartCityService {
     private Response InsertFacture(final Request request, final Connection connection) throws SQLException, IOException {
     final ObjectMapper objectMapper = new ObjectMapper();
     final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
-    
+
     final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_FACTURE.query, Statement.RETURN_GENERATED_KEYS);
     stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
     stmt.setDouble(2, facture.getMontantFacture());
     stmt.setBoolean(3, facture.getRegle());
+    stmt.setInt(4, facture.getIdExamen());
     
     int rowsAffected = stmt.executeUpdate();
     if (rowsAffected > 0) {
@@ -560,7 +562,8 @@ public class XMartCityService {
         stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
         stmt.setDouble(2, facture.getMontantFacture());
         stmt.setBoolean(3, facture.getRegle());
-        stmt.setInt(4, facture.getIdFacture());
+        stmt.setInt(4, facture.getIdExamen());
+        stmt.setInt(5, facture.getIdFacture());
  
         stmt.executeUpdate();
  
