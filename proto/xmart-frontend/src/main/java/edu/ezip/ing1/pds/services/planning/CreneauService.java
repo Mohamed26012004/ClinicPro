@@ -26,6 +26,7 @@ public class CreneauService {
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
 
     final String selectRequestOrder = "SELECT_DISPONIBILITE_PAR_DATE";
+    final String selectByMedecinRequestOrder = "SELECT_DISPONIBILITE_PAR_DATE_BY_MEDECIN";
 
     private final NetworkConfig networkConfig;
 
@@ -34,7 +35,7 @@ public class CreneauService {
     }
 
 
-    public PlanificationExamens selectCreneauxParDate(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
+    public Creneaux selectCreneaux(PlanificationExamen planificationExamen, String requestOrder) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -42,7 +43,7 @@ public class CreneauService {
         final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
         final Request request = new Request();
         request.setRequestId(requestId);
-        request.setRequestOrder(selectRequestOrder);
+        request.setRequestOrder(requestOrder);
         request.setRequestContent(jsonifiedGuy);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
@@ -56,11 +57,18 @@ public class CreneauService {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (PlanificationExamens) joinedClientRequest.getResult();
+            return (Creneaux) joinedClientRequest.getResult();
         }
         else {
             logger.error("No creneaux found");
             return null;
         }
+    }
+
+    public Creneaux selectCreneauByDate(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+        return selectCreneaux(planificationExamen, selectRequestOrder);
+    }
+    public Creneaux selectCreneauByDateByMedecin(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+        return selectCreneaux(planificationExamen, selectByMedecinRequestOrder);
     }
 }

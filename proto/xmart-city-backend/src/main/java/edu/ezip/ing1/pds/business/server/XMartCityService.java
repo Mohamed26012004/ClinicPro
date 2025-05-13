@@ -139,6 +139,26 @@ public class XMartCityService {
                 "    OR (h.heureDebut < d.heureFin AND h.heureFin > d.heureFin))" +
                 "    AND d.statut = 'Réservé' " +
                 ")"),
+        SELECT_DISPONIBILITE_PAR_DATE_BY_MEDECIN("SELECT h.heureDebut, h.heureFin " +
+                "FROM horaire h " +
+                "JOIN consulte c ON h.id = c.id "+
+                "WHERE c.numeroADELI = ? "+
+                "AND jour = (SELECT CASE DAYOFWEEK(?) " +
+                "    WHEN 1 THEN 'Dimanche' " +
+                "    WHEN 2 THEN 'Lundi' " +
+                "    WHEN 3 THEN 'Mardi' " +
+                "    WHEN 4 THEN 'Mercredi' " +
+                "    WHEN 5 THEN 'Jeudi' " +
+                "    WHEN 6 THEN 'Vendredi' " +
+                "    WHEN 7 THEN 'Samedi' " +
+                "END )" +
+                "AND NOT EXISTS ( " +
+                "    SELECT d.heureDebut, d.heureFin FROM disponibilite d " +
+                "    WHERE d.dateDisponibilite = ? " +
+                "    AND ( (h.heureDebut < d.heureDebut AND h.heureFin > d.heureDebut)" +
+                "    OR (h.heureDebut < d.heureFin AND h.heureFin > d.heureFin))" +
+                "    AND d.statut = 'Réservé' " +
+                ")"),
 
         SELECT_PLANIFICATION_WITH_NAME("SELECT plan.idPlanification, m.nom AS nomMedecin, m.prenom AS prenomMedecin, " +
                 "p.nom AS nomPatient, p.prenom AS prenomPatient, e.nom AS nomExamen, s.numeroSalle, " +
@@ -393,6 +413,10 @@ public class XMartCityService {
             case SELECT_DISPONIBILITE_PAR_DATE:
                 response = SelectAllDisponibilite(request, connection);
                 break;
+            case SELECT_DISPONIBILITE_PAR_DATE_BY_MEDECIN:
+                response = SelectAllDisponibiliteByMedecin(request, connection);
+                break;
+
             case INSERT_PLANIFICATION:
                 response = InsertPlanification(request, connection);
                 break;
@@ -1550,6 +1574,27 @@ public class XMartCityService {
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(creneaux));
     }
+
+    private Response SelectAllDisponibiliteByMedecin(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen plan = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_DISPONIBILITE_PAR_DATE_BY_MEDECIN.query);
+
+        stmt.setInt(1, plan.getNumeroADELI());
+        stmt.setDate(2, Date.valueOf(plan.getDatePlanification()));
+        stmt.setDate(3, Date.valueOf(plan.getDatePlanification()));
+
+        final ResultSet res = stmt.executeQuery();
+        Creneaux creneaux = new Creneaux();
+        while (res.next()) {
+            Creneau creneau = new Creneau();
+            creneau.setHeureDebut(res.getTime(1).toLocalTime());
+            creneau.setHeureFin(res.getTime(2).toLocalTime());
+            creneaux.add(creneau);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(creneaux));
+    }
+
 
 
     // Méthodes des requêtes sur la table planification
