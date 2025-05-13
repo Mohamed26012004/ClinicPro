@@ -96,3 +96,14 @@ CREATE TABLE planification(
    FOREIGN KEY(idPatient) REFERENCES patient(idPatient),
    FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
 );
+
+CREATE TABLE disponibilite(
+   idDisponiblilite INT NOT NULL AUTO_INCREMENT,
+   dateDisponibilite DATE NOT NULL,
+   heureDebut TIME NOT NULL,
+   heureFin TIME NOT NULL,
+   statut VARCHAR(50) NOT NULL,
+   numeroADELI INT NOT NULL,
+   PRIMARY KEY(idDisponiblilite),
+   FOREIGN KEY(numeroADELI) REFERENCES Medecin(numeroADELI)
+);

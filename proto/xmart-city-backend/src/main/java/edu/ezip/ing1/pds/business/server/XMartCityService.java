@@ -123,41 +123,49 @@ public class XMartCityService {
         DELETE_DISPONIBILITE("DELETE FROM disponibilite WHERE numeroADELI = ? AND dateDisponibilite = ? AND heureDebut = ? AND heureFin = ? AND statut = 'Réservé'"),
         SELECT_DISPONIBILITE_PAR_DATE("SELECT h.heureDebut, h.heureFin " +
                 "FROM horaire h " +
-                "WHERE jour = (SELECT CASE DAYOFWEEK(?) " +
-                "    WHEN 1 THEN 'Dimanche' " +
-                "    WHEN 2 THEN 'Lundi' " +
-                "    WHEN 3 THEN 'Mardi' " +
-                "    WHEN 4 THEN 'Mercredi' " +
-                "    WHEN 5 THEN 'Jeudi' " +
-                "    WHEN 6 THEN 'Vendredi' " +
-                "    WHEN 7 THEN 'Samedi' " +
-                "END )" +
+                "WHERE h.jour = ( " +
+                "    SELECT CASE DAYOFWEEK(?) " +
+                "        WHEN 1 THEN 'Dimanche' " +
+                "        WHEN 2 THEN 'Lundi' " +
+                "        WHEN 3 THEN 'Mardi' " +
+                "        WHEN 4 THEN 'Mercredi' " +
+                "        WHEN 5 THEN 'Jeudi' " +
+                "        WHEN 6 THEN 'Vendredi' " +
+                "        WHEN 7 THEN 'Samedi' " +
+                "    END " +
+                ") " +
                 "AND NOT EXISTS ( " +
                 "    SELECT d.heureDebut, d.heureFin FROM disponibilite d " +
                 "    WHERE d.dateDisponibilite = ? " +
-                "    AND ( (h.heureDebut < d.heureDebut AND h.heureFin > d.heureDebut)" +
-                "    OR (h.heureDebut < d.heureFin AND h.heureFin > d.heureFin))" +
                 "    AND d.statut = 'Réservé' " +
+                "    AND ( " +
+                "        h.heureDebut < d.heureFin AND h.heureFin > d.heureDebut " +
+                "    ) " +
                 ")"),
         SELECT_DISPONIBILITE_PAR_DATE_BY_MEDECIN("SELECT h.heureDebut, h.heureFin " +
                 "FROM horaire h " +
-                "JOIN consulte c ON h.id = c.id "+
-                "WHERE c.numeroADELI = ? "+
-                "AND jour = (SELECT CASE DAYOFWEEK(?) " +
-                "    WHEN 1 THEN 'Dimanche' " +
-                "    WHEN 2 THEN 'Lundi' " +
-                "    WHEN 3 THEN 'Mardi' " +
-                "    WHEN 4 THEN 'Mercredi' " +
-                "    WHEN 5 THEN 'Jeudi' " +
-                "    WHEN 6 THEN 'Vendredi' " +
-                "    WHEN 7 THEN 'Samedi' " +
-                "END )" +
+                "JOIN consulte c ON h.id = c.id " +
+                "WHERE c.numeroADELI = ? " +
+                "AND h.jour = ( " +
+                "    SELECT CASE DAYOFWEEK(?) " +
+                "        WHEN 1 THEN 'Dimanche' " +
+                "        WHEN 2 THEN 'Lundi' " +
+                "        WHEN 3 THEN 'Mardi' " +
+                "        WHEN 4 THEN 'Mercredi' " +
+                "        WHEN 5 THEN 'Jeudi' " +
+                "        WHEN 6 THEN 'Vendredi' " +
+                "        WHEN 7 THEN 'Samedi' " +
+                "    END " +
+                ") " +
                 "AND NOT EXISTS ( " +
-                "    SELECT d.heureDebut, d.heureFin FROM disponibilite d " +
+                "    SELECT d.heureDebut, d.heureFin " +
+                "    FROM disponibilite d " +
                 "    WHERE d.dateDisponibilite = ? " +
-                "    AND ( (h.heureDebut < d.heureDebut AND h.heureFin > d.heureDebut)" +
-                "    OR (h.heureDebut < d.heureFin AND h.heureFin > d.heureFin))" +
                 "    AND d.statut = 'Réservé' " +
+                "    AND ( " +
+                "        h.heureDebut < d.heureFin " +
+                "        AND h.heureFin > d.heureDebut " +
+                "    ) " +
                 ")"),
 
         SELECT_PLANIFICATION_WITH_NAME("SELECT plan.idPlanification, m.nom AS nomMedecin, m.prenom AS prenomMedecin, " +
