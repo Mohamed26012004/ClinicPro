@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.Creneaux;
+import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
+import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
 import edu.ezip.ing1.pds.business.dto.RendezVous;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
@@ -32,12 +34,12 @@ public class CreneauService {
     }
 
 
-    public Creneaux selectCreneauxParDate(RendezVous rdv) throws InterruptedException, IOException {
+    public PlanificationExamens selectCreneauxParDate(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
         final String requestId = UUID.randomUUID().toString();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(rdv);
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestOrder(selectRequestOrder);
@@ -47,14 +49,14 @@ public class CreneauService {
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
         final SelectDisponibiliteParDateClientRequest clientRequest = new SelectDisponibiliteParDateClientRequest (
                 networkConfig,
-                birthdate++, request, rdv, requestBytes);
+                birthdate++, request, planificationExamen, requestBytes);
         clientRequests.push(clientRequest);
 
         if(!clientRequests.isEmpty()) {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
             logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (Creneaux) joinedClientRequest.getResult();
+            return (PlanificationExamens) joinedClientRequest.getResult();
         }
         else {
             logger.error("No creneaux found");

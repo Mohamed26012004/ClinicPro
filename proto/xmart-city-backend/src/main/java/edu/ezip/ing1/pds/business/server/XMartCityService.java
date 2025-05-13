@@ -1534,11 +1534,11 @@ public class XMartCityService {
 
     private Response SelectAllDisponibilite(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final RendezVous rdv = objectMapper.readValue(request.getRequestBody(), RendezVous.class);
+        final PlanificationExamen plan = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
         final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_DISPONIBILITE_PAR_DATE.query);
 
-        stmt.setDate(1, Date.valueOf(rdv.getDateRendezVous()));
-        stmt.setDate(2, Date.valueOf(rdv.getDateRendezVous()));
+        stmt.setDate(1, Date.valueOf(plan.getDatePlanification()));
+        stmt.setDate(2, Date.valueOf(plan.getDatePlanification()));
 
         final ResultSet res = stmt.executeQuery();
         Creneaux creneaux = new Creneaux();
@@ -1711,7 +1711,6 @@ public class XMartCityService {
         final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
         final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN.query);
 
-        logger.info("Planning envoyé " +planification);
         stmt.setInt(1, planification.getNumeroADELI());
         stmt.setDate(2, Date.valueOf(planification.getDatePlanification()));
 

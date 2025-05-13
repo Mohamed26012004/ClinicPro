@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.plaf.SplitPaneUI;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -39,26 +40,31 @@ public class PanelPlanningMedecin extends JPanel {
     public static DefaultTableModel modelPlanification;
     public static JTable tablePlanification;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    public static JRadioButton planningButton = new JRadioButton("Planning", true);
+    public static JRadioButton disponibiliteButton = new JRadioButton("Disponibilité");
 
     public PanelPlanningMedecin() throws IOException, InterruptedException {
-//        examenDuMedecin.setNumeroADELI(0);
-//        examenDuMedecin.setDatePlanification(LocalDate.now().minusDays(1));
 
-    setLayout(new BorderLayout());
-    add(leftPanel(), BorderLayout.WEST);
-    add(rightPanel(planificationDuMedecin), BorderLayout.CENTER);
+        setLayout(new BorderLayout());
+        add(leftPanel(), BorderLayout.WEST);
+        if(planningButton.isSelected()){
+        add(rightPanelPlanning(planificationDuMedecin), BorderLayout.CENTER);
+        }else if (disponibiliteButton.isSelected()){
+
+
+        }
+
     }
 
 
     public static JPanel leftPanel() throws IOException, InterruptedException {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
         JPanel panel1 = new JPanel();
         // Planning ou disponiblité
-        JRadioButton planningButton = new JRadioButton("Planning", true);
-        JRadioButton disponibiliteButton = new JRadioButton("Disponibilité");
+        planningButton = new JRadioButton("Planning", true);
+        disponibiliteButton = new JRadioButton("Disponibilité");
 
         ButtonGroup group = new ButtonGroup();
         group.add(planningButton);
@@ -108,8 +114,12 @@ public class PanelPlanningMedecin extends JPanel {
                     planificationDuMedecin.setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(i, 0).toString()));
 
                     try {
-                        logger.info("Date sélectionnée " +planificationDuMedecin);
-                        chargerPlanification(planificationDuMedecin);
+                        if(planningButton.isSelected()){
+                            chargerPlanification(planificationDuMedecin);
+                        }else if (disponibiliteButton.isSelected()){
+
+                        }
+
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } catch (InterruptedException ex) {
@@ -166,12 +176,10 @@ public class PanelPlanningMedecin extends JPanel {
         return panel;
     }
 
-    public static JPanel rightPanel(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+    public static JPanel rightPanelPlanning(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
 
         JPanel panel = new JPanel();
         panel.setBorder(null);
-
-
 
         String[] columns = {"ID","Heure de début", "Heure de Fin", "Nom Patient", "Nom Examen", "Numéro de Salle"};
         modelPlanification = new DefaultTableModel(columns, 0){
@@ -211,5 +219,12 @@ public class PanelPlanningMedecin extends JPanel {
                 });
             }
         }
+    }
+
+    public JPanel rightPanelDisponibilite(){
+        JPanel panel = new JPanel();
+
+
+        return panel;
     }
 }
