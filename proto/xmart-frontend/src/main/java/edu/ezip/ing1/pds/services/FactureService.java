@@ -79,7 +79,7 @@ public class FactureService {
             final Facture fac = (Facture)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} --> {}",
                     clientRequest2.getThreadName(),
-                    fac.getIdFacture(), fac.getDateFacture(), fac.getRegle(),
+                    fac.getIdFacture(), fac.getDateFacture(), fac.getMontantFacture(), fac.getRegle(), fac.getIdExamen(),
                     clientRequest2.getResult());
         }
     }

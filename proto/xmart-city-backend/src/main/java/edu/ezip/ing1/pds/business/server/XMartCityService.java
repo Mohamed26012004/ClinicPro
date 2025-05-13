@@ -37,11 +37,11 @@ public class XMartCityService {
         SELECT_ONE_EXAMEN("SELECT t.id, t.nom, t.cout, t.duree FROM examen t WHERE nom = ? AND cout = ? AND duree = ?"),
         ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND duree = ?"),
 
-        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.regle FROM facture t"),
-        INSERT_FACTURE("INSERT into facture (dateFacture, regle) values (?, ?)"),
-        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, regle = ? WHERE idFacture = ?"),
+        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle, t.idExamen FROM facture t"),
+        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle, idExamen) values (?, ?, ?, ?)"),
+        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ?, idExamen = ? WHERE idFacture = ?"),
         DELETE_FACTURE("DELETE FROM facture WHERE idFacture = ?"),
-        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND regle = ?"),
+        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle = ? AND idExamen = ?"),
 
         FACTURES_PAYEES("SELECT t.idFacture, t.dateFacture FROM facture t WHERE t.regle=true"),
         FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?"),
@@ -114,7 +114,7 @@ public class XMartCityService {
 
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
         INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
-        UPDATE_EQUIPEMENT("UPDATE eq QSDTY890S8__uipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
+        UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
         TOTAL_COUT_PAR_JOUR("SELECT dateAchat, SUM(coutEquipement) AS totalCout FROM equipement GROUP BY dateAchat ORDER BY dateAchat"),
         ID_EQUIPEMENT("SELECT idEquipeemnt FROM equipement WHERE coutEquipement = ? AND dateAchat = ?"),
@@ -566,7 +566,7 @@ public class XMartCityService {
     }
 
     // Méthodes des requêtes sur les factures
-
+ 
     private Response SelectAllFactures(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
@@ -575,46 +575,61 @@ public class XMartCityService {
         while (res.next()) {
             Facture facture = new Facture();
             facture.setIdFacture(res.getInt(1));
-            facture.setDateFacture(res.getString(2));
-            facture.setRegle(res.getBoolean(3));
+            facture.setDateFacture(res.getDate(2).toLocalDate());
+            facture.setMontantFacture(res.getDouble(3));
+            facture.setRegle(res.getBoolean(4));
+            facture.setIdExamen(res.getInt(5));
             factures.add(facture);
-        }
+        }        
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
     }
-
+ 
     private Response InsertFacture(final Request request, final Connection connection) throws SQLException, IOException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_FACTURE.query);
-        stmt.setString(1, facture.getDateFacture());
-        stmt.setBoolean(2, facture.getRegle());
-        stmt.executeUpdate();
-
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
+    final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_FACTURE.query, Statement.RETURN_GENERATED_KEYS);
+    stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
+    stmt.setDouble(2, facture.getMontantFacture());
+    stmt.setBoolean(3, facture.getRegle());
+    stmt.setInt(4, facture.getIdExamen());
+    
+    int rowsAffected = stmt.executeUpdate();
+    if (rowsAffected > 0) {
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            int idFacture = generatedKeys.getInt(1);
+            facture.setIdFacture(idFacture);
+        }
     }
+    return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
+}
 
+ 
     private Response UpdateFacture(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_FACTURE.query);
-        stmt.setString(1, facture.getDateFacture());
-        stmt.setBoolean(2, facture.getRegle());
-        stmt.setInt(3, facture.getIdFacture());
+        stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
+        stmt.setDouble(2, facture.getMontantFacture());
+        stmt.setBoolean(3, facture.getRegle());
+        stmt.setInt(4, facture.getIdExamen());
+        stmt.setInt(5, facture.getIdFacture());
+ 
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
     }
-
+ 
     private Response DeleteFacture(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_FACTURE.query);
         stmt.setInt(1, facture.getIdFacture());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
     }
 
@@ -626,7 +641,7 @@ public class XMartCityService {
         while (res.next()) {
             Facture facture = new Facture();
             facture.setIdFacture(res.getInt(1));
-            facture.setDateFacture(res.getString(2));
+            //facture.setDateFacture(res.getString(2));
             factures.add(facture);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
@@ -982,21 +997,21 @@ public class XMartCityService {
     }
 
     // Méthodes liées à la table Paiement
-
+ 
     private Response InsertPaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_PAIEMENT.query);
         stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
+        stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-
+ 
     private Response SelectAllPaiements ( final Request request, final Connection connection) throws
             SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -1007,37 +1022,37 @@ public class XMartCityService {
             Paiement paiement = new Paiement();
             paiement.setidPaiement(res.getInt(1));
             paiement.setmontant(res.getDouble(2));
-            paiement.setdatePaiement(res.getString(3));
+            paiement.setdatePaiement(res.getDate(3).toLocalDate());
             paiement.setmoyenDePaiement(res.getString(4));
             paiements.add(paiement);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiements));
     }
-
+ 
     private Response UpdatePaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_PAIEMENT.query);
         stmt.setDouble(1, paiement.getmontant());
-        stmt.setString(2, paiement.getdatePaiement());
+        stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
         stmt.setInt(4, paiement.getidPaiement());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-
+ 
     private Response DeletePaiement ( final Request request, final Connection connection) throws
             SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Paiement paiement = objectMapper.readValue(request.getRequestBody(), Paiement.class);
-
+ 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PAIEMENT.query);
         stmt.setInt(1, paiement.getidPaiement());
         stmt.executeUpdate();
-
+ 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
 
