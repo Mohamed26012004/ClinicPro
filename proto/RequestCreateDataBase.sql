@@ -2,9 +2,9 @@
 CREATE DATABASE clinicprodatabase;
 CREATE TABLE paiement (
     idPaiement INT PRIMARY KEY AUTO_INCREMENT,
-    montant DOUBLE NOT NULL,
+    montane DOUBLE NOT NULL,
     datePaiement VARCHAR(50) NOT NULL,
-    moyenDePaiement VARCHAR(50) NOT NULL
+    moneyDePaiement VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE patient(
@@ -50,7 +50,6 @@ CREATE TABLE antecedentMedical(
    FOREIGN KEY(idPatient) REFERENCES patient(idPatient)
 );
 
-
 CREATE TABLE salle(
    id INT AUTO_INCREMENT,
    numeroSalle VARCHAR(10) NOT NULL,
@@ -61,7 +60,7 @@ CREATE TABLE salle(
 
 CREATE TABLE paiement (
     idPaiement INT PRIMARY KEY AUTO_INCREMENT,
-    montant DOUBLE NOT NULL,
+    montane DOUBLE NOT NULL,
     datePaiement VARCHAR(50) NOT NULL,
     moyenDePaiement VARCHAR(50) NOT NULL
 );
@@ -88,7 +87,7 @@ CREATE TABLE planification(
    idPatient INT NOT NULL,
    idExamen INT NOT NULL,
    idSalle INT,
-   dateRendezVous DATE NOT NULL,
+   datePlanification DATE NOT NULL,
    heureDebut TIME NOT NULL,
    heureFin TIME NOT NULL,
    PRIMARY KEY(idPlanification),
