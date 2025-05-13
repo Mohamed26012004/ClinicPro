@@ -19,6 +19,7 @@ public class Facture {
     private  double montantFacture;
     private boolean regle;
     private int idExamen;
+    private int idPatient;
    
  
     @JsonDeserialize(using = DeserialisationDate.class) // doit etre au dessus des dates
@@ -31,20 +32,23 @@ public class Facture {
     }
     public final Facture build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle", "idExamen");
+        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle", "idExamen", "idPatient");
         return this;
  
     }
  
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture.format(formatDate), String.valueOf(montantFacture), String.valueOf(regle), String.valueOf(idExamen));
+                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture.format(formatDate), String.valueOf(montantFacture), String.valueOf(regle), String.valueOf(idExamen), String.valueOf(idPatient));
     }
  
     public Facture(LocalDate dateFacture, double montantFacture, boolean regle) {
         this.dateFacture = dateFacture;
         this.montantFacture = montantFacture;
         this.regle = regle;
+        this.idExamen = idExamen;
+        this.idPatient = idPatient;
+       
     }
  
     public int  getIdFacture() {
@@ -66,6 +70,10 @@ public class Facture {
 
     public int getIdExamen(){
         return idExamen;
+    }
+
+    public int getIdPatient(){
+        return idPatient;
     }
  
     @JsonProperty("idFacture")
@@ -91,6 +99,11 @@ public class Facture {
     @JsonProperty("idExamen")
     public void setIdExamen(int idExamen) {
         this.idExamen = idExamen;
+    }
+
+    @JsonProperty("idPatient")
+    public void setIdPatient(int idPatient) {
+        this.idPatient = idPatient;
     }
  
  
@@ -118,6 +131,7 @@ public class Facture {
     ", montantFacture=" + montantFacture +
     ", regle=" + regle +
     ", idExamen=" + idExamen +
+    ", idPatient=" + idPatient +
     '}';
  
     }
