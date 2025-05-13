@@ -3,6 +3,7 @@ package edu.ezip.ing1.pds.services.planning;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
+import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
 import edu.ezip.ing1.pds.business.dto.PlanificationWithNames;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
@@ -25,6 +26,7 @@ public class PlanificationWithNameService {
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
 
     final String selectRequestOrder = "SELECT_PLANIFICATION_WITH_NAME";
+    final String selectByMedecinRequestOrder = "SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN";
 
     private final NetworkConfig networkConfig;
 
@@ -46,6 +48,35 @@ public class PlanificationWithNameService {
         final SelectPlanificationWithNameClientRequest clientRequest = new SelectPlanificationWithNameClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if (!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            return (PlanificationWithNames) joinedClientRequest.getResult();
+        } else {
+            logger.error("No planification found");
+            return null;
+        }
+    }
+
+    public PlanificationWithNames selectPlanificationWithNameByMedecin(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(selectByMedecinRequestOrder);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectPlanificationWithNameClientRequest clientRequest = new SelectPlanificationWithNameClientRequest(
+                networkConfig,
+                birthdate++, request, planificationExamen, requestBytes);
         clientRequests.push(clientRequest);
 
         if (!clientRequests.isEmpty()) {

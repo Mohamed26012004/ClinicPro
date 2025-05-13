@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
 
 import edu.ezip.ing1.pds.business.dto.*;
 import org.slf4j.Logger;
@@ -77,6 +76,7 @@ public class XMartCityService {
 
         INSERT_CONSULTE("INSERT into consulte (numeroADELI, id) values (?, ?)"),
         DELETE_CONSULTE("DELETE FROM consulte WHERE numeroADELI = ?"),
+        DELETE_CONSULTE_WHERE_HORAIRE("DELETE FROM consulte WHERE id = ?"),
         SELECT_HORAIRE_MEDECIN("SELECT h.jour, h.heureDebut, h.heureFin FROM horaire h, consulte c, medecin m WHERE m.numeroADELI = ? AND m.numeroADELI = c.numeroADELI AND h.id = c.id "),
 
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
@@ -147,7 +147,16 @@ public class XMartCityService {
                 "JOIN medecin m ON plan.numeroADELI = m.numeroADELI " +
                 "JOIN patient p ON plan.idPatient = p.idPatient " +
                 "JOIN examen e ON plan.idExamen = e.id " +
-                "JOIN salle s ON plan.idSalle = s.id;"),
+                "JOIN salle s ON plan.idSalle = s.id"),
+        SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN("SELECT plan.idPlanification, m.nom AS nomMedecin, m.prenom AS prenomMedecin, " +
+                "p.nom AS nomPatient, p.prenom AS prenomPatient, e.nom AS nomExamen, s.numeroSalle, " +
+                        "plan.datePlanification, plan.heureDebut, plan.heureFin " +
+                        "FROM planification plan " +
+                        "JOIN medecin m ON plan.numeroADELI = m.numeroADELI " +
+                        "JOIN patient p ON plan.idPatient = p.idPatient " +
+                        "JOIN examen e ON plan.idExamen = e.id " +
+                        "JOIN salle s ON plan.idSalle = s.id " +
+                        "WHERE plan.numeroADELI = ? AND plan.datePlanification = ?"),
 
         SELECT_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p"),
         INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?) "),
@@ -362,6 +371,9 @@ public class XMartCityService {
             case DELETE_CONSULTE:
                 response = DeleteConsulte(request, connection);
                 break;
+            case DELETE_CONSULTE_WHERE_HORAIRE:
+                response = DeleteConsulteWhereHoraire(request, connection);
+                break;
             case SELECT_HORAIRE_MEDECIN:
                 response = SelectHoraireMedecin(request, connection);
                 break;
@@ -420,6 +432,9 @@ public class XMartCityService {
 
             case SELECT_PLANIFICATION_WITH_NAME:
                 response = SelectPlanificationWithName(request, connection);
+                break;
+            case SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN:
+                response = SelectPlanificationWithNameByName(request, connection);
                 break;
             default:
                 break;
@@ -1272,6 +1287,29 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(consulte));
     }
 
+    private Response DeleteConsulteWhereHoraire(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Horaire horaire = objectMapper.readValue(request.getRequestBody(), Horaire.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_CONSULTE_WHERE_HORAIRE.query);
+
+        final PreparedStatement stmt2 = connection.prepareStatement(Queries.ID_HORAIRE.query);
+
+        Time debut = Time.valueOf(horaire.getHeureDebut());
+        Time fin = Time.valueOf(horaire.getHeureFin());
+
+        stmt2.setString(1, horaire.getJour());
+        stmt2.setTime(2, debut);
+        stmt2.setTime(3, fin);
+
+        final ResultSet res = stmt2.executeQuery();
+        res.next();
+
+        stmt.setInt(1, res.getInt(1));
+        stmt.executeUpdate();
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(horaire));
+    }
+
     private Response SelectHoraireMedecin(final Request request, final Connection connection) throws SQLException, JsonProcessingException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Medecin medecin = objectMapper.readValue(request.getRequestBody(), Medecin.class);
@@ -1650,6 +1688,34 @@ public class XMartCityService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
         final ResultSet res = stmt.executeQuery(Queries.SELECT_PLANIFICATION_WITH_NAME.query);
+        PlanificationWithNames planificationWithNames = new PlanificationWithNames();
+        while (res.next()) {
+            PlanificationWithName pwn = new PlanificationWithName();
+            pwn.setIdPlanification(res.getInt(1));
+            pwn.setNomMedecin(res.getString(2));
+            pwn.setPrenomMedecin(res.getString(3));
+            pwn.setNomPatient(res.getString(4));
+            pwn.setPrenomPatient(res.getString(5));
+            pwn.setNomExamen(res.getString(6));
+            pwn.setNumeroSalle(res.getString(7));
+            pwn.setDatePlanification(res.getDate(8).toLocalDate());
+            pwn.setHeureDebut(res.getTime(9).toLocalTime());
+            pwn.setHeureFin(res.getTime(10).toLocalTime());
+            planificationWithNames.add(pwn);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationWithNames));
+    }
+
+    private Response SelectPlanificationWithNameByName(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN.query);
+
+        logger.info("Planning envoyé " +planification);
+        stmt.setInt(1, planification.getNumeroADELI());
+        stmt.setDate(2, Date.valueOf(planification.getDatePlanification()));
+
+        final ResultSet res = stmt.executeQuery();
         PlanificationWithNames planificationWithNames = new PlanificationWithNames();
         while (res.next()) {
             PlanificationWithName pwn = new PlanificationWithName();
