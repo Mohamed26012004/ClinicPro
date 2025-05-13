@@ -38,7 +38,7 @@ public class XMartCityService {
         ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND duree = ?"),
 
         SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle FROM facture t"),
-        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle) VALUES (?, ?, ?)"),
+        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle) values (?, ?, ?)"),
         UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ? WHERE idFacture = ?"),
         DELETE_FACTURE("DELETE FROM facture WHERE idFacture = ?"),
         ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle =?"),
@@ -532,17 +532,25 @@ public class XMartCityService {
     }
  
     private Response InsertFacture(final Request request, final Connection connection) throws SQLException, IOException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
- 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_FACTURE.query);
-        stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
-        stmt.setDouble(2, facture.getMontantFacture());
-        stmt.setBoolean(3, facture.getRegle());
- 
- 
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final Facture facture = objectMapper.readValue(request.getRequestBody(), Facture.class);
+    
+    final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_FACTURE.query, Statement.RETURN_GENERATED_KEYS);
+    stmt.setDate(1, Date.valueOf(facture.getDateFacture()));
+    stmt.setDouble(2, facture.getMontantFacture());
+    stmt.setBoolean(3, facture.getRegle());
+    
+    int rowsAffected = stmt.executeUpdate();
+    if (rowsAffected > 0) {
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            int idFacture = generatedKeys.getInt(1);
+            facture.setIdFacture(idFacture);
+        }
     }
+    return new Response(request.getRequestId(), objectMapper.writeValueAsString(facture));
+}
+
  
     private Response UpdateFacture(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
