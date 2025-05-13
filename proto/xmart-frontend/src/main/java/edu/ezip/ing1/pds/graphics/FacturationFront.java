@@ -2,8 +2,11 @@ package edu.ezip.ing1.pds.graphics;
  
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.Examen;
+import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
+import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
  
 import javax.swing.*;
@@ -12,34 +15,51 @@ import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
  
 public class FacturationFront {
     private JTextField montantChamp, dateFactureChamp;
     private JCheckBox regleCheckBox;
+    private JComboBox<String> examenCombobox;
     private DefaultTableModel model;
     private JTable table;
     private final FactureService factureService;
  
-    public FacturationFront() {
+    public FacturationFront() throws InterruptedException, IOException {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+        final ExamenService examenService = new ExamenService(networkConfig);
         this.factureService = new FactureService(networkConfig);
- 
+        
+
         JFrame frame = new JFrame("Gestion des Factures");
         frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
  
-        JPanel panelNord = new JPanel(new GridLayout(3, 2, 5, 5));
+        JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
+
+        Examens examens = examenService.selectExamens();
+        if (examens != null && examens.getExamens() != null) {    
+            ArrayList<Examen> list = new ArrayList<>(examens.getExamens());    
+            String[] tab = new String[list.size()];    
+            for (int i = 0; i < tab.length; i ++){        
+                tab[i] = list.get(i).getNom();    
+            }
+            examenCombobox = new JComboBox<>(tab);    
+        }
  
         montantChamp = new JTextField();
         dateFactureChamp = new JTextField();
         regleCheckBox = new JCheckBox("Facture réglée");
- 
+        
+
+        panelNord.add(new JLabel("Examen :"));
+        panelNord.add(examenCombobox);
         panelNord.add(new JLabel("Montant :"));
         panelNord.add(montantChamp);
-        panelNord.add(new JLabel("Date de facture (yyyy-MM-dd) :"));
+        panelNord.add(new JLabel("Date de facture (AAAA-MM-JJ) :"));
         panelNord.add(dateFactureChamp);
         panelNord.add(new JLabel("Réglé :"));
         panelNord.add(regleCheckBox);
@@ -144,7 +164,7 @@ public class FacturationFront {
         });
 
          boutonPaiement.addActionListener(e -> {
-            // Crée une nouvelle instance de PaiementFront lorsque le bouton est cliqué
+            // PaiementFront bouton pour ouverture
             new PaiementFront();
         });
  
@@ -179,7 +199,14 @@ public class FacturationFront {
     }
    
  
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(FacturationFront::new);
+   public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                new FacturationFront();
+            } catch (InterruptedException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        });
     }
 }
