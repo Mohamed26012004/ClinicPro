@@ -10,7 +10,8 @@ import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.requests.medecin.SelectHoraireMedecinClientRequest;
-import edu.ezip.ing1.pds.requestsplanning.*;
+import edu.ezip.ing1.pds.requests.planning.InsertHoraireClientRequest;
+import edu.ezip.ing1.pds.requests.planning.SelectAllHorairesClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -31,6 +32,7 @@ public class HoraireService {
     final String deleteRequestOrder = "DELETE_HORAIRE";
     final String selectHoraireMedecinRequestOrder = "SELECT_HORAIRE_MEDECIN";
     final String selectOneHoraireRequestOrder = "SELECT_ONE_HORAIRE";
+    final String deleteConsulteWithHoraireRequestOrder = "DELETE_CONSULTE_WHERE_HORAIRE";
 
     private final NetworkConfig networkConfig;
 
@@ -39,18 +41,22 @@ public class HoraireService {
     }
 
     public void insertHoraire(Horaire horaire)throws InterruptedException, IOException {
-        insertDeleteUpdateMedecin(horaire, insertRequestOrder);
+        insertDeleteUpdateHoraire(horaire, insertRequestOrder);
 
     }
 
     public void updateHoraire(Horaire horaire)throws InterruptedException, IOException {
-        insertDeleteUpdateMedecin(horaire, updateRequestOrder);
+        insertDeleteUpdateHoraire(horaire, updateRequestOrder);
     }
 
     public void deleteHoraire(Horaire horaire)throws InterruptedException, IOException {
-        insertDeleteUpdateMedecin(horaire, deleteRequestOrder);
+        insertDeleteUpdateHoraire(horaire, deleteRequestOrder);
     }
-    public void insertDeleteUpdateMedecin(Horaire horaire, String requestOrder) throws InterruptedException, IOException {
+
+    public void deleteConsulteWithHoraire(Horaire horaire) throws IOException, InterruptedException {
+        insertDeleteUpdateHoraire(horaire, deleteConsulteWithHoraireRequestOrder);
+    }
+    public void insertDeleteUpdateHoraire(Horaire horaire, String requestOrder) throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
 
         int birthdate = 0;

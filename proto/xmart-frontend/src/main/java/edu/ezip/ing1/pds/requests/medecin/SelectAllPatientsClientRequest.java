@@ -1,8 +1,7 @@
-package edu.ezip.ing1.pds.requestsplanning;
+package edu.ezip.ing1.pds.requests.medecin;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ezip.ing1.pds.business.dto.Medecins;
 import edu.ezip.ing1.pds.business.dto.Patients;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
