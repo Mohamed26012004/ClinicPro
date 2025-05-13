@@ -18,14 +18,12 @@ public class MainFrontEnd {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        final String networkConfigFile = "network.yaml";
-        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+//        final String networkConfigFile = "network.yaml";
+//        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
 //        final EquipementService equipementService = new EquipementService(networkConfig);
-        final FactureService factureService = new FactureService(networkConfig);
 
-        Facture facture = new Facture(LocalDate.now(), 132, true);
-        facture.setIdExamen(1);
-        factureService.deleteFacture(facture);
+
+
 
         // Pour un jolie look and feel.
         try {
@@ -33,8 +31,8 @@ public class MainFrontEnd {
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         }
-//        Fenetre fene = new Fenetre();
-//        fene.setVisible(true);
+        Fenetre fene = new Fenetre();
+        fene.setVisible(true);
 
 
     }
