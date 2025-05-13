@@ -18,6 +18,7 @@ public class Facture {
     private int idFacture;
     private  double montantFacture;
     private boolean regle;
+    private int idExamen;
    
  
     @JsonDeserialize(using = DeserialisationDate.class) // doit etre au dessus des dates
@@ -30,20 +31,21 @@ public class Facture {
     }
     public final Facture build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle");
+        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle", "idExamen");
         return this;
  
     }
  
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture.format(formatDate), String.valueOf(montantFacture), String.valueOf(regle));
+                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture.format(formatDate), String.valueOf(montantFacture), String.valueOf(regle), String.valueOf(idExamen));
     }
  
     public Facture(LocalDate dateFacture, double montantFacture, boolean regle) {
         this.dateFacture = dateFacture;
         this.montantFacture = montantFacture;
         this.regle = regle;
+        this.idExamen = idExamen;
        
     }
  
@@ -62,6 +64,10 @@ public class Facture {
  
     public boolean  getRegle() {
         return regle;
+    }
+
+    public int getIdExamen(){
+        return idExamen;
     }
  
     @JsonProperty("idFacture")
@@ -82,6 +88,11 @@ public class Facture {
     @JsonProperty("regle")
     public void setRegle(boolean regle) {
         this.regle = regle;
+    }
+
+    @JsonProperty("idExamen")
+    public void setIdExamen(int idExamen) {
+        this.idExamen = idExamen;
     }
  
  
@@ -108,6 +119,7 @@ public class Facture {
     ", dateFacture=" + dateFacture +
     ", montantFacture=" + montantFacture +
     ", regle=" + regle +
+    ", idExamen=" + idExamen +
     '}';
  
     }
