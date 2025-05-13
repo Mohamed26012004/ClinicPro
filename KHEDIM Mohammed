@@ -1,0 +1,27 @@
+CREATE TABLE examen (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    cout DOUBLE NOT NULL,
+    duree TIME NOT NULL
+);
+
+CREATE TABLE facture (
+    idFacture INT AUTO_INCREMENT PRIMARY KEY,
+    dateFacture DATE NOT NULL,
+    montantFacture DOUBLE NOT NULL,
+    regle BOOLEAN NOT NULL,
+    idExamen INT,
+    FOREIGN KEY (idExamen) REFERENCES examen(id)
+);
+
+INSERT INTO examen (nom, cout, duree) VALUES
+('Prise de sang', 25.00, '00:10:00'),
+('Radiographie thoracique', 60.00, '00:20:00'),
+('IRM cérébrale', 350.00, '00:45:00'),
+('Scanner abdominal', 280.00, '00:30:00'),
+('Échographie pelvienne', 90.00, '00:25:00'),
+('Test d’effort', 150.00, '00:40:00'),
+('Fibroscopie gastrique', 180.00, '00:35:00'),
+('Bilan biologique complet', 110.00, '00:15:00'),
+('Électrocardiogramme (ECG)', 40.00, '00:10:00'),
+('Mammographie', 100.00, '00:20:00');
