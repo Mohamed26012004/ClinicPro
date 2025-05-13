@@ -58,13 +58,6 @@ CREATE TABLE salle(
    PRIMARY KEY(id)
 );
 
-CREATE TABLE paiement (
-    idPaiement INT PRIMARY KEY AUTO_INCREMENT,
-    montane DOUBLE NOT NULL,
-    datePaiement VARCHAR(50) NOT NULL,
-    moyenDePaiement VARCHAR(50) NOT NULL
-);
-
 CREATE TABLE consulte(
    numeroADELI INT,
    id INT,

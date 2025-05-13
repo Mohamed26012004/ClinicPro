@@ -8,8 +8,8 @@
 databaseName: "clinicprodatabase"
 host: "127.0.0.1"
 port: 3306
-username : "raslene"
-password: "Tibertiber@11"
+username : "root"
+password: ""
 poolSize: 1
 
 

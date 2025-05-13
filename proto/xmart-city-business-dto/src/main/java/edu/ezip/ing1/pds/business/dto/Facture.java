@@ -45,8 +45,6 @@ public class Facture {
         this.dateFacture = dateFacture;
         this.montantFacture = montantFacture;
         this.regle = regle;
-        this.idExamen = idExamen;
-       
     }
  
     public int  getIdFacture() {

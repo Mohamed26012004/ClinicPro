@@ -6,9 +6,9 @@ import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
- 
+import edu.ezip.ing1.pds.services.planning.ExamenService;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
