@@ -199,8 +199,34 @@ public class XMartCityService {
         INSERT_MAINTENANCE("INSERT into maintenance (idMaintenance, typeMaintenance, dateMaintenance, coutMaintenance) values (?, ?, ?, ?)"),
         UPDATE_MAINTENANCE("UPDATE maintenance SET coutMaintenance = ?, dateMaintenance = ?, typeMaintenance = ? WHERE idMaintenance = ?"),
         DELETE_MAINTENANCE("DELETE FROM maintenance WHERE idMaintenance = ? AND coutMaintenance = ? AND typeMaintenance = ? AND dateMaintenance = ? "),
-        TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance");
+        TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance"),
 
+        SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU("SELECT m.numeroADELI, m.nom, m.prenom " +
+                "FROM medecin m " +
+                "WHERE m.numeroADELI IN ( " +
+                "    SELECT c.numeroADELI " +
+                "    FROM consulte c, horaire h " +
+                "    WHERE c.id = h.id " +
+                "    AND h.jour = ( " +
+                "        SELECT CASE DAYOFWEEK(?) " +
+                "            WHEN 1 THEN 'Dimanche' " +
+                "            WHEN 2 THEN 'Lundi' " +
+                "            WHEN 3 THEN 'Mardi' " +
+                "            WHEN 4 THEN 'Mercredi' " +
+                "            WHEN 5 THEN 'Jeudi' " +
+                "            WHEN 6 THEN 'Vendredi' " +
+                "            WHEN 7 THEN 'Samedi' " +
+                "        END " +
+                "    ) " +
+                "    AND h.heureDebut <= ? AND h.heureFin >= ? " +
+                ") " +
+                "AND m.numeroADELI NOT IN ( " +
+                "    SELECT d.numeroADELI " +
+                "    FROM disponibilite d " +
+                "    WHERE d.dateDisponibilite = ? " +
+                "    AND d.statut = 'Réservé' " +
+                "    AND ( ? < d.heureFin AND ? > d.heureDebut ) " +
+                ")");
 
         private final String query;
 
@@ -467,6 +493,9 @@ public class XMartCityService {
                 break;
             case SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN:
                 response = SelectPlanificationWithNameByName(request, connection);
+                break;
+            case SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU:
+                response = SelectMedecinsDisponibleByDateAndCreneau(request, connection);
                 break;
             default:
                 break;
@@ -1799,6 +1828,30 @@ public class XMartCityService {
             planificationWithNames.add(pwn);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationWithNames));
+    }
+
+    private Response SelectMedecinsDisponibleByDateAndCreneau(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU.query);
+        final PlanificationExamen planificationExamen = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+
+        stmt.setDate(1, Date.valueOf(planificationExamen.getDatePlanification()));
+        stmt.setTime(2, Time.valueOf(planificationExamen.getHeureDebut()));
+        stmt.setTime(3, Time.valueOf(planificationExamen.getHeureFin()));
+        stmt.setDate(4, Date.valueOf(planificationExamen.getDatePlanification()));
+        stmt.setTime(5, Time.valueOf(planificationExamen.getHeureDebut()));
+        stmt.setTime(6, Time.valueOf(planificationExamen.getHeureFin()));
+
+        final ResultSet res = stmt.executeQuery();
+        Medecins medecins = new Medecins();
+        while (res.next()) {
+            Medecin medecin = new Medecin();
+            medecin.setNumeroADELI(res.getInt(1));
+            medecin.setNom(res.getString(2));
+            medecin.setPrenom(res.getString(3));
+            medecins.add(medecin);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecins));
     }
 
 }
