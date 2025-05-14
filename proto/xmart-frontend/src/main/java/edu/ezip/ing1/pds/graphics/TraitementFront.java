@@ -22,7 +22,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.TraitementService;
 
 public class TraitementFront extends JPanel {
-    private JTextField id_TraitementChamp, idPatientChamp, numeroADELIChamp, typeTraitementChamp, descriptionTraitementChamp, debutTraitementChamp, finTraitementChamp;
+    private JTextField id_TraitementChamp, idPlanificationChamp, numeroADELIChamp, typeTraitementChamp, descriptionTraitementChamp, debutTraitementChamp, finTraitementChamp;
     private DefaultTableModel model;
     private JTable table;
     private final TraitementService TraitementService;
@@ -61,7 +61,7 @@ public class TraitementFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Traitement", "Id Patient", "Numéro ADELI", "Type de traitement", "Description", "Début", "Fin"};
+        String[] columns = {"ID Traitement", "Id Planification", "Numéro ADELI", "Type de traitement", "Description", "Début", "Fin"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -116,8 +116,7 @@ public class TraitementFront extends JPanel {
                 if (i >= 0) {
                     Traitement Traitement = new Traitement();
                     Traitement.setId_Traitement(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    Traitement.setIdPatient(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    Traitement.setNumeroADELI(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                    Traitement.setIdPlanification(Integer.parseInt(model.getValueAt(i, 0).toString()));
                     Traitement.setType_Traitement(typeTraitementChamp.getText().trim());
                     Traitement.setDebut_Traitement(debutTraitementChamp.getText().trim());
                     Traitement.setFin_Traitement(finTraitementChamp.getText().trim());
@@ -167,8 +166,7 @@ public class TraitementFront extends JPanel {
             for (Traitement a : traitements.getTraitements()) {
                 model.addRow(new Object[]{
                         a.getId_Traitement(),
-                        a.getIdPatient(),
-                        a.getNumeroADELI(),
+                        a.getIdPlanification(),
                         a.getType_Traitement(),
                         a.getDescription_Traitement(),
                         a.getDebut_Traitement(),
@@ -182,7 +180,7 @@ public class TraitementFront extends JPanel {
 
     private void viderChamps() {
         id_TraitementChamp.setText("");
-        idPatientChamp.setText("");
+        idPlanificationChamp.setText("");
         numeroADELIChamp.setText("");
         typeTraitementChamp.setText("");
         descriptionTraitementChamp.setText("");

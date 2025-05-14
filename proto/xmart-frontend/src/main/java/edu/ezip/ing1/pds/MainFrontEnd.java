@@ -34,8 +34,8 @@ public class MainFrontEnd {
         Fenetre fene = new Fenetre();
         fene.setVisible(true);
 
-        //FenetreMedecin fm = new FenetreMedecin();
-        //fm.setVisible(true);
+        FenetreMedecin fm = new FenetreMedecin();
+        fm.setVisible(true);
 
 
     }

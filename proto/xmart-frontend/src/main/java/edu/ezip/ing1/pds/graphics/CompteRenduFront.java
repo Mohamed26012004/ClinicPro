@@ -22,7 +22,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.CompteRenduService;
 
 public class CompteRenduFront extends JPanel {
-    private JTextField id_compteRenduChamp, idPatientChamp, numeroADELIChamp, typeSymptomeChamp, descriptionSymptomeChamp;
+    private JTextField id_compteRenduChamp, idPlanificationChamp, typeSymptomeChamp, descriptionSymptomeChamp;
     private DefaultTableModel model;
     private JTable table;
     private final CompteRenduService compteRenduService;
@@ -54,7 +54,7 @@ public class CompteRenduFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID CompteRendu", "Id Patient", "Numéro ADELI", "Symptôme", "Description"};
+        String[] columns = {"ID CompteRendu", "Id Planification", "Symptôme", "Description"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -154,7 +154,7 @@ public class CompteRenduFront extends JPanel {
             for (CompteRendu a : compteRendus.getCompteRendus()) {
                 model.addRow(new Object[]{
                         a.getId_compteRendu(),
-                        a.getIdPatient(),
+                        a.getIdPlanification(),
                         a.getTypeSymptome(),
                         a.getDescriptionSymptome()
                 });
@@ -164,8 +164,7 @@ public class CompteRenduFront extends JPanel {
 
     private void viderChamps() {
         id_compteRenduChamp.setText("");
-        idPatientChamp.setText("");
-        numeroADELIChamp.setText("");
+        idPlanificationChamp.setText("");
         typeSymptomeChamp.setText("");
         descriptionSymptomeChamp.setText("");
 

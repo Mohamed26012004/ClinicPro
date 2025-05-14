@@ -71,6 +71,11 @@ public class AntecedentMedicalFront extends JPanel {
 
         add(panelSud, BorderLayout.SOUTH);
 
+
+
+
+
+
         boutonAjouter.addActionListener(e -> {
             try {
 
@@ -97,8 +102,8 @@ public class AntecedentMedicalFront extends JPanel {
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
-                type_antecedentMedicalChamp.setText(model.getValueAt(i, 1).toString());
-                description_antecedentMedicalChamp.setText(model.getValueAt(i, 2).toString());
+                type_antecedentMedicalChamp.setText(model.getValueAt(i, 3).toString());
+                description_antecedentMedicalChamp.setText(model.getValueAt(i, 4).toString());
             }
         });
 

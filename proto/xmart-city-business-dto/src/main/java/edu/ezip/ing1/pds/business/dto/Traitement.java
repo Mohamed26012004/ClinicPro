@@ -16,8 +16,7 @@ public class Traitement {
     private  String description_Traitement;
     private  String debut_Traitement;
     private  String fin_Traitement;
-    private int idPatient;
-    private int numeroADELI;
+    private int idPlanification;
 
 
 
@@ -26,23 +25,23 @@ public class Traitement {
 
     public final Traitement build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_Traitement", "idPatient", "numeroADELI", "type_Traitement","description_Traitement", "debut_traitement", "fin_Traitement");
+        setFieldsFromResulset(resultSet, "id_Traitement", "idPlanification", "numeroADELI", "type_Traitement","description_Traitement", "debut_traitement", "fin_Traitement");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_Traitement), String.valueOf(idPatient), String.valueOf(numeroADELI), type_Traitement, description_Traitement, debut_Traitement, fin_Traitement);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_Traitement), String.valueOf(idPlanification), type_Traitement, description_Traitement, debut_Traitement, fin_Traitement);
     }
 
-    public Traitement(String type_Traitement, String description_Traitement, String debut_Traitement, String fin_Traitement, int idPatient, int numeroADELI) {
+    public Traitement(String type_Traitement, String description_Traitement, String debut_Traitement, String fin_Traitement, int idPlanification) {
         this.type_Traitement = type_Traitement;
         this.description_Traitement = description_Traitement;
         this.debut_Traitement = debut_Traitement;
         this.fin_Traitement = fin_Traitement;
-        this.idPatient = idPatient;
-        this.numeroADELI = numeroADELI;
+        this.idPlanification = idPlanification;
+
     }
 
 
@@ -53,8 +52,7 @@ public class Traitement {
     public String getDescription_Traitement() {return description_Traitement;}
     public String getDebut_Traitement() {return debut_Traitement;}
     public String getFin_Traitement() {return fin_Traitement;}
-    public int getIdPatient() {return idPatient;}
-    public int getNumeroADELI() {return numeroADELI;}
+    public int getIdPlanification() {return idPlanification;}
 
 
     @JsonProperty("Traitement_type_Traitement")
@@ -69,10 +67,9 @@ public class Traitement {
     public void setDebut_Traitement(String debut_Traitement) {this.debut_Traitement = debut_Traitement;}
     @JsonProperty("Traitement_fin_Traitement")
     public void setFin_Traitement(String fin_Traitement) {this.fin_Traitement = fin_Traitement;}
-    @JsonProperty("Traitement_idPatient")
-    public void setIdPatient(int idPatient) {this.idPatient = idPatient;}
-    @JsonProperty("Traitement_numeroADELI")
-    public void setNumeroADELI(int numeroADELI) {this.numeroADELI = numeroADELI;}
+    @JsonProperty("Traitement_idPlanification")
+    public void setIdPlanification(int idPlanification) {this.idPlanification = idPlanification;}
+
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
@@ -95,8 +92,7 @@ public class Traitement {
     public String toString() {
         return "Traitement{" +
                 "id_Traitement='" + id_Traitement + '\'' +
-                ", idPatient='" + idPatient + '\'' +
-                ", numeroADELI='" + numeroADELI + '\'' +
+                ", idPlanification='" + idPlanification + '\'' +
                 ", type_Traitement='" + type_Traitement + '\'' +
                 ", description_Traitement='" + description_Traitement + '\'' +
                 ", debut_Traitement='" + debut_Traitement + '\'' +

@@ -22,7 +22,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.servicesdpi.DiagnosticService;
 
 public class DiagnosticFront extends JPanel{
-    private JTextField id_DiagnosticChamp, id_PatientChamp, numeroADELIChamp, codeCIM10Champ, nomMaladieChamp, descriptionDiagnosticChamp;
+    private JTextField id_DiagnosticChamp, id_PlanificationChamp, codeCIM10Champ, nomMaladieChamp, descriptionDiagnosticChamp;
     private DefaultTableModel model;
     private JTable table;
     private final DiagnosticService diagnosticService;
@@ -56,7 +56,7 @@ public class DiagnosticFront extends JPanel{
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID_Diagnostic", "ID Patient", "Numéro ADELI", "Code CIM10", "Nom maladie", "Description diagnostic"};
+        String[] columns = {"ID_Diagnostic", "ID Planification", "Code CIM10", "Nom maladie", "Description diagnostic"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -177,8 +177,7 @@ public class DiagnosticFront extends JPanel{
 
     private void viderChamps() {
         id_DiagnosticChamp.setText("");
-        id_PatientChamp.setText("");
-        numeroADELIChamp.setText("");
+        id_PlanificationChamp.setText("");
         codeCIM10Champ.setText("");
         nomMaladieChamp.setText("");
         descriptionDiagnosticChamp.setText("");
