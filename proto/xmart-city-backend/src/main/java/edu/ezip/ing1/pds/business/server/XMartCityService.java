@@ -190,6 +190,7 @@ public class XMartCityService {
         INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?) "),
         DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
         UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
+        SELECT_ONE_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p WHERE idPlanification = ?"),
 
         SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT idPlanification FROM planification WHERE idExamen = ?"),
         SELECT_ID_PLANIFICATION_PAR_MEDECIN("SELECT idPlanification FROM planification WHERE numeroADELI = ?"),
@@ -459,6 +460,9 @@ public class XMartCityService {
                 break;
             case SELECT_PLANIFICATION:
                 response = SelectAllPlanifications(request, connection);
+                break;
+            case SELECT_ONE_PLANIFICATION:
+                response = SelectOnePlanifications(request, connection);
                 break;
 
             case SELECT_ID_PLANIFICATION_PAR_EXAMEN:
@@ -1749,6 +1753,28 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
     }
 
+    private Response SelectOnePlanifications(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ONE_PLANIFICATION.query);
+        stmt.setInt(1, planification.getIdPlanification());
+
+        final ResultSet res = stmt.executeQuery();
+        PlanificationExamens planificationExamens = new PlanificationExamens();
+        while (res.next()) {
+            PlanificationExamen planificationExamen = new PlanificationExamen();
+            planificationExamen.setIdPlanification(res.getInt(1));
+            planificationExamen.setNumeroADELI(res.getInt(2));
+            planificationExamen.setIdPatient(res.getInt(3));
+            planificationExamen.setIdExamen(res.getInt(4));
+            planificationExamen.setIdSalle(res.getInt(5));
+            planificationExamen.setDatePlanification(res.getDate(6).toLocalDate());
+            planificationExamen.setHeureDebut(res.getTime(7).toLocalTime());
+            planificationExamen.setHeureFin(res.getTime(8).toLocalTime());
+            planificationExamens.add(planificationExamen);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
+    }
 
     private Response SelectIdPlanificationParExamen(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();

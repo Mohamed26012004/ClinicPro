@@ -33,6 +33,7 @@ public class PlanificationService {
     final String deleteRequestOrder = "DELETE_PLANIFICATION";
     final String selectIdPlanParMedecin = "SELECT_ID_PLANIFICATION_PAR_MEDECIN";
     final String selectIdPlanParExamen = "SELECT_ID_PLANIFICATION_PAR_EXAMEN";
+    final String selectOnePlanificationRequestOrder = "SELECT_ONE_PLANIFICATION";
 
 
     private final NetworkConfig networkConfig;
@@ -148,6 +149,39 @@ public class PlanificationService {
     }
     public PlanificationExamens selectIdPlanificationParMedecin(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
         return selectIdPlanification(planificationExamen, selectIdPlanParMedecin);
+    }
+
+    public PlanificationExamen selectOnePlanifications(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String requestId = UUID.randomUUID().toString();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(selectOnePlanificationRequestOrder);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectPlanificationClientRequest clientRequest = new SelectPlanificationClientRequest(
+                networkConfig,
+                birthdate++, request, null, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if (!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            PlanificationExamens planificationExamens = (PlanificationExamens) joinedClientRequest.getResult();
+            for (PlanificationExamen p : planificationExamens.getPlanifications()) {
+                return p;
+            }
+        } else {
+            logger.error("No Salles found");
+            return null;
+        }
+        return planificationExamen;
     }
 
 }

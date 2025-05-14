@@ -8,6 +8,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
 import edu.ezip.ing1.pds.services.planning.CreneauService;
 import edu.ezip.ing1.pds.services.planning.MedecinService;
+import edu.ezip.ing1.pds.services.planning.PlanificationService;
 import edu.ezip.ing1.pds.services.planning.PlanificationWithNameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ public class PanelPlanningMedecin extends JPanel {
     final static MedecinService medecinService = new MedecinService(networkConfig);
     final static PlanificationWithNameService planificationWithNameService = new PlanificationWithNameService(networkConfig);
     final static CreneauService creneauService = new CreneauService(networkConfig);
+    final static PlanificationService planificationService = new PlanificationService(networkConfig);
 
     private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
     private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
@@ -321,7 +323,20 @@ public class PanelPlanningMedecin extends JPanel {
         delete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                int i = tablePlanification.getSelectedRow();
+                if (i >= 0){
+                    PlanificationExamen plan = new PlanificationExamen();
+                    plan.setIdPlanification(Integer.parseInt(modelPlanification.getValueAt(i, 0).toString()));
+                    try {
+                        plan = planificationService.selectOnePlanifications(plan);
+                        planificationService.deletePlanification(plan);
+                        chargerPlanification(planificationDuMedecin);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
         update.addActionListener(new ActionListener() {
