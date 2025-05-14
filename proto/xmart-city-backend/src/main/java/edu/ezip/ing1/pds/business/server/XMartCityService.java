@@ -37,11 +37,11 @@ public class XMartCityService {
         SELECT_ONE_EXAMEN("SELECT t.id, t.nom, t.cout, t.duree FROM examen t WHERE nom = ? AND cout = ? AND duree = ?"),
         ID_EXAMEN("SELECT id FROM examen WHERE nom = ? AND cout = ? AND duree = ?"),
 
-        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle, t.idExamen FROM facture t"),
-        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle, idExamen) values (?, ?, ?, ?)"),
-        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ?, idExamen = ? WHERE idFacture = ?"),
+        SELECT_ALL_FACTURES("SELECT t.idFacture, t.dateFacture, t.montantFacture, t.regle, t.idExamen, t.idPatient FROM facture t"),
+        INSERT_FACTURE("INSERT INTO facture (dateFacture, montantFacture, regle, idExamen, idPatient) values (?, ?, ?, ?, ?)"),
+        UPDATE_FACTURE("UPDATE facture SET dateFacture = ?, montantFacture = ?, regle = ?, idExamen = ?, idPatient = ? WHERE idFacture = ?"),
         DELETE_FACTURE("DELETE FROM facture WHERE idFacture = ?"),
-        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle = ? AND idExamen = ?"),
+        ID_FACTURE("SELECT idFacture FROM facture WHERE dateFacture = ? AND montantFacture = ? AND regle = ? AND idExamen = ? AND idPatient = ?"),
 
         FACTURES_PAYEES("SELECT t.idFacture, t.dateFacture FROM facture t WHERE t.regle=true"),
         FACTURES_QUOTIDIENNES("SELECT idFacture, regle FROM facture WHERE dateFacture = ?"),
@@ -608,6 +608,7 @@ public class XMartCityService {
             facture.setMontantFacture(res.getDouble(3));
             facture.setRegle(res.getBoolean(4));
             facture.setIdExamen(res.getInt(5));
+            facture.setIdPatient(res.getInt(6));
             factures.add(facture);
         }        
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(factures));
@@ -622,6 +623,7 @@ public class XMartCityService {
     stmt.setDouble(2, facture.getMontantFacture());
     stmt.setBoolean(3, facture.getRegle());
     stmt.setInt(4, facture.getIdExamen());
+    stmt.setInt(5, facture.getIdPatient());
     
     int rowsAffected = stmt.executeUpdate();
     if (rowsAffected > 0) {
@@ -644,7 +646,8 @@ public class XMartCityService {
         stmt.setDouble(2, facture.getMontantFacture());
         stmt.setBoolean(3, facture.getRegle());
         stmt.setInt(4, facture.getIdExamen());
-        stmt.setInt(5, facture.getIdFacture());
+        stmt.setInt(5, facture.getIdPatient());
+        stmt.setInt(6, facture.getIdFacture());
  
         stmt.executeUpdate();
  

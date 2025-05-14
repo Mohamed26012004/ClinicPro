@@ -21,6 +21,8 @@ public class Fenetre extends JFrame{
     private static JLabel boutonSalle;
     private static JLabel boutonEquipement;
     private static JLabel boutonPaiement;
+    private static JLabel boutonFacture;
+
 
     private static CardLayout card = new CardLayout();
     private static JPanel cartePanel = new JPanel(card);
@@ -42,6 +44,9 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationExamen(), "Examen");
         cartePanel.add(new PanelManipulationSalle(), "Salle");
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
+        cartePanel.add(new FacturationFront(), "Facture");
+        cartePanel.add(new PaiementFront(), "Paiement");
+
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -60,6 +65,8 @@ public class Fenetre extends JFrame{
         pane.add(panelBoutonMedecin());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonPaiement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonFacture());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         pane.add(panelBoutonDiagnostic());
@@ -117,18 +124,19 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonPaiement(){
-        boutonExamem = createLabel("Paiement");
-        JPanel panelExamen = new JPanel();
-        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(boutonExamem);
-        panelExamen.addMouseListener(new MouseAdapter() {
+        JLabel label = createLabel("Paiement");
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                PaiementFront f = new PaiementFront();
+               card.show(cartePanel, "Paiement");
             }
         });
-        return panelExamen;
+        return panel;
     }
 
     public JPanel panelBoutonDiagnostic(){
@@ -158,6 +166,22 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                card.show(cartePanel, "Medecin");
+            }
+        });
+        return panel;
+    }
+
+     public JPanel panelBoutonFacture(){
+        JLabel label = createLabel("Facture");
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               card.show(cartePanel, "Facture");
             }
         });
         return panel;
@@ -196,3 +220,4 @@ public class Fenetre extends JFrame{
 
 
 }
+    

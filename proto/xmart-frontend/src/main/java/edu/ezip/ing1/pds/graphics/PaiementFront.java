@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
  
-public class PaiementFront {
+public class PaiementFront extends JPanel {
     private JTextField montantChamp, datePaiementChamp;
     private JRadioButton cartebancaireRadio, especesRadio, chequeRadio, tierspayantRadio;
     private ButtonGroup moyenDePaiementGroup; //https://koor.fr/Java/TutorialSwing/swing_JRadioButton.wp //Unique bouton coché
@@ -27,10 +29,8 @@ public class PaiementFront {
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.paiementService = new PaiementService(networkConfig);
  
-        JFrame frame = new JFrame("Gestion des Paiements");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+        setSize(700, 400);
  
         JPanel panelNord = new JPanel(new GridLayout(3, 2, 5, 5));
  
@@ -50,7 +50,7 @@ public class PaiementFront {
  
         panelNord.add(new JLabel("Montant :"));
         panelNord.add(montantChamp);
-        panelNord.add(new JLabel("Date de paiement (yyyy-MM-dd) :"));
+        panelNord.add(new JLabel("Date de paiement (AAAA-MM-DD) :"));
         panelNord.add(datePaiementChamp);
         panelNord.add(new JLabel("Moyen de Paiement :"));
  
@@ -61,21 +61,19 @@ public class PaiementFront {
         panelRadio.add(tierspayantRadio);
         panelNord.add(panelRadio);
  
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
  
         String[] columns = {"ID", "Montant", "Date de paiement", "Moyen de Paiement"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
  
         JPanel panelSud = new JPanel();
         JButton boutonSoumettre = new JButton("Soumettre");
-        JButton boutonAnnuler = new JButton("Annuler");
  
         panelSud.add(boutonSoumettre);
-        panelSud.add(boutonAnnuler);
  
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
  
         boutonSoumettre.addActionListener(e -> {
             try {
@@ -94,15 +92,25 @@ public class PaiementFront {
                 }
  
                 if (montantText.isEmpty() && dateText.isEmpty() && moyen.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
+                }
+
+
+                if (moyen.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Vous devez sélectionner un moyen de paiement", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return; 
                 }
  
                 double montant = Double.parseDouble(montantText);
  
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate datePaiement = LocalDate.parse(dateText, formatter);
- 
+
+                int confirmation = JOptionPane.showConfirmDialog(null, "Êtes-vous sûr de vouloir confirmer ce paiement ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                
+                if (confirmation == JOptionPane.YES_OPTION) {
+
                 Paiement paiement = new Paiement();
                 paiement.setmontant(montant);
                 paiement.setdatePaiement(datePaiement);
@@ -111,13 +119,16 @@ public class PaiementFront {
                 paiementService.insertPaiement(paiement);
                 chargerPaiements();
                 viderChamps();
+
+                JOptionPane.showMessageDialog(null, "Paiement ajouté avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                }
  
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez le format yyyy-MM-dd", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Format de date invalide. Utilisez le format AAAA-MM-DD", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
  
@@ -129,22 +140,22 @@ public class PaiementFront {
             }
         });
  
-        boutonAnnuler.addActionListener(e -> frame.dispose());
  
         try {
             chargerPaiements();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des paiements: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erreur lors du chargement des paiements: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
- 
-        frame.setVisible(true);
+
     }
  
     private void chargerPaiements() throws IOException, InterruptedException {
         model.setRowCount(0);
         Paiements paiements = paiementService.selectPaiements();
         if (paiements != null && paiements.getPaiements() != null) {
-            for (Paiement p : paiements.getPaiements()) {
+            ArrayList<Paiement> list = new ArrayList<>(paiements.getPaiements());
+            list.sort(Comparator.comparing(Paiement::getdatePaiement));
+            for (Paiement p : list) {
                 model.addRow(new Object[]{
                     p.getidPaiement(),
                     p.getmontant(),
@@ -158,9 +169,5 @@ public class PaiementFront {
     private void viderChamps() {
         montantChamp.setText("");
         datePaiementChamp.setText("");
-    }
- 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(PaiementFront::new);
     }
 }
