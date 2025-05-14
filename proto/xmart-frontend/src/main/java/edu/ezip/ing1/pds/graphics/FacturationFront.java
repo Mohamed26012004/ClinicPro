@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.Paiement;
 import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.business.dto.Patient;
@@ -19,6 +20,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class FacturationFront extends JPanel {
 
@@ -222,8 +225,9 @@ public class FacturationFront extends JPanel {
     private void chargerFactures() throws IOException, InterruptedException {
         model.setRowCount(0);
         Factures factures = factureService.selectFactures();
-        if (factures != null && factures.getFactures() != null) {
-            for (Facture f : factures.getFactures()) {
+        ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
+            list.sort(Comparator.comparing(Facture::getDateFacture));
+            for (Facture f : list) {
                 String nomExamen = "";
                 for (Examen e : examensListe) {
                     if (e.getId() == f.getIdExamen()) {
@@ -249,7 +253,6 @@ public class FacturationFront extends JPanel {
                 });
             }
         }
-    }
 
     private void viderChamps() {
         montantChamp.setText("");
@@ -259,4 +262,4 @@ public class FacturationFront extends JPanel {
     }
 
     
-        }
+}
