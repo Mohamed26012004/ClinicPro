@@ -20,6 +20,8 @@ public class Fenetre extends JFrame{
     private static JLabel boutonSalle;
     private static JLabel boutonEquipement;
     private static JLabel boutonPaiement;
+    private static JLabel boutonFacture;
+
 
     private static CardLayout card = new CardLayout();
     private static JPanel cartePanel = new JPanel(card);
@@ -41,6 +43,7 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationExamen(), "Examen");
         cartePanel.add(new PanelManipulationSalle(), "Salle");
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
+        cartePanel.add(new FacturationFront(), "Facture");
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -59,6 +62,8 @@ public class Fenetre extends JFrame{
         pane.add(panelBoutonMedecin());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonPaiement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonFacture());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         pane.add(panelBoutonDiagnostic());
@@ -157,6 +162,22 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                card.show(cartePanel, "Medecin");
+            }
+        });
+        return panel;
+    }
+
+     public JPanel panelBoutonFacture(){
+        JLabel label = createLabel("Facture");
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               card.show(cartePanel, "Facture");
             }
         });
         return panel;
