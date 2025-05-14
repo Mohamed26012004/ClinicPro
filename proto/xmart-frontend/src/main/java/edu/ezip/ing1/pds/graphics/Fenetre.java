@@ -3,6 +3,7 @@ package edu.ezip.ing1.pds.graphics;
 import edu.ezip.ing1.pds.graphics.examen.PanelManipulationExamen;
 import edu.ezip.ing1.pds.graphics.medecin.PanelManipulationMedecin;
 import edu.ezip.ing1.pds.graphics.salle.PanelManipulationSalle;
+import org.stringtemplate.v4.ST;
 
 import java.awt.*;
 
@@ -193,14 +194,5 @@ public class Fenetre extends JFrame{
         return t;
     }
 
-//    public JMenuBar menuBar(){
-//        JMenuBar bar = new JMenuBar();
-//        bar.setPreferredSize(new Dimension(0, 35));
-//        JMenu compte = new JMenu("Compte");
-//        compte.setFont(new Font("Arial", Font.PLAIN, 16));
-//        bar.add(compte);
-//
-//        return bar;
-//    }
 
 }
