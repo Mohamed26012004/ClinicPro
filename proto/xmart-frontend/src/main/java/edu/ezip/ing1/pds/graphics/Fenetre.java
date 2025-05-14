@@ -44,6 +44,8 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationSalle(), "Salle");
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
         cartePanel.add(new FacturationFront(), "Facture");
+        cartePanel.add(new PaiementFront(), "Paiement");
+
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -121,18 +123,19 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonPaiement(){
-        boutonExamem = createLabel("Paiement");
-        JPanel panelExamen = new JPanel();
-        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(boutonExamem);
-        panelExamen.addMouseListener(new MouseAdapter() {
+        JLabel label = createLabel("Paiement");
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                PaiementFront f = new PaiementFront();
+               card.show(cartePanel, "Paiement");
             }
         });
-        return panelExamen;
+        return panel;
     }
 
     public JPanel panelBoutonDiagnostic(){
