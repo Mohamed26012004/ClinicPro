@@ -1,9 +1,5 @@
 package edu.ezip.ing1.pds.graphics;
 
-import edu.ezip.ing1.pds.graphics.AntecedentMedicalFront;
-import edu.ezip.ing1.pds.medecingrahics.PanelManipulationExamen;
-import edu.ezip.ing1.pds.medecingrahics.PanelManipulationSalle;
-
 import java.awt.*;
 
 import java.awt.event.*;
@@ -34,7 +30,7 @@ public class FenetreMedecin extends JFrame{
         contentPane.setLayout(new BorderLayout());
 //            contentPane.add(menuBar(), BorderLayout.NORTH);
         contentPane.add(PanelGauche(), BorderLayout.WEST);
-        contentPane.add(new PanelManipulationExamen(), BorderLayout.CENTER);
+        contentPane.add(new JLabel("Sélectionnez un sous-dossier à compléter"), BorderLayout.CENTER);
 
 
     }
