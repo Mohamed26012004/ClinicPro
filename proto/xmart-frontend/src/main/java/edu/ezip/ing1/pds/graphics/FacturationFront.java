@@ -99,12 +99,10 @@ public class FacturationFront extends JPanel {
         JButton boutonAjouter = new JButton("Ajouter");
         JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
-        JButton boutonPaiement = new JButton("Paiement");
 
         panelSud.add(boutonAjouter);
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
-        panelSud.add(boutonPaiement);
 
         add(panelSud, BorderLayout.SOUTH);
 
@@ -217,8 +215,6 @@ public class FacturationFront extends JPanel {
                 JOptionPane.showMessageDialog(null, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
-
-        boutonPaiement.addActionListener(e -> new PaiementFront());
 
         chargerFactures();
     }
