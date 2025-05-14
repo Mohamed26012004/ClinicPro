@@ -363,10 +363,16 @@ public class PanelPlanningMedecin extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int i = tableDisponibilite.getSelectedRow();
                 if (i > 0){
-                    planificationDuMedecin.setHeureDebut(LocalTime.parse(modelDisponibilite.getValueAt(i, 0).toString(), formatter));
-                    planificationDuMedecin.setHeureFin(LocalTime.parse(modelDisponibilite.getValueAt(i, 1).toString(), formatter));
-                    FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(planificationDuMedecin);
+                    if(planificationDuMedecin.getDatePlanification().isBefore(LocalDate.now())){
+                        JOptionPane.showMessageDialog(null, "La date sélectionnée est déjà passée. Veuillez choisir une date future.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }else{
+                        planificationDuMedecin.setHeureDebut(LocalTime.parse(modelDisponibilite.getValueAt(i, 0).toString(), formatter));
+                        planificationDuMedecin.setHeureFin(LocalTime.parse(modelDisponibilite.getValueAt(i, 1).toString(), formatter));
+                        FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(planificationDuMedecin);
+                    }
                 }
+
+
             }
         });
 
