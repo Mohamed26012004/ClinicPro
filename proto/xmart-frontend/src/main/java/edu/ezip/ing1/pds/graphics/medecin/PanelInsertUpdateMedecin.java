@@ -7,8 +7,8 @@ import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
-import edu.ezip.ing1.pds.servicesplanning.HoraireService;
-import edu.ezip.ing1.pds.servicesplanning.MedecinService;
+import edu.ezip.ing1.pds.services.planning.HoraireService;
+import edu.ezip.ing1.pds.services.planning.MedecinService;
 
 import javax.swing.*;
 
@@ -155,7 +155,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
     public JPanel panelHorairesMedecin(Medecin medecin) throws IOException, InterruptedException {
         panneau = new JPanel(new BorderLayout());
         panneau.setBorder(new EmptyBorder(15, 15, 15, 15));
-        panneau.add(boutonHoraireMedecin(), BorderLayout.WEST);
+        panneau.add(boutonHoraireMedecin(medecin), BorderLayout.WEST);
 
         panneauCenter.add(afficheListHoraireAajouter(medecin), "HoraireAajouter");
         panneauCenter.add(formulaireCreerHoraire(), "Formulaire");
@@ -236,7 +236,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
 
     //Boutons au gauche permettant d'ajouter ou de supprimer une horaire.
 
-    public JPanel boutonHoraireMedecin(){
+    public JPanel boutonHoraireMedecin(Medecin medecin){
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
@@ -269,15 +269,21 @@ public class PanelInsertUpdateMedecin extends JFrame{
                     h.setHeureDebut(LocalTime.parse(modelHoraireAajouter.getValueAt(i, 1).toString(), formatter));
                     h.setHeureFin(LocalTime.parse(modelHoraireAajouter.getValueAt(i, 2).toString(), formatter));
 
-                    try {
-                        horaireService.deleteHoraire(h);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
+                    if(medecin != null){
+                        try {
+                            horaireService.deleteConsulteWithHoraire(h);
+                            cardLayoutPanneauCenter.show(panneauCenter, "HoraireAajouter");
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }else{
+                        listHoraireAajouter.remove(h);
+                        cardLayoutPanneauCenter.show(panneauCenter, "HoraireAajouter");
                     }
                 }
-                cardLayoutPanneauCenter.show(panneauCenter, "HoraireAajouter");
+
             }
         });
 

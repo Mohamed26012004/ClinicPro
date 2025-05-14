@@ -4,7 +4,7 @@ import edu.ezip.ing1.pds.business.dto.Salle;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
-import edu.ezip.ing1.pds.servicesplanning.SalleService;
+import edu.ezip.ing1.pds.services.planning.SalleService;
 
 import javax.swing.*;
 import java.awt.*;

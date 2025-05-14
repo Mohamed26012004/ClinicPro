@@ -20,6 +20,8 @@ public class Fenetre extends JFrame{
     private static JLabel boutonSalle;
     private static JLabel boutonEquipement;
     private static JLabel boutonPaiement;
+    private static JLabel boutonFacture;
+
 
     private static CardLayout card = new CardLayout();
     private static JPanel cartePanel = new JPanel(card);
@@ -27,63 +29,65 @@ public class Fenetre extends JFrame{
 
 
     public Fenetre() throws IOException, InterruptedException {
-            super("ClinicPro");
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-            setLocationRelativeTo(null);
-            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        super("ClinicPro");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setMinimumSize(new Dimension(600, 400));
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-            contentPane = (JPanel)getContentPane();
-            contentPane.setLayout(new BorderLayout());
-//            contentPane.add(menuBar(), BorderLayout.NORTH);
-            contentPane.add(PanelGauche(), BorderLayout.WEST);
+        contentPane = (JPanel)getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        //           contentPane.add(menuBar(), BorderLayout.NORTH);
+        contentPane.add(PanelGauche(), BorderLayout.WEST);
 
-            cartePanel.add(new PanelManipulationExamen(), "Examen");
-            cartePanel.add(new PanelManipulationSalle(), "Salle");
-            cartePanel.add(new PanelManipulationMedecin(), "Medecin");
-            contentPane.add(cartePanel, BorderLayout.CENTER);
+        cartePanel.add(new PanelManipulationExamen(), "Examen");
+        cartePanel.add(new PanelManipulationSalle(), "Salle");
+        cartePanel.add(new PanelManipulationMedecin(), "Medecin");
+        cartePanel.add(new FacturationFront(), "Facture");
+        contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
-
-
-        }
+    }
             
-        public JPanel PanelGauche(){
-            JPanel pane = new JPanel();
-            pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
+    public JPanel PanelGauche(){
+        JPanel pane = new JPanel();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
-            pane.add(panelBoutonExamen());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
-            pane.add(panelBoutonSalle());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
-            pane.add(panelBoutonEquipement());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
-            pane.add(panelBoutonMedecin());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
-            pane.add(panelBoutonPaiement());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonExamen());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonSalle());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonEquipement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonMedecin());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonPaiement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonFacture());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
-            pane.add(panelBoutonDiagnostic());
-            pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonDiagnostic());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
-            return pane;
-        }
+        return pane;
+    }
 
-        public JPanel panelBoutonExamen(){
-            boutonExamem = createLabel("Examen");
-            JPanel panelExamen = new JPanel();
-            panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-            panelExamen.add(boutonExamem);
-            effetSurBouton(panelExamen);
-            panelExamen.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    card.show(cartePanel, "Examen");
-                }
-            });
+    public JPanel panelBoutonExamen(){
+        boutonExamem = createLabel("Examen");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonExamem);
+        effetSurBouton(panelExamen);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                card.show(cartePanel, "Examen");
+            }
+        });
 
-            return panelExamen;
-        }
+        return panelExamen;
+    }
 
     public JPanel panelBoutonSalle(){
         boutonSalle = createLabel("Salle");
@@ -163,6 +167,22 @@ public class Fenetre extends JFrame{
         return panel;
     }
 
+     public JPanel panelBoutonFacture(){
+        JLabel label = createLabel("Facture");
+        JPanel panel = new JPanel();
+        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panel.add(label);
+        effetSurBouton(panel);
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+               card.show(cartePanel, "Facture");
+            }
+        });
+        return panel;
+    }
+
     public static void effetSurBouton(JPanel p){
         p.addMouseListener(new MouseAdapter() {
             @Override
@@ -205,3 +225,4 @@ public class Fenetre extends JFrame{
 //    }
 
 }
+    

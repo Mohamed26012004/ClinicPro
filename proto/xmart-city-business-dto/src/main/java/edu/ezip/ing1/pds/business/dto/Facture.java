@@ -18,8 +18,8 @@ public class Facture {
     private int idFacture;
     private  double montantFacture;
     private boolean regle;
+    private int idExamen;
     private int idPatient;
-    private int idExamen;  
    
  
     @JsonDeserialize(using = DeserialisationDate.class) // doit etre au dessus des dates
@@ -32,30 +32,23 @@ public class Facture {
     }
     public final Facture build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle", "idPatient", "idExamen");
+        setFieldsFromResulset(resultSet, "idFacture","dateFacture", "montantFacture", "regle", "idExamen", "idPatient");
         return this;
  
     }
  
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), String.valueOf(montantFacture), dateFacture.format(formatDate), String.valueOf(regle), String.valueOf(idPatient), String.valueOf(idExamen));
+                return buildPreparedStatement(preparedStatement, String.valueOf(idFacture), dateFacture.format(formatDate), String.valueOf(montantFacture), String.valueOf(regle), String.valueOf(idExamen), String.valueOf(idPatient));
     }
  
-    public Facture(double montantFacture, boolean regle, LocalDate dateFacture, int idPatient, int idExamen) {
+    public Facture(LocalDate dateFacture, double montantFacture, boolean regle) {
+        this.dateFacture = dateFacture;
         this.montantFacture = montantFacture;
         this.regle = regle;
-        this.dateFacture = dateFacture;
-        this.idPatient = idPatient;
         this.idExamen = idExamen;
-    }
- 
-    public double getMontantFacture() {
-        return montantFacture;
-    }
- 
-    public boolean  getRegle() {
-        return regle;
+        this.idPatient = idPatient;
+       
     }
  
     public int  getIdFacture() {
@@ -67,42 +60,50 @@ public class Facture {
         return dateFacture;
     }
  
-    public int getIdPatient() {
+    public double getMontantFacture() {
+        return montantFacture;
+    }
+ 
+    public boolean  getRegle() {
+        return regle;
+    }
+
+    public int getIdExamen(){
+        return idExamen;
+    }
+
+    public int getIdPatient(){
         return idPatient;
     }
  
-    public int getIdExamen() {
-        return idExamen;
-    }
- 
-    @JsonProperty("facture_idFacture")
+    @JsonProperty("idFacture")
     public void setIdFacture(int idFacture) {
         this.idFacture = idFacture;
     }
  
-    @JsonProperty("facture_montant")
-    public void setMontantFacture(double montantFacture) {
-        this.montantFacture = montantFacture;
-    }
- 
-    @JsonProperty("facture_regle")
-    public void setRegle(boolean regle) {
-        this.regle = regle;
-    }
- 
-    @JsonProperty("facture_date")
+    @JsonProperty("dateFacture")
     public void setDateFacture(LocalDate dateFacture) {
         this.dateFacture = dateFacture;
     }
  
-    @JsonProperty("facture_idPatient")
-    public void setIdPatient(int idPatient) {
-        this.idPatient = idPatient;
+    @JsonProperty("montantFacture")
+    public void setMontantFacture(double montantFacture) {
+        this.montantFacture = montantFacture;
     }
  
-    @JsonProperty("facture_idExamen")
+    @JsonProperty("regle")
+    public void setRegle(boolean regle) {
+        this.regle = regle;
+    }
+
+    @JsonProperty("idExamen")
     public void setIdExamen(int idExamen) {
         this.idExamen = idExamen;
+    }
+
+    @JsonProperty("idPatient")
+    public void setIdPatient(int idPatient) {
+        this.idPatient = idPatient;
     }
  
  
@@ -125,12 +126,12 @@ public class Facture {
     @Override
     public String toString() {
         return "facture{" +
-    "facture_date='" + dateFacture + '\'' +
-    ", facture_idFacture=" + idFacture +
-    ", facture_regle=" + regle +
-    ", facture_montant=" + montantFacture +
-    ", facture_idPatient=" + idPatient +
-    ", facture_idExamen=" + idExamen +
+    "idFacture='" + idFacture + '\'' +
+    ", dateFacture=" + dateFacture +
+    ", montantFacture=" + montantFacture +
+    ", regle=" + regle +
+    ", idExamen=" + idExamen +
+    ", idPatient=" + idPatient +
     '}';
  
     }

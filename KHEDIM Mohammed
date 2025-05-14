@@ -1,0 +1,49 @@
+CREATE TABLE examen (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    cout DOUBLE NOT NULL,
+    duree TIME NOT NULL
+);
+
+CREATE TABLE facture (
+    idFacture INT AUTO_INCREMENT PRIMARY KEY,
+    dateFacture DATE NOT NULL,
+    montantFacture DOUBLE NOT NULL,
+    regle BOOLEAN NOT NULL,
+    idExamen INT NOT NULL,
+    idPatient INT NOT NULL,
+    FOREIGN KEY (idExamen) REFERENCES examen(id),
+    FOREIGN KEY (idPatient) REFERENCES patient(idPatient)
+);
+
+INSERT INTO examen (nom, cout, duree) VALUES
+('Prise de sang', 25.00, '00:10:00'),
+('Radiographie thoracique', 60.00, '00:20:00'),
+('IRM cérébrale', 350.00, '00:45:00'),
+('Scanner abdominal', 280.00, '00:30:00'),
+('Échographie pelvienne', 90.00, '00:25:00'),
+('Test d’effort', 150.00, '00:40:00'),
+('Fibroscopie gastrique', 180.00, '00:35:00'),
+('Bilan biologique complet', 110.00, '00:15:00'),
+('Électrocardiogramme (ECG)', 40.00, '00:10:00'),
+('Mammographie', 100.00, '00:20:00');
+
+CREATE TABLE patient (
+    idPatient INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    prenom VARCHAR(255) NOT NULL,
+    telephone VARCHAR(20),
+    adresse VARCHAR(255)
+);
+
+INSERT INTO patient (nom, prenom, telephone, adresse) VALUES
+('Dupont', 'Jean', '0612345678', '10 rue de Paris, 75001 Paris'),
+('Martin', 'Sophie', '0623456789', '15 avenue des Champs, 75008 Paris'),
+('Bernard', 'Luc', '0634567890', '5 boulevard Haussmann, 75009 Paris'),
+('Petit', 'Claire', '0645678901', '22 rue Lafayette, 75010 Paris'),
+('Robert', 'Thomas', '0656789012', '33 rue Oberkampf, 75011 Paris'),
+('Richard', 'Julie', '0667890123', '44 avenue de la République, 75011 Paris'),
+('Durand', 'Élise', '0678901234', '55 rue de Rennes, 75006 Paris'),
+('Moreau', 'Paul', '0689012345', '66 rue de Sèvres, 75007 Paris'),
+('Laurent', 'Chloé', '0690123456', '77 rue du Bac, 75007 Paris'),
+('Garcia', 'Hugo', '0601234567', '88 boulevard Saint-Michel, 75005 Paris');

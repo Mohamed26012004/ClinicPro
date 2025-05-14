@@ -2,9 +2,9 @@
 CREATE DATABASE clinicprodatabase;
 CREATE TABLE paiement (
     idPaiement INT PRIMARY KEY AUTO_INCREMENT,
-    montant DOUBLE NOT NULL,
+    montane DOUBLE NOT NULL,
     datePaiement VARCHAR(50) NOT NULL,
-    moyenDePaiement VARCHAR(50) NOT NULL
+    moneyDePaiement VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE patient(
@@ -50,36 +50,12 @@ CREATE TABLE antecedentMedical(
    FOREIGN KEY(idPatient) REFERENCES patient(idPatient)
 );
 
-
 CREATE TABLE salle(
    id INT AUTO_INCREMENT,
    numeroSalle VARCHAR(10) NOT NULL,
    typeSalle VARCHAR(50),
    statut VARCHAR(50) NOT NULL,
    PRIMARY KEY(id)
-);
-
-CREATE TABLE paiement (
-    idPaiement INT PRIMARY KEY AUTO_INCREMENT,
-    montant DOUBLE NOT NULL,
-    datePaiement VARCHAR(50) NOT NULL,
-    moyenDePaiement VARCHAR(50) NOT NULL
-);
-
-CREATE TABLE rendezvous(
-   idRendezVous INT AUTO_INCREMENT,
-   idSalle INT,
-   dateRendezVous DATE NOT NULL,
-   heureDebut TIME NOT NULL,
-   heureFin TIME NOT NULL,
-   idPatient INT NOT NULL,
-   id INT NOT NULL,
-   numeroADELI INT NOT NULL,
-   PRIMARY KEY(idRendezVous),
-   FOREIGN KEY(idSalle) REFERENCES salle(id),
-   FOREIGN KEY(idPatient) REFERENCES patient(idPatient),
-   FOREIGN KEY(id) REFERENCES examen(id),
-   FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
 );
 
 CREATE TABLE consulte(
@@ -96,4 +72,31 @@ CREATE TABLE equipement(
    dateAchat DATE NOT NULL,
    coutEquipement DECIMAL(15,2) NOT NULL,
    PRIMARY KEY(idEquipement)
+);
+
+CREATE TABLE planification(
+   idPlanification INT AUTO_INCREMENT,
+   numeroADELI INT NOT NULL,
+   idPatient INT NOT NULL,
+   idExamen INT NOT NULL,
+   idSalle INT,
+   datePlanification DATE NOT NULL,
+   heureDebut TIME NOT NULL,
+   heureFin TIME NOT NULL,
+   PRIMARY KEY(idPlanification),
+   FOREIGN KEY(idSalle) REFERENCES salle(id),
+   FOREIGN KEY(idExamen) REFERENCES examen(id),
+   FOREIGN KEY(idPatient) REFERENCES patient(idPatient),
+   FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
+);
+
+CREATE TABLE disponibilite(
+   idDisponiblilite INT NOT NULL AUTO_INCREMENT,
+   dateDisponibilite DATE NOT NULL,
+   heureDebut TIME NOT NULL,
+   heureFin TIME NOT NULL,
+   statut VARCHAR(50) NOT NULL,
+   numeroADELI INT NOT NULL,
+   PRIMARY KEY(idDisponiblilite),
+   FOREIGN KEY(numeroADELI) REFERENCES Medecin(numeroADELI)
 );
