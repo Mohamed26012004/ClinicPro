@@ -76,6 +76,7 @@ public class FrameDeSelectionPatient extends JFrame {
                             modelPatient.getValueAt(i, 3),
                             modelPatient.getValueAt(i, 4),
                     });
+                    FrameInsertUpdatePlanification.tablePatient.setRowSelectionInterval(0, 0);
                 }
                 dispose();
 

@@ -73,6 +73,7 @@ public class FrameDeSelectionSalle extends JFrame {
                             modelSalle.getValueAt(i, 2),
                             modelSalle.getValueAt(i, 3),
                     });
+                    FrameInsertUpdatePlanification.tableSalle.setRowSelectionInterval(0, 0);
                 }
                 dispose();
 

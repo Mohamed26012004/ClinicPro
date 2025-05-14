@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,6 +34,11 @@ public class PanelPlanningMedecin extends JPanel {
     final static MedecinService medecinService = new MedecinService(networkConfig);
     final static PlanificationWithNameService planificationWithNameService = new PlanificationWithNameService(networkConfig);
     final static CreneauService creneauService = new CreneauService(networkConfig);
+
+    private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
+    private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
+    private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
+    private final String informationFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\information_button.png";
 
     public static PlanificationExamen planificationDuMedecin = new PlanificationExamen();
 
@@ -131,6 +137,7 @@ public class PanelPlanningMedecin extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int i = tableMedecin.getSelectedRow();
                 if(i > 0){
+                    planificationDuMedecin.setDatePlanification(calandrier.getDate());
                     planificationDuMedecin.setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(i, 0).toString()));
 
                     try {
@@ -197,10 +204,10 @@ public class PanelPlanningMedecin extends JPanel {
         return panel;
     }
 
-    public static JPanel rightPanelPlanning(){
+    public JPanel rightPanelPlanning(){
 
         JPanel panel = new JPanel();
-        panel.setBorder(null);
+        panel.setLayout(new BorderLayout());
 
         String[] columns = {"ID","Heure de début", "Heure de Fin", "Nom Patient", "Nom Examen", "Numéro de Salle"};
         modelPlanification = new DefaultTableModel(columns, 0){
@@ -217,6 +224,7 @@ public class PanelPlanningMedecin extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tablePlanification);
         scrollPane.setPreferredSize(new Dimension(800, 600));
         panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(this.planningToolBar(), BorderLayout.NORTH );
 
         return panel;
     }
@@ -246,9 +254,9 @@ public class PanelPlanningMedecin extends JPanel {
         }
     }
 
-    public static JPanel rightPanelDisponibilite(){
+    public JPanel rightPanelDisponibilite(){
         JPanel panel = new JPanel();
-
+        panel.setLayout(new BorderLayout());
         String[] columns = {"Heure de début", "Heure de Fin"};
         modelDisponibilite = new DefaultTableModel(columns, 0){
             @Override
@@ -264,6 +272,7 @@ public class PanelPlanningMedecin extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tableDisponibilite);
         scrollPane.setPreferredSize(new Dimension(500, 600));
         panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(disponibiliteToolBar(), BorderLayout.NORTH );
 
         return panel;
     }
@@ -290,6 +299,82 @@ public class PanelPlanningMedecin extends JPanel {
         }
     }
 
+
+    public JToolBar planningToolBar(){
+        JToolBar bar = new JToolBar();
+
+        ImageIcon updateImage = new ImageIcon(updateFileNameButton);
+        Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        updateImage = new ImageIcon(u);
+        JButton update = new JButton(updateImage);
+
+        ImageIcon deleteImage = new ImageIcon(deleteFileNameButton);
+        Image d = deleteImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        deleteImage = new ImageIcon(d);
+        JButton delete = new JButton(deleteImage);
+
+        ImageIcon informationImage = new ImageIcon(informationFileNameButton);
+        Image i = informationImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        deleteImage = new ImageIcon(i);
+        JButton information = new JButton(deleteImage);
+
+        delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        update.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        information.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        update.setToolTipText("Modifier");
+        delete.setToolTipText("Supprimer");
+        information.setToolTipText("Plus d'information");
+        bar.addSeparator(new Dimension( 10, 10));
+        bar.add(information);
+        bar.addSeparator(new Dimension( 10, 10));
+        bar.add(update);
+        bar.addSeparator(new Dimension( 10, 10));
+        bar.add(delete);
+        return bar;
+    }
+
+    public JToolBar disponibiliteToolBar(){
+        JToolBar bar = new JToolBar();
+
+        ImageIcon addImage = new ImageIcon(addFileNameButton);
+        Image a = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+        addImage = new ImageIcon(a);
+        JButton addButton = new JButton("Réserver", addImage);
+
+        addButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int i = tableDisponibilite.getSelectedRow();
+                if (i > 0){
+                    planificationDuMedecin.setHeureDebut(LocalTime.parse(modelDisponibilite.getValueAt(i, 0).toString(), formatter));
+                    planificationDuMedecin.setHeureFin(LocalTime.parse(modelDisponibilite.getValueAt(i, 1).toString(), formatter));
+                    FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(planificationDuMedecin);
+                }
+            }
+        });
+
+        addButton.setBackground(new Color(113, 70, 255));
+
+        bar.add(addButton);
+        return bar;
+    }
 
 
 

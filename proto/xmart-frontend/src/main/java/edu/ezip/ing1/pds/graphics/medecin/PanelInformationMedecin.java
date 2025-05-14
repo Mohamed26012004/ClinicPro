@@ -93,7 +93,10 @@ public class PanelInformationMedecin extends JFrame{
             Horaires horaires = horaireService.selectHoraireMedecin(medecin);
             ArrayList<Horaire> listHoraire = new ArrayList<>(horaires.getHoraires());
             setListHoraireAajouter(listHoraire);
-            listHoraire.sort(Comparator.comparing(Horaire :: getJour));
+            listHoraire.sort(
+                    Comparator.comparing(Horaire::getJour)
+                            .thenComparing(Horaire::getHeureDebut)
+            );
             if (!listHoraire.isEmpty()){
                 for (Horaire h : listHoraire){
                     modelHoraireAajouter.addRow(new Object[]{

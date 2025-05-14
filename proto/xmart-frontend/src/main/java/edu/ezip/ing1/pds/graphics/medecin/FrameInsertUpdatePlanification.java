@@ -1,10 +1,11 @@
 package edu.ezip.ing1.pds.graphics.medecin;
 
-import edu.ezip.ing1.pds.business.dto.Creneau;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
-import edu.ezip.ing1.pds.graphics.Fenetre;
+import edu.ezip.ing1.pds.client.commons.ConfigLoader;
+import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.examen.FrameDeSelectionExamen;
 import edu.ezip.ing1.pds.graphics.salle.FrameDeSelectionSalle;
+import edu.ezip.ing1.pds.services.planning.PlanificationService;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -16,7 +17,11 @@ import java.io.IOException;
 
 public class FrameInsertUpdatePlanification extends JFrame {
 
-    private PlanificationExamen dateEtCreneau;
+    final String networkConfigFile = "network.yaml";
+    final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+    final PlanificationService planificationService = new PlanificationService(networkConfig);
+
+    private PlanificationExamen planificationToInsert;
     private static JPanel contentPane;
     public static DefaultTableModel modelPatient;
     public static JTable tablePatient;
@@ -31,7 +36,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         setSize(600, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        this.dateEtCreneau = planificationExamen;
+        this.planificationToInsert = planificationExamen;
 
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -173,6 +178,32 @@ public class FrameInsertUpdatePlanification extends JFrame {
                 FrameInsertUpdatePlanification.this.dispose();
             }
         });
+        enregistrer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int i = tableExamen.getSelectedRow();
+                int j = tablePatient.getSelectedRow();
+                int k = tableSalle.getSelectedRow();
+
+                if (i >= 0 && j >= 0 && k >= 0){
+                    getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
+                    getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
+                    getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
+                    try {
+                        planificationService.insertPlanification(getPlanificationToInsert());
+                        JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        PanelPlanningMedecin.chargerDisponibilite(PanelPlanningMedecin.planificationDuMedecin);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
 
         panel.add(enregistrer);
         panel.add(annuler);
@@ -180,5 +211,11 @@ public class FrameInsertUpdatePlanification extends JFrame {
     }
 
 
-    
+    public PlanificationExamen getPlanificationToInsert() {
+        return planificationToInsert;
+    }
+
+    public void setPlanificationToInsert(PlanificationExamen planificationToInsert) {
+        this.planificationToInsert = planificationToInsert;
+    }
 }

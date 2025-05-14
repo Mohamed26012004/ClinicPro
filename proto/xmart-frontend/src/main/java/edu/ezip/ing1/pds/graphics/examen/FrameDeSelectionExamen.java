@@ -71,6 +71,7 @@ public class FrameDeSelectionExamen extends JFrame {
                             modelExamen.getValueAt(i, 2),
                             modelExamen.getValueAt(i, 3),
                     });
+                    FrameInsertUpdatePlanification.tableExamen.setRowSelectionInterval(0, 0);
                 }
                 dispose();
 
