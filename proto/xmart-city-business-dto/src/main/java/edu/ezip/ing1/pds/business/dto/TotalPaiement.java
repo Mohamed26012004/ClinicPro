@@ -1,53 +1,49 @@
-/*package edu.ezip.ing1.pds.business.dto;
-import java.lang.reflect.Field;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+package edu.ezip.ing1.pds.business.dto;
 
 import java.time.LocalDate;
-import com.fasterxml.jackson.annotation.JsonRootName;
-@JsonRootName(value = "totalPaiement")
+import java.time.format.DateTimeFormatter;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonRootName(value = "totalPaiement")
 public class TotalPaiement {
+
     @JsonDeserialize(using = DeserialisationDate.class)
-    private LocalDate ;
-    private int totalMaintenance;
+    private LocalDate datePaiement;
+
+    private double totalPaiement;
+
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    public TotalMaintenance() {}
+    public TotalPaiement() {}
 
-    public TotalMaintenance(LocalDate dateMaintenance, int totalMaintenance) {
-        this.dateMaintenance= dateMaintenance;
-        this.totalMaintenance = totalMaintenance;
+    public TotalPaiement(LocalDate datePaiement, double totalPaiement) {
+        this.datePaiement = datePaiement;
+        this.totalPaiement = totalPaiement;
     }
 
-    public LocalDate getDateMaintenance() {
-        return dateMaintenance;
+    public LocalDate getDatePaiement() {
+        return datePaiement;
     }
 
-    public void setDateMaintenance(LocalDate dateMaintenance) {
-        this.dateMaintenance = dateMaintenance;
+    public void setDatePaiement(LocalDate datePaiement) {
+        this.datePaiement = datePaiement;
     }
 
-    public double getTotalMaintenance() {
-        return totalMaintenance;
+    public double getTotalPaiement() {
+        return totalPaiement;
     }
 
-    public void setTotalMaintenance(int totalMaintenance) {
-        this.totalMaintenance = totalMaintenance;
+    public void setTotalPaiement(double totalPaiement) {
+        this.totalPaiement = totalPaiement;
     }
 
     @Override
     public String toString() {
-        return "TotalMaintenance{" +
-                "dateMaintenance=" + dateMaintenance +
-                ", totalMaintenance=" + totalMaintenance +
+        return "TotalPaiement{" +
+                "datePaiement=" + datePaiement +
+                ", totalPaiement=" + totalPaiement +
                 '}';
     }
-}*/
-
-
+}

@@ -338,8 +338,9 @@ public class XMartCityService {
             case DELETE_PAIEMENT:
                 response = DeletePaiement(request, connection);
                 break;
-            //case TOTAL_PAIEMENT_PAR_JOUR:
-                //response = TotalPaiementParJour(request, connection);
+            case TOTAL_PAIEMENT_PAR_JOUR:
+                response = TotalPaiementParJour(request, connection);
+                break;
 
 
             case SELECT_ALL_ANTECEDENT_MEDICALS:
@@ -1062,7 +1063,7 @@ public class XMartCityService {
  
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
-    /*private Response TotalPaiementParJour (final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+    private Response TotalPaiementParJour (final Request request, final Connection connection) throws SQLException, JsonProcessingException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -1084,9 +1085,9 @@ public class XMartCityService {
 
         }
 
-        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalMaintenances));
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalPaiements));
 
-    }*/
+    }
 
     // Méthodes de CRUD de la table AntecedentMedical
 

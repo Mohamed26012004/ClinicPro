@@ -45,6 +45,7 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
         cartePanel.add(new EquipementFront(), "Equipement");
         cartePanel.add(new MaintenanceFront(), "Maintenance");
+        cartePanel.add(new CoutGlobalParMoisFront(), "Statistiques");
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -63,6 +64,8 @@ public class Fenetre extends JFrame{
         pane.add(panelBoutonMedecin());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonPaiement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonStatistiques());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         pane.add(panelBoutonDiagnostic());
@@ -113,6 +116,7 @@ public class Fenetre extends JFrame{
         panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
+        effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -128,6 +132,7 @@ public class Fenetre extends JFrame{
         panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonExamem);
+        effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -157,6 +162,7 @@ public class Fenetre extends JFrame{
         panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         panelExamen.add(boutonEquipement);
+        effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -164,6 +170,21 @@ public class Fenetre extends JFrame{
             }
         });
         return panelExamen;
+    }
+    public JPanel panelBoutonStatistiques(){
+        boutonStatistiques = createLabel("Statistiques");
+        JPanel panelStatistiques = new JPanel();
+        panelStatistiques.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelStatistiques.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelStatistiques.add(boutonStatistiques);
+        effetSurBouton(panelStatistiques);
+        panelStatistiques.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                card.show(cartePanel, "Statistiques");
+            }
+        });
+        return panelStatistiques;
     }
 
 

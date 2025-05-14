@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
@@ -25,6 +26,7 @@ public class CoutGlobalParJourFront {
     private final MaintenanceService maintenanceService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private JTextField dateField;
+    private int ligneSimulation = -1;
 
     public CoutGlobalParJourFront() {
         final String networkConfigFile = "network.yaml";
@@ -39,7 +41,17 @@ public class CoutGlobalParJourFront {
 
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
-        table = new JTable(model);
+        table = new JTable(model) {
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (row == ligneSimulation) {
+                    c.setBackground(new Color(173, 216, 230));
+                } else {
+                    c.setBackground(Color.WHITE);
+                }
+                return c;
+            }
+        };
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
         dateField = new JTextField(10);
@@ -85,6 +97,7 @@ public class CoutGlobalParJourFront {
 
     private void chargerCoutsGlobaux() throws IOException, InterruptedException {
         model.setRowCount(0);
+        ligneSimulation = -1;
 
         Map<LocalDate, Double> coutEquipementParJour = new HashMap<>();
         Map<LocalDate, Double> coutMaintenanceParJour = new HashMap<>();
@@ -108,10 +121,18 @@ public class CoutGlobalParJourFront {
             }
         }
 
+        double sommeEq = 0.0;
+        double sommeMaint = 0.0;
+        int count = 0;
+
         for (LocalDate date : toutesLesDates) {
             double coutEq = coutEquipementParJour.getOrDefault(date, 0.0);
             double coutMaint = coutMaintenanceParJour.getOrDefault(date, 0.0);
             double total = coutEq + coutMaint;
+
+            sommeEq += coutEq;
+            sommeMaint += coutMaint;
+            count++;
 
             model.addRow(new Object[]{
                     date.format(formatter),
@@ -120,10 +141,28 @@ public class CoutGlobalParJourFront {
                     total
             });
         }
+
+        if (count > 0) {
+            double moyenneEq = sommeEq / count;
+            double moyenneMaint = sommeMaint / count;
+            double total = moyenneEq + moyenneMaint;
+
+            LocalDate maxDate = ((TreeSet<LocalDate>) toutesLesDates).last();
+            LocalDate dateSimulation = maxDate.plusDays(1);
+
+            ligneSimulation = model.getRowCount();
+            model.addRow(new Object[]{
+                    dateSimulation.format(formatter),
+                    moyenneEq,
+                    moyenneMaint,
+                    total
+            });
+        }
     }
 
     private void chargerCoutsPourDate(LocalDate date) throws IOException, InterruptedException {
         model.setRowCount(0);
+        ligneSimulation = -1;
 
         double coutEq = 0.0;
         double coutMaint = 0.0;
