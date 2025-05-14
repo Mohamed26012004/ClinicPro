@@ -86,6 +86,8 @@ public class XMartCityService {
         UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
         DELETE_PAIEMENT("DELETE FROM paiement WHERE idPaiement = ?"),
         ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        TOTAL_PAIEMENT_PAR_JOUR("SELECT datePaiement, SUM(montant) AS totalPaiement FROM paiement GROUP BY datePaiement ORDER BY datePaiement"),
+
 
         SELECT_ALL_ANTECEDENT_MEDICALS("SELECT a.id_antecedentMedical, a.type_antecedentMedical, a.description_antecedentMedical, a.idPatient FROM antecedentMedical a"),
         INSERT_ANTECEDENT_MEDICAL("INSERT into antecedentMedical (type_antecedentMedical, description_antecedentMedical, idPatient) values (?, ?, ?)"),
@@ -336,6 +338,8 @@ public class XMartCityService {
             case DELETE_PAIEMENT:
                 response = DeletePaiement(request, connection);
                 break;
+            //case TOTAL_PAIEMENT_PAR_JOUR:
+                //response = TotalPaiementParJour(request, connection);
 
 
             case SELECT_ALL_ANTECEDENT_MEDICALS:
@@ -1058,6 +1062,31 @@ public class XMartCityService {
  
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
+    /*private Response TotalPaiementParJour (final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Statement stmt = connection.createStatement();
+
+        final ResultSet res = stmt.executeQuery(Queries.TOTAL_PAIEMENT_PAR_JOUR.query);
+
+        TotalPaiements totalPaiements = new TotalPaiements(); // Liste des résultats
+
+        while (res.next()) {
+
+            TotalPaiement totalPaiement = new TotalPaiement();
+
+            totalPaiement.setDatePaiement(res.getDate(1).toLocalDate());
+
+            totalPaiement.setTotalPaiement(res.getInt(2));
+
+            totalPaiements.add(totalPaiement);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(totalMaintenances));
+
+    }*/
 
     // Méthodes de CRUD de la table AntecedentMedical
 

@@ -14,7 +14,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.MaintenanceService;
 
-public class MaintenanceFront {
+public class MaintenanceFront extends JPanel{
     private JTextField idMaintenanceChamp, coutMaintenancechamp, typeMaintenancechamp, dateMaintenanceChamp, filtreDateChamp;
     private DefaultTableModel model;
     private JTable table;
@@ -25,11 +25,7 @@ public class MaintenanceFront {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.maintenanceService = new MaintenanceService(networkConfig);
-
-        JFrame frame = new JFrame("Gestion des Maintenances");
-        frame.setSize(800, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
         JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
@@ -81,12 +77,12 @@ public class MaintenanceFront {
         panelNord.add(new JLabel("Filtrer par date (yyyy-MM-dd) :"));
         panelNord.add(filtreDateChamp);
 
-        frame.add(panelNord, BorderLayout.NORTH);
+       add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"IDMaintenance", "CoutMaintenance", "TypeMaintenance", "Date Maintenance"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -100,7 +96,7 @@ public class MaintenanceFront {
         panelSud.add(boutonSupprimer);
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReset);
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -110,7 +106,7 @@ public class MaintenanceFront {
                 LocalDate date = LocalDate.parse(dateMaintenanceChamp.getText().trim(), formattage);
 
                 if (type.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -124,9 +120,9 @@ public class MaintenanceFront {
                 chargerMaintenances();
                 viderChamps();
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le coût doit être un nombre valide", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Le coût doit être un nombre valide", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -159,10 +155,10 @@ public class MaintenanceFront {
                     chargerMaintenances();
                     viderChamps();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Veuillez sélectionner une ligne à modifier.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner une ligne à modifier.", "Information", JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -181,7 +177,7 @@ public class MaintenanceFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la suppression: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -203,7 +199,7 @@ public class MaintenanceFront {
                                 }));
                     }
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(frame, "Date invalide. Format attendu : yyyy-MM-dd", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Date invalide. Format attendu : yyyy-MM-dd", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -214,17 +210,17 @@ public class MaintenanceFront {
                 filtreDateChamp.setText("");
                 viderChamps();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du rechargement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         try {
             chargerMaintenances();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur lors du chargement des maintenances: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erreur lors du chargement des maintenances: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+
     }
 
     private void chargerMaintenances() throws IOException, InterruptedException {

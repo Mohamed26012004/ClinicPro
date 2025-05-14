@@ -20,6 +20,8 @@ public class Fenetre extends JFrame{
     private static JLabel boutonSalle;
     private static JLabel boutonEquipement;
     private static JLabel boutonPaiement;
+    private static JLabel boutonMaintenance;
+    private static JLabel boutonStatistiques;
 
     private static CardLayout card = new CardLayout();
     private static JPanel cartePanel = new JPanel(card);
@@ -41,6 +43,8 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationExamen(), "Examen");
         cartePanel.add(new PanelManipulationSalle(), "Salle");
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
+        cartePanel.add(new EquipementFront(), "Equipement");
+        cartePanel.add(new MaintenanceFront(), "Maintenance");
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
 
@@ -62,6 +66,9 @@ public class Fenetre extends JFrame{
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         pane.add(panelBoutonDiagnostic());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonMaintenance());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         return pane;
@@ -109,7 +116,7 @@ public class Fenetre extends JFrame{
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                EquipementFront f = new EquipementFront();
+                card.show(cartePanel, "Equipement");
             }
         });
         return panelExamen;
@@ -140,6 +147,20 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 DiagnosticFront d = new DiagnosticFront();
+            }
+        });
+        return panelExamen;
+    }
+    public JPanel panelBoutonMaintenance(){
+        boutonEquipement = createLabel("Maintenance");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonEquipement);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                card.show(cartePanel, "Maintenance");
             }
         });
         return panelExamen;
