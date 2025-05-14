@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Comparator;
  
 public class PaiementFront extends JPanel {
     private JTextField montantChamp, datePaiementChamp;
@@ -151,7 +153,9 @@ public class PaiementFront extends JPanel {
         model.setRowCount(0);
         Paiements paiements = paiementService.selectPaiements();
         if (paiements != null && paiements.getPaiements() != null) {
-            for (Paiement p : paiements.getPaiements()) {
+            ArrayList<Paiement> list = new ArrayList<>(paiements.getPaiements());
+            list.sort(Comparator.comparing(Paiement::getdatePaiement));
+            for (Paiement p : list) {
                 model.addRow(new Object[]{
                     p.getidPaiement(),
                     p.getmontant(),
