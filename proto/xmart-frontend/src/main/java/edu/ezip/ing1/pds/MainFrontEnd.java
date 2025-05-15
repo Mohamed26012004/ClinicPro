@@ -31,8 +31,8 @@ public class MainFrontEnd {
         } catch (UnsupportedLookAndFeelException e) {
             throw new RuntimeException(e);
         }
-        Fenetre fene = new Fenetre();
-        fene.setVisible(true);
+//        Fenetre fene = new Fenetre();
+//        fene.setVisible(true);
 
         FenetreMedecin fm = new FenetreMedecin();
         fm.setVisible(true);
