@@ -96,25 +96,19 @@ public class PanelAfficheMedecin extends JPanel {
     public JToolBar toolBar(){
         JToolBar bar = new JToolBar();
 
-        ImageIcon addImage = new ImageIcon(addFileNameButton);
-        Image a = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        addImage = new ImageIcon(a);
-        JButton addButton = new JButton("Nouveau Médecin", addImage);
 
-        ImageIcon updateImage = new ImageIcon(updateFileNameButton);
-        Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        updateImage = new ImageIcon(u);
-        JButton update = new JButton(updateImage);
-
-        ImageIcon deleteImage = new ImageIcon(deleteFileNameButton);
-        Image d = deleteImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        deleteImage = new ImageIcon(d);
-        JButton delete = new JButton(deleteImage);
-
-        ImageIcon informationImage = new ImageIcon(informationFileNameButton);
-        Image i = informationImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        deleteImage = new ImageIcon(i);
-        JButton information = new JButton(deleteImage);
+        JButton addButton = new JButton("Nouveau Médecin");
+        addButton.setFont(new Font("Arial", Font.BOLD, 16));
+        addButton.setBackground(new Color(151, 255, 110));
+        JButton update = new JButton("Modifier");
+        update.setFont(new Font("Arial", Font.PLAIN, 16));
+        update.setBackground(new Color(127, 91, 255));
+        JButton delete = new JButton("Supprimer");
+        delete.setFont(new Font("Arial", Font.PLAIN, 16));
+        delete.setBackground(new Color(255, 65, 65));
+        JButton information = new JButton("Détail");
+        information.setFont(new Font("Arial", Font.PLAIN, 16));
+        information.setBackground(new Color(126, 118, 118));
 
         addButton.addActionListener(new ActionListener() {
             @Override

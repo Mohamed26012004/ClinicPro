@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.graphics.medecin;
+package edu.ezip.ing1.pds.graphics.rendezvous;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
@@ -6,6 +6,7 @@ import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
+import edu.ezip.ing1.pds.graphics.medecin.FrameInsertUpdatePlanification;
 import edu.ezip.ing1.pds.services.planning.CreneauService;
 import edu.ezip.ing1.pds.services.planning.MedecinService;
 import edu.ezip.ing1.pds.services.planning.PlanificationService;
@@ -25,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-public class PanelPlanningMedecin extends JPanel {
+public class PanelRendezVous extends JPanel {
 
     private final static String LoggingLabel = "FrontEnd - HoraireService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
@@ -38,9 +39,6 @@ public class PanelPlanningMedecin extends JPanel {
     final static PlanificationService planificationService = new PlanificationService(networkConfig);
 
     public static PlanificationExamen planificationDuMedecin = new PlanificationExamen();
-
-    public static DefaultTableModel modelMedecin;
-    public static JTable tableMedecin;
     public static DefaultTableModel modelPlanification;
     public static JTable tablePlanification;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -52,7 +50,8 @@ public class PanelPlanningMedecin extends JPanel {
     private static CardLayout rightCardLayout = new CardLayout();
     private static JPanel rightPanel = new JPanel(rightCardLayout);
 
-    public PanelPlanningMedecin() throws IOException, InterruptedException {
+    public PanelRendezVous() throws IOException, InterruptedException {
+
         setLayout(new BorderLayout());
         add(leftPanel(), BorderLayout.WEST);
         add(rightPanel, BorderLayout.EAST);
@@ -63,10 +62,11 @@ public class PanelPlanningMedecin extends JPanel {
         }else if (disponibiliteButton.isSelected()){
             rightCardLayout.show(rightPanel, "Disponibilite");
         }
+
     }
 
 
-    public JPanel leftPanel() throws IOException, InterruptedException {
+    public static JPanel leftPanel() throws IOException, InterruptedException {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(null);
@@ -97,8 +97,6 @@ public class PanelPlanningMedecin extends JPanel {
         panel1.add(planningButton);
         panel1.add(disponibiliteButton);
         panel.add(panel1);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(tableauMedecin());
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 40, 10));
 
         JLabel label = Fenetre.createLabel("Choisir une date");
@@ -129,28 +127,25 @@ public class PanelPlanningMedecin extends JPanel {
         JPanel panel3 = new JPanel(new FlowLayout());
         JButton valider = new JButton("Valider");
         valider.setFont(new Font("Arial", Font.PLAIN, 16));
-        valider.setBackground(new Color(89, 106, 255));
+        valider.setBackground(new Color(165, 172, 250));
         valider.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = tableMedecin.getSelectedRow();
-                if(i >= 0){
-                    planificationDuMedecin.setDatePlanification(calandrier.getDate());
-                    planificationDuMedecin.setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(i, 0).toString()));
 
-                    try {
-                        if(planningButton.isSelected()){
-                            chargerPlanification(planificationDuMedecin);
-                        }else if (disponibiliteButton.isSelected()){
-                            chargerDisponibilite(planificationDuMedecin);
-                        }
-
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
+                planificationDuMedecin.setDatePlanification(calandrier.getDate());
+                try {
+                    if(planningButton.isSelected()){
+                        chargerPlanification(planificationDuMedecin);
+                    }else if (disponibiliteButton.isSelected()){
+                        chargerDisponibilite(planificationDuMedecin);
                     }
+
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
                 }
+
             }
         });
         panel3.add(valider);
@@ -159,61 +154,19 @@ public class PanelPlanningMedecin extends JPanel {
         return panel;
     }
 
-    public static JPanel tableauMedecin() throws IOException, InterruptedException {
-        JPanel panel = new JPanel();
-
-        String[] columns = {"Numéro ADELI", "Nom et Prénom"};
-        modelMedecin = new DefaultTableModel(columns, 0){
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        modelMedecin.setRowCount(0);
-
-        Medecins medecins = medecinService.selectAllMedecins();
-
-        if (medecins != null && medecins.getMedecins() != null) {
-            ArrayList<Medecin> list = new ArrayList<>(medecins.getMedecins());
-            list.sort(Comparator.comparing(Medecin::getNom));//Order by nom
-            planificationDuMedecin.setDatePlanification(LocalDate.now());
-            planificationDuMedecin.setNumeroADELI(list.get(0).getNumeroADELI());
-            for (Medecin medecin : list){
-                modelMedecin.addRow(new Object[]{
-                        medecin.getNumeroADELI(),
-                        medecin.getNom()+"  "+medecin.getPrenom(),
-                });
-            }
-        }
-
-        tableMedecin = new JTable(modelMedecin);
-        tableMedecin.setRowHeight(30);
-        tableMedecin.setFont(new Font("Arial", Font.PLAIN, 15));
-        tableMedecin.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        JScrollPane scrollPane = new JScrollPane(tableMedecin);
-        scrollPane.setPreferredSize(new Dimension(300, 400));
-        panel.add(scrollPane, BorderLayout.CENTER);
-
-        int i = tableMedecin.getSelectedRow();
-        if(i >= 0){
-            planificationDuMedecin.setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(i, 0).toString()));
-        }
-        return panel;
-    }
-
     public JPanel rightPanelPlanning(){
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        String[] columns = {"ID","Heure de début", "Heure de Fin", "Nom Patient", "Nom Examen", "Numéro de Salle"};
-
+        String[] columns = {"ID","Heure de début", "Heure de Fin", "Nom Médecin", "Nom Patient", "Nom Examen", "Numéro de Salle"};
         modelPlanification = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
+
         tablePlanification = new JTable(modelPlanification);
         tablePlanification.setRowHeight(30);
         tablePlanification.setFont(new Font("Arial", Font.PLAIN, 15));
@@ -226,23 +179,22 @@ public class PanelPlanningMedecin extends JPanel {
         return panel;
     }
 
-    public void chargerPlanification(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
+    public static void chargerPlanification(PlanificationExamen planificationExamen) throws IOException, InterruptedException {
         modelPlanification.setRowCount(0);
 
-        PlanificationWithNames planificationWithNames = planificationWithNameService.selectPlanificationWithNameByMedecin(planificationExamen);
+        PlanificationWithNames planificationWithNames = planificationWithNameService.selectPlanificationWithNames(planificationExamen);
 
         if (planificationWithNames != null && planificationWithNames.getPlanificationWithNames() != null) {
             ArrayList<PlanificationWithName> list = new ArrayList<>(planificationWithNames.getPlanificationWithNames());
-            list.sort(
-                    Comparator.comparing(PlanificationWithName::getHeureDebut)
-                            .thenComparing(PlanificationWithName::getNomExamen)
-            );
+            list.sort(Comparator.comparing(PlanificationWithName::getHeureDebut)
+                    .thenComparing(PlanificationWithName :: getNomMedecin));              //Order by nom
             if (!list.isEmpty()) {
                 for (PlanificationWithName plan : list) {
                     modelPlanification.addRow(new Object[]{
                             plan.getIdPlanification(),
                             plan.getHeureDebut(),
                             plan.getHeureFin(),
+                            plan.getNomMedecin() + "  " + plan.getPrenomMedecin(),
                             plan.getNomPatient() + "  " + plan.getPrenomPatient(),
                             plan.getNomExamen(),
                             plan.getNumeroSalle()
@@ -252,8 +204,6 @@ public class PanelPlanningMedecin extends JPanel {
                 JOptionPane.showMessageDialog(null, "Aucun examen programmé.", "Information", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-
-
     }
 
     public JPanel rightPanelDisponibilite(){
@@ -283,8 +233,8 @@ public class PanelPlanningMedecin extends JPanel {
 
         modelDisponibilite.setRowCount(0);
 
-        Creneaux creneauxDisponible = new Creneaux();
-        creneauxDisponible = creneauService.selectCreneauByDateByMedecin(planificationExamen);
+        Creneaux creneauxDisponible = creneauService.selectCreneauByDate(planificationExamen);
+
         if (creneauxDisponible != null && creneauxDisponible.getCreneaux() != null) {
             ArrayList<Creneau> list = new ArrayList<>(creneauxDisponible.getCreneaux());
             list.sort(Comparator.comparing(Creneau :: getHeureDebut));
@@ -295,7 +245,7 @@ public class PanelPlanningMedecin extends JPanel {
                             creneau.getHeureFin(),
                     });
                 }
-            }else {
+            }else{
                 JOptionPane.showMessageDialog(null, "Aucun créneau disponible.", "Information", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -313,7 +263,6 @@ public class PanelPlanningMedecin extends JPanel {
         delete.setBackground(new Color(255, 65, 65));
         JButton information = new JButton("Détail");
         information.setFont(new Font("Arial", Font.PLAIN, 16));
-        information.setBackground(new Color(126, 118, 118));
 
         delete.addActionListener(new ActionListener() {
             @Override
@@ -323,8 +272,8 @@ public class PanelPlanningMedecin extends JPanel {
                     PlanificationExamen plan = new PlanificationExamen();
                     plan.setIdPlanification(Integer.parseInt(modelPlanification.getValueAt(i, 0).toString()));
                     try {
-                        PlanificationExamen p = planificationService.selectOnePlanifications(plan);
-                        planificationService.deletePlanification(p);
+                        plan = planificationService.selectOnePlanifications(plan);
+                        planificationService.deletePlanification(plan);
                         chargerPlanification(planificationDuMedecin);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
@@ -361,7 +310,7 @@ public class PanelPlanningMedecin extends JPanel {
         JToolBar bar = new JToolBar();
 
         JButton addButton = new JButton("Réserver");
-        addButton.setFont(new Font("Arial", Font.BOLD, 16));
+        addButton.setFont(new Font("Arial", Font.PLAIN, 16));
         addButton.setBackground(new Color(151, 255, 110));
         addButton.addActionListener(new ActionListener() {
             @Override
@@ -373,8 +322,7 @@ public class PanelPlanningMedecin extends JPanel {
                     }else{
                         planificationDuMedecin.setHeureDebut(LocalTime.parse(modelDisponibilite.getValueAt(i, 0).toString(), formatter));
                         planificationDuMedecin.setHeureFin(LocalTime.parse(modelDisponibilite.getValueAt(i, 1).toString(), formatter));
-                        FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(planificationDuMedecin, 0);
-
+                        FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(planificationDuMedecin, 1);
                     }
                 }
 
@@ -385,5 +333,7 @@ public class PanelPlanningMedecin extends JPanel {
         bar.add(addButton);
         return bar;
     }
+
+
 
 }

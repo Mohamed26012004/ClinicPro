@@ -11,6 +11,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.requests.planning.InsertPlanificationClientRequest;
 import edu.ezip.ing1.pds.requests.planning.SelectIdPlanificationClientRequest;
+import edu.ezip.ing1.pds.requests.planning.SelectOnePlanificationClientRequest;
 import edu.ezip.ing1.pds.requests.planning.SelectPlanificationClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,9 +165,9 @@ public class PlanificationService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectPlanificationClientRequest clientRequest = new SelectPlanificationClientRequest(
+        final SelectOnePlanificationClientRequest clientRequest = new SelectOnePlanificationClientRequest(
                 networkConfig,
-                birthdate++, request, null, requestBytes);
+                birthdate++, request, planificationExamen, requestBytes);
         clientRequests.push(clientRequest);
 
         if (!clientRequests.isEmpty()) {

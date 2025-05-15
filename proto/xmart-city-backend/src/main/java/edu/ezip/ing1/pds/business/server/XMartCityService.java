@@ -121,7 +121,7 @@ public class XMartCityService {
 
         INSERT_DISPONIBILITE("INSERT into disponibilite (numeroADELI, dateDisponibilite, heureDebut, heureFin, statut) values (?, ?, ?, ?, ?)"),
         DELETE_DISPONIBILITE("DELETE FROM disponibilite WHERE numeroADELI = ? AND dateDisponibilite = ? AND heureDebut = ? AND heureFin = ? AND statut = 'Réservé'"),
-        SELECT_DISPONIBILITE_PAR_DATE("SELECT h.heureDebut, h.heureFin " +
+        SELECT_DISPONIBILITE_PAR_DATE("SELECT DISTINCT h.heureDebut, h.heureFin " +
                 "FROM horaire h " +
                 "WHERE h.jour = ( " +
                 "    SELECT CASE DAYOFWEEK(?) " +
@@ -175,7 +175,8 @@ public class XMartCityService {
                 "JOIN medecin m ON plan.numeroADELI = m.numeroADELI " +
                 "JOIN patient p ON plan.idPatient = p.idPatient " +
                 "JOIN examen e ON plan.idExamen = e.id " +
-                "JOIN salle s ON plan.idSalle = s.id"),
+                "JOIN salle s ON plan.idSalle = s.id " +
+                "WHERE plan.datePlanification = ?"),
         SELECT_PLANIFICATION_WITH_NAME_BY_MEDECIN("SELECT plan.idPlanification, m.nom AS nomMedecin, m.prenom AS prenomMedecin, " +
                 "p.nom AS nomPatient, p.prenom AS prenomPatient, e.nom AS nomExamen, s.numeroSalle, " +
                         "plan.datePlanification, plan.heureDebut, plan.heureFin " +
@@ -190,7 +191,7 @@ public class XMartCityService {
         INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?) "),
         DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
         UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
-        SELECT_ONE_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p WHERE idPlanification = ?"),
+        SELECT_ONE_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p WHERE p.idPlanification = ?"),
 
         SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT idPlanification FROM planification WHERE idExamen = ?"),
         SELECT_ID_PLANIFICATION_PAR_MEDECIN("SELECT idPlanification FROM planification WHERE numeroADELI = ?"),
@@ -202,7 +203,7 @@ public class XMartCityService {
         DELETE_MAINTENANCE("DELETE FROM maintenance WHERE idMaintenance = ? AND coutMaintenance = ? AND typeMaintenance = ? AND dateMaintenance = ? "),
         TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance"),
 
-        SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU("SELECT m.numeroADELI, m.nom, m.prenom " +
+        SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU("SELECT m.numeroADELI, m.nom, m.prenom, m.telephone, m.specialite, m.salaire " +
                 "FROM medecin m " +
                 "WHERE m.numeroADELI IN ( " +
                 "    SELECT c.numeroADELI " +
@@ -1810,10 +1811,14 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(planificationExamens));
     }
 
-    private Response SelectPlanificationWithName(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+    private Response SelectPlanificationWithName(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
-        final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(Queries.SELECT_PLANIFICATION_WITH_NAME.query);
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_PLANIFICATION_WITH_NAME.query);
+
+        stmt.setDate(1, Date.valueOf(planification.getDatePlanification()));
+
+        final ResultSet res = stmt.executeQuery();
         PlanificationWithNames planificationWithNames = new PlanificationWithNames();
         while (res.next()) {
             PlanificationWithName pwn = new PlanificationWithName();
@@ -1878,6 +1883,9 @@ public class XMartCityService {
             medecin.setNumeroADELI(res.getInt(1));
             medecin.setNom(res.getString(2));
             medecin.setPrenom(res.getString(3));
+            medecin.setTelephone(res.getString(4));
+            medecin.setSpecialite(res.getString(5));
+            medecin.setSalaire(res.getInt(6));
             medecins.add(medecin);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecins));

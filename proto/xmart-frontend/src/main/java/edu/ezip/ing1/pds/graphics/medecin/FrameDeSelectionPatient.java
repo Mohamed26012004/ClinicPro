@@ -60,14 +60,16 @@ public class FrameDeSelectionPatient extends JFrame {
 
         JPanel pane = new JPanel(new FlowLayout());
         JButton selectionner = new JButton("Sélectionner");
+        selectionner.setFont(new Font("Arial", Font.PLAIN, 16));
         JButton enregistrer = new JButton("Enregistrer un patient");
+        enregistrer.setFont(new Font("Arial", Font.PLAIN, 16));
         selectionner.setBackground(new Color(115, 91, 255));
         enregistrer.setBackground(new Color(72, 255, 0));
         selectionner.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int i = tablePatient.getSelectedRow();
-                if (i > 0){
+                if (i >= 0){
                     FrameInsertUpdatePlanification.modelPatient.setRowCount(0);
                     FrameInsertUpdatePlanification.modelPatient.addRow(new Object[]{
                             modelPatient.getValueAt(i, 0),

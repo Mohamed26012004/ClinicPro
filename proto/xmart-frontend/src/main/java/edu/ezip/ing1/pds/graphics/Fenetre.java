@@ -2,6 +2,8 @@ package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.graphics.examen.PanelManipulationExamen;
 import edu.ezip.ing1.pds.graphics.medecin.PanelManipulationMedecin;
+import edu.ezip.ing1.pds.graphics.medecin.PanelPlanningMedecin;
+import edu.ezip.ing1.pds.graphics.rendezvous.PanelRendezVous;
 import edu.ezip.ing1.pds.graphics.salle.PanelManipulationSalle;
 import org.stringtemplate.v4.ST;
 
@@ -22,6 +24,7 @@ public class Fenetre extends JFrame{
     private static JLabel boutonEquipement;
     private static JLabel boutonPaiement;
     private static JLabel boutonFacture;
+    private static JLabel boutonRendezVous;
 
 
     private static CardLayout card = new CardLayout();
@@ -41,11 +44,13 @@ public class Fenetre extends JFrame{
         //           contentPane.add(menuBar(), BorderLayout.NORTH);
         contentPane.add(PanelGauche(), BorderLayout.WEST);
 
+        cartePanel.add(new PanelRendezVous(), "RendezVous");
         cartePanel.add(new PanelManipulationExamen(), "Examen");
         cartePanel.add(new PanelManipulationSalle(), "Salle");
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
         cartePanel.add(new FacturationFront(), "Facture");
         cartePanel.add(new PaiementFront(), "Paiement");
+
 
         contentPane.add(cartePanel, BorderLayout.CENTER);
 
@@ -56,19 +61,20 @@ public class Fenetre extends JFrame{
         JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
+        pane.add(panelBoutonRendezVous());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonMedecin());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonExamen());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonSalle());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonEquipement());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
-        pane.add(panelBoutonMedecin());
-        pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonPaiement());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonFacture());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
-
         pane.add(panelBoutonDiagnostic());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
@@ -185,6 +191,23 @@ public class Fenetre extends JFrame{
             }
         });
         return panel;
+    }
+
+    public JPanel panelBoutonRendezVous(){
+        boutonRendezVous = createLabel("Rendez-Vous");
+        JPanel panelExamen = new JPanel();
+        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelExamen.add(boutonRendezVous);
+        effetSurBouton(panelExamen);
+        panelExamen.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                card.show(cartePanel, "RendezVous");
+            }
+        });
+
+        return panelExamen;
     }
 
     public static void effetSurBouton(JPanel p){
