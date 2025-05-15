@@ -12,7 +12,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.EquipementService;
 
-public class EquipementFront {
+public class EquipementFront extends JPanel{
     private JTextField idEquipementChamp, coutEquipementchamp, nomEquipementchamp, dateEquipementChamp, filtreDateChamp;
     private DefaultTableModel model;
     private JTable table;
@@ -25,10 +25,9 @@ public class EquipementFront {
         this.equipementService = new EquipementService(networkConfig);
 
         JFrame frame = new JFrame("Gestion des Équipements");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        setSize(700, 400);
 
+        setLayout(new BorderLayout());
         JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
         idEquipementChamp = new JTextField();
@@ -74,12 +73,12 @@ public class EquipementFront {
         panelNord.add(new JLabel("Filtrer par date (yyyy-MM-dd) :"));
         panelNord.add(filtreDateChamp);
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID Équipement", "Coût", "Nom", "Date Achat"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
@@ -93,7 +92,7 @@ public class EquipementFront {
         panelSud.add(boutonSupprimer);
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReset);
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -217,7 +216,6 @@ public class EquipementFront {
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
     }
 
     private void chargerEquipements() throws IOException, InterruptedException {
@@ -247,7 +245,4 @@ public class EquipementFront {
         filtreDateChamp.setText("");
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(EquipementFront::new);
-    }
 }
