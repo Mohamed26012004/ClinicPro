@@ -22,7 +22,7 @@ public class CompteRendu {
 
     public final CompteRendu build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_compteRendu", "idPlanification", "typeSymptome", "descriptionSymptome");
+        setFieldsFromResulset(resultSet, "id_compteRendu", "typeSymptome", "descriptionSymptome, idPlanification");
         return this;
 
     }
@@ -74,9 +74,9 @@ public class CompteRendu {
     public String toString() {
         return "CompteRendu{" +
                 "id_compteRendu='" + id_compteRendu + '\'' +
-                "idPlanification='" + idPlanification + '\'' +
                 ", typeSymptome='" + typeSymptome + '\'' +
                 ", descriptionSymptome='" + descriptionSymptome + '\'' +
+                ", idPlanification='" + idPlanification + '\'' +
                 '}';
     }
 }

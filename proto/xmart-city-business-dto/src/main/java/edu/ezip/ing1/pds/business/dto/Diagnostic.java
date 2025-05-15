@@ -24,7 +24,7 @@ public class Diagnostic {
 
     public final Diagnostic build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_Diagnostic", "idPlanification", "codeCIM10", "nomMaladie", "description_Diagnostic");
+        setFieldsFromResulset(resultSet, "id_Diagnostic", "codeCIM10", "nomMaladie", "description_Diagnostic", "idPlanification");
         return this;
 
     }
@@ -83,10 +83,10 @@ public class Diagnostic {
     public String toString() {
         return "Diagnostic{" +
                 "id_Diagnostic='" + id_Diagnostic + '\'' +
-                "idPlanification='" + idPlanification + '\'' +
                 ", codeCIM10='" + codeCIM10 + '\'' +
                 ", nomMaladie='" + nomMaladie + '\'' +
                 ", description_Diagnostic='" + description_Diagnostic + '\'' +
+                "idPlanification='" + idPlanification + '\'' +
                 '}';
     }
 

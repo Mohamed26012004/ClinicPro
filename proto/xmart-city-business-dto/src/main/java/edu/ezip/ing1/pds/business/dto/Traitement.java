@@ -25,14 +25,14 @@ public class Traitement {
 
     public final Traitement build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_Traitement", "idPlanification", "numeroADELI", "type_Traitement","description_Traitement", "debut_traitement", "fin_Traitement");
+        setFieldsFromResulset(resultSet, "id_Traitement", "type_Traitement","description_Traitement", "debut_traitement", "fin_Traitement", "idPlanification");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_Traitement), String.valueOf(idPlanification), type_Traitement, description_Traitement, debut_Traitement, fin_Traitement);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_Traitement), type_Traitement, description_Traitement, debut_Traitement, fin_Traitement, String.valueOf(idPlanification));
     }
 
     public Traitement(String type_Traitement, String description_Traitement, String debut_Traitement, String fin_Traitement, int idPlanification) {
@@ -92,11 +92,11 @@ public class Traitement {
     public String toString() {
         return "Traitement{" +
                 "id_Traitement='" + id_Traitement + '\'' +
-                ", idPlanification='" + idPlanification + '\'' +
                 ", type_Traitement='" + type_Traitement + '\'' +
                 ", description_Traitement='" + description_Traitement + '\'' +
                 ", debut_Traitement='" + debut_Traitement + '\'' +
                 ", fin_Traitement='" + fin_Traitement + '\'' +
+                ", idPlanification='" + idPlanification + '\'' +
                 '}';
     }
 
