@@ -5,11 +5,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.Paiement;
 import edu.ezip.ing1.pds.business.dto.Paiements;
+import edu.ezip.ing1.pds.business.dto.TotalCouts;
+import edu.ezip.ing1.pds.business.dto.TotalPaiements;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.requests.SelectAllPaiementsClientRequest;
 import edu.ezip.ing1.pds.requests.InsertPaiementClientRequest;
+import edu.ezip.ing1.pds.requests.TotalCoutParJourClientRequest;
+import edu.ezip.ing1.pds.requests.TotalPaiementParJourClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -28,6 +32,7 @@ public class PaiementService {
     final String selectRequestOrder = "SELECT_ALL_PAIEMENTS";
     final String updateRequestOrder = "UPDATE_PAIEMENT";
     final String deleteRequestOrder = "DELETE_PAIEMENT";
+    static final String totalPaiementParJourRequestOrder = "TOTAL_PAIEMENT_PAR_JOUR";
  
     private final NetworkConfig networkConfig;
  
@@ -106,7 +111,36 @@ public class PaiementService {
             logger.error("Pas de paiements trouvées");
             return null;
         }
+    }
+
+        public TotalPaiements getTotalPaiementParJour() throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(totalPaiementParJourRequestOrder);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+
+        final TotalPaiementParJourClientRequest clientRequest = new TotalPaiementParJourClientRequest(
+                networkConfig,
+                birthdate++, request, null, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if (!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            return (TotalPaiements) joinedClientRequest.getResult();
+        } else {
+            logger.error("No total costs found");
+            return null;
+        }
+    }
  
  
     }
-}
