@@ -78,9 +78,9 @@ public class CompteRenduService {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
             final CompteRendu cr = (CompteRendu)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {}  --> {}",
+            logger.debug("Thread {} complete : {} {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    cr.getIdPlanification(), cr.getTypeSymptome(), cr.getDescriptionSymptome(),
+                    cr.getIdPlanification(), cr.getTypeSymptome(), cr.getDescriptionSymptome(), cr.getIdPlanification(),
                     clientRequest2.getResult());
         }
     }

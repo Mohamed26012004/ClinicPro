@@ -80,7 +80,7 @@ public class AntecedentMedicalService {
             final AntecedentMedical am = (AntecedentMedical)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    am.getIdPatient(), am.getType_antecedentMedical(), am.getDescription_antecedentMedical(),
+                    am.getType_antecedentMedical(), am.getDescription_antecedentMedical(), am.getIdPatient(),
                     clientRequest2.getResult());
         }
     }

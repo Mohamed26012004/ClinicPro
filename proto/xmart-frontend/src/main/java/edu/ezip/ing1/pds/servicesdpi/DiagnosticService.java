@@ -78,9 +78,9 @@ public class DiagnosticService {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
             final Diagnostic d = (Diagnostic)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {} {}  --> {}",
+            logger.debug("Thread {} complete : {} {} {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    d.getIdPlanification(), d.getCodeCIM10(), d.getNomMaladie(), d.getDescription_Diagnostic(),
+                    d.getIdPlanification(), d.getCodeCIM10(), d.getNomMaladie(), d.getDescription_Diagnostic(), d.getIdPlanification(),
                     clientRequest2.getResult());
         }
     }
