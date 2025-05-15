@@ -41,7 +41,7 @@ public class CoutGlobalParMoisFront extends JPanel {
             public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
                 if (row == ligneSimulation) {
-                    c.setBackground(new Color(173, 216, 230));
+                    c.setBackground(Color.CYAN);
                 } else {
                     c.setBackground(Color.WHITE);
                 }

@@ -16,7 +16,7 @@ import edu.ezip.ing1.pds.services.MaintenanceService;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenances;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenance;
 
-public class TotalMaintenanceFront {
+public class TotalMaintenanceFront extends JPanel {
     private DefaultTableModel model;
     private JTable table;
     private final MaintenanceService maintenanceService;
@@ -27,28 +27,25 @@ public class TotalMaintenanceFront {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.maintenanceService = new MaintenanceService(networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Coûts Totaux des Maintenances par Jour");
-        frame.setSize(700, 450);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
 
         String[] columns = {"Date Maintenance", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         dateField = new JTextField(10);
 
-        JButton boutonAfficherParDate = new JButton("Afficher par Date");
+        JButton boutonAfficherParDate = new JButton("Filtrer");
         boutonAfficherParDate.addActionListener(e -> {
             try {
                 LocalDate selectedDate = LocalDate.parse(dateField.getText(), formatter);
                 chargerCoutsPourDate(selectedDate);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -56,10 +53,10 @@ public class TotalMaintenanceFront {
         boutonReinitialiser.addActionListener(e -> {
             try {
                 chargerTotalMaintenances();
-                frame.revalidate();
-                frame.repaint();
+                revalidate();
+                repaint();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement des données: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du rechargement des données: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -69,15 +66,15 @@ public class TotalMaintenanceFront {
         panelSud.add(boutonAfficherParDate);
         panelSud.add(boutonReinitialiser);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         try {
             chargerTotalMaintenances();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
+
     }
 
     private void chargerTotalMaintenances() throws IOException, InterruptedException {

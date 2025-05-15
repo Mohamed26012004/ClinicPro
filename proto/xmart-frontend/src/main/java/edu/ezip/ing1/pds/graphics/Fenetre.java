@@ -5,15 +5,12 @@ import edu.ezip.ing1.pds.graphics.medecin.PanelManipulationMedecin;
 import edu.ezip.ing1.pds.graphics.salle.PanelManipulationSalle;
 
 import java.awt.*;
-
 import java.awt.event.*;
 import java.io.IOException;
 
 import javax.swing.*;
 
-
 public class Fenetre extends JFrame{
-
 
     private JPanel contentPane;
     private static JLabel boutonExamem;
@@ -26,8 +23,6 @@ public class Fenetre extends JFrame{
     private static CardLayout card = new CardLayout();
     private static JPanel cartePanel = new JPanel(card);
 
-
-
     public Fenetre() throws IOException, InterruptedException {
         super("ClinicPro");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -37,7 +32,6 @@ public class Fenetre extends JFrame{
 
         contentPane = (JPanel)getContentPane();
         contentPane.setLayout(new BorderLayout());
-        //           contentPane.add(menuBar(), BorderLayout.NORTH);
         contentPane.add(PanelGauche(), BorderLayout.WEST);
 
         cartePanel.add(new PanelManipulationExamen(), "Examen");
@@ -45,12 +39,26 @@ public class Fenetre extends JFrame{
         cartePanel.add(new PanelManipulationMedecin(), "Medecin");
         cartePanel.add(new EquipementFront(), "Equipement");
         cartePanel.add(new MaintenanceFront(), "Maintenance");
-        cartePanel.add(new CoutGlobalParMoisFront(), "Statistiques");
+
+
+
+        // Panneau Statistiques  (6 cases)
+        JPanel panelStatistiques = new JPanel(new GridLayout(3, 3));
+        panelStatistiques.add(new TotalPaiementFront());
+        panelStatistiques.add(new CoutGlobalParJourFront());
+        panelStatistiques.add(new CoutGlobalParMoisFront());
+        panelStatistiques.add(new TotalMaintenanceFront());
+        panelStatistiques.add(new TotalCoutFront());
+        panelStatistiques.add(new RevenuesNetParJour());
+        panelStatistiques.add(new RevenuesNetParMois());
+        for (int i = 0; i < 4; i++) {
+            panelStatistiques.add(new JPanel());
+        }
+        cartePanel.add(panelStatistiques, "Statistiques");
+
         contentPane.add(cartePanel, BorderLayout.CENTER);
-
-
     }
-            
+
     public JPanel PanelGauche(){
         JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -77,6 +85,22 @@ public class Fenetre extends JFrame{
         return pane;
     }
 
+    public JPanel panelBoutonStatistiques(){
+        boutonStatistiques = createLabel("Statistiques");
+        JPanel panelStatistiques = new JPanel();
+        panelStatistiques.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelStatistiques.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        panelStatistiques.add(boutonStatistiques);
+        effetSurBouton(panelStatistiques);
+        panelStatistiques.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                card.show(cartePanel, "Statistiques");
+            }
+        });
+        return panelStatistiques;
+    }
+
     public JPanel panelBoutonExamen(){
         boutonExamem = createLabel("Examen");
         JPanel panelExamen = new JPanel();
@@ -90,7 +114,6 @@ public class Fenetre extends JFrame{
                 card.show(cartePanel, "Examen");
             }
         });
-
         return panelExamen;
     }
 
@@ -127,16 +150,17 @@ public class Fenetre extends JFrame{
     }
 
     public JPanel panelBoutonPaiement(){
-        boutonExamem = createLabel("Paiement");
+        boutonPaiement = createLabel("Paiement");
         JPanel panelExamen = new JPanel();
         panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(boutonExamem);
+        panelExamen.add(boutonPaiement);
         effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 PaiementFront f = new PaiementFront();
+
             }
         });
         return panelExamen;
@@ -152,16 +176,18 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 DiagnosticFront d = new DiagnosticFront();
+
             }
         });
         return panelExamen;
     }
+
     public JPanel panelBoutonMaintenance(){
-        boutonEquipement = createLabel("Maintenance");
+        boutonMaintenance = createLabel("Maintenance");
         JPanel panelExamen = new JPanel();
         panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
         panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(boutonEquipement);
+        panelExamen.add(boutonMaintenance);
         effetSurBouton(panelExamen);
         panelExamen.addMouseListener(new MouseAdapter() {
             @Override
@@ -171,22 +197,6 @@ public class Fenetre extends JFrame{
         });
         return panelExamen;
     }
-    public JPanel panelBoutonStatistiques(){
-        boutonStatistiques = createLabel("Statistiques");
-        JPanel panelStatistiques = new JPanel();
-        panelStatistiques.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelStatistiques.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelStatistiques.add(boutonStatistiques);
-        effetSurBouton(panelStatistiques);
-        panelStatistiques.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                card.show(cartePanel, "Statistiques");
-            }
-        });
-        return panelStatistiques;
-    }
-
 
     public JPanel panelBoutonMedecin(){
         JLabel label = createLabel("Médecin");
@@ -198,7 +208,7 @@ public class Fenetre extends JFrame{
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-               card.show(cartePanel, "Medecin");
+                card.show(cartePanel, "Medecin");
             }
         });
         return panel;
@@ -224,7 +234,7 @@ public class Fenetre extends JFrame{
     }
 
     public static JLabel createLabel(String text){
-        JLabel label = new JLabel(java.lang.String.valueOf(text));
+        JLabel label = new JLabel(String.valueOf(text));
         label.setFont(new Font("Arial", Font.PLAIN, 16));
         return label;
     }
@@ -234,15 +244,5 @@ public class Fenetre extends JFrame{
         t.setFont(new Font("Arial", Font.PLAIN, 14));
         return t;
     }
-
-//    public JMenuBar menuBar(){
-//        JMenuBar bar = new JMenuBar();
-//        bar.setPreferredSize(new Dimension(0, 35));
-//        JMenu compte = new JMenu("Compte");
-//        compte.setFont(new Font("Arial", Font.PLAIN, 16));
-//        bar.add(compte);
-//
-//        return bar;
-//    }
 
 }

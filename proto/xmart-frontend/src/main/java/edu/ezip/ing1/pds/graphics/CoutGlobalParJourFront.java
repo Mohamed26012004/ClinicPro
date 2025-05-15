@@ -19,7 +19,7 @@ import edu.ezip.ing1.pds.business.dto.TotalCout;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenances;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenance;
 
-public class CoutGlobalParJourFront {
+public class CoutGlobalParJourFront extends JPanel {
     private DefaultTableModel model;
     private JTable table;
     private final EquipementService equipementService;
@@ -33,11 +33,9 @@ public class CoutGlobalParJourFront {
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.equipementService = new EquipementService(networkConfig);
         this.maintenanceService = new MaintenanceService(networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Coût Global (Équipements + Maintenances) par Jour");
-        frame.setSize(700, 450);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+
 
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
@@ -45,14 +43,14 @@ public class CoutGlobalParJourFront {
             public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
                 Component c = super.prepareRenderer(renderer, row, column);
                 if (row == ligneSimulation) {
-                    c.setBackground(new Color(173, 216, 230));
+                    c.setBackground(Color.CYAN);
                 } else {
                     c.setBackground(Color.WHITE);
                 }
                 return c;
             }
         };
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         dateField = new JTextField(10);
 
@@ -62,9 +60,9 @@ public class CoutGlobalParJourFront {
                 LocalDate selectedDate = LocalDate.parse(dateField.getText(), formatter);
                 chargerCoutsPourDate(selectedDate);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -74,7 +72,7 @@ public class CoutGlobalParJourFront {
                 chargerCoutsGlobaux();
                 dateField.setText("");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du rechargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -84,15 +82,14 @@ public class CoutGlobalParJourFront {
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReinitialiser);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         try {
             chargerCoutsGlobaux();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
     }
 
     private void chargerCoutsGlobaux() throws IOException, InterruptedException {
