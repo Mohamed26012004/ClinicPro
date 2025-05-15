@@ -51,7 +51,7 @@ public class AntecedentMedicalFront extends JPanel {
         typeChamp = new JTextField();
         descriptionChamp = new JTextField();
 
-        panelNord.add(new JLabel("Type :"));
+        panelNord.add(new JLabel("Antécédent médical :"));
         panelNord.add(typeChamp);
         panelNord.add(new JLabel("Description :"));
         panelNord.add(descriptionChamp);
@@ -60,7 +60,7 @@ public class AntecedentMedicalFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "ID Patient", "Type", "Description",};
+        String[] columns = {"ID", "ID Patient", "Antécédent médical", "Description",};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -83,7 +83,7 @@ public class AntecedentMedicalFront extends JPanel {
                 Patient selectedPatient = (Patient) patientComboBox.getSelectedItem();
 
                 if (type.isEmpty() || description.isEmpty() || selectedPatient == null) {
-                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez svp remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

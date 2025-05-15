@@ -52,16 +52,16 @@ public class DiagnosticFront extends JPanel {
 
         panelNord.add(new JLabel("Code CIM10 :"));
         panelNord.add(codeCIM10Champ);
-        panelNord.add(new JLabel("Nom maladie :"));
+        panelNord.add(new JLabel("Maladie :"));
         panelNord.add(nomMaladieChamp);
-        panelNord.add(new JLabel("Description diagnostic :"));
+        panelNord.add(new JLabel("Description :"));
         panelNord.add(descriptionDiagnosticChamp);
         panelNord.add(new JLabel("Planification :"));
         panelNord.add(planificationExamenComboBox);
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Diagnostic", "ID Planification", "Code CIM10", "Nom maladie", "Description diagnostic"};
+        String[] columns = {"ID Diagnostic", "ID Planification", "Code CIM10", "Maladie", "Description"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -84,15 +84,11 @@ public class DiagnosticFront extends JPanel {
                 String descriptionDiagnostic = descriptionDiagnosticChamp.getText().trim();
                 PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
 
-                if (codeCIM10.isEmpty() || nomMaladie.isEmpty() || descriptionDiagnostic.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                if (nomMaladie.isEmpty() || descriptionDiagnostic.isEmpty() || selectedPlanification == null ) {
+                    JOptionPane.showMessageDialog(this, "Veuillez svp les champs nécessaires", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (selectedPlanification == null) {
-                    JOptionPane.showMessageDialog(this, "Veuillez sélectionner une planification.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
 
                 Diagnostic diagnostic = new Diagnostic();
                 diagnostic.setCodeCIM10(codeCIM10);

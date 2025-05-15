@@ -18,7 +18,7 @@ public class FenetreMedecin extends JFrame{
     private static JLabel boutonTraitement;
 
     public FenetreMedecin() throws IOException, InterruptedException {
-        super("Medecin - ClinicPro");
+        super("Médecins - ClinicPro");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -30,7 +30,7 @@ public class FenetreMedecin extends JFrame{
         contentPane.setLayout(new BorderLayout());
 //            contentPane.add(menuBar(), BorderLayout.NORTH);
         contentPane.add(PanelGauche(), BorderLayout.WEST);
-        contentPane.add(new JLabel("Sélectionnez un sous-dossier à compléter"), BorderLayout.CENTER);
+        contentPane.add(new JLabel("Sélectionnez un sous-dossier à traiter"), BorderLayout.CENTER);
 
 
     }
@@ -62,13 +62,13 @@ public class FenetreMedecin extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 contentPane.removeAll();
-//                try {
+                try {
                     contentPane.add(new AntecedentMedicalFront(), BorderLayout.CENTER);
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                } catch (InterruptedException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
                 contentPane.repaint();
                 contentPane.revalidate();
@@ -87,13 +87,13 @@ public class FenetreMedecin extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 contentPane.removeAll();
-//                try {
+                try {
                     contentPane.add(new CompteRenduFront(), BorderLayout.CENTER);
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                } catch (InterruptedException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
                 contentPane.repaint();
                 contentPane.revalidate();
@@ -113,13 +113,13 @@ public class FenetreMedecin extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 contentPane.removeAll();
-//                try {
+                try {
                     contentPane.add(new DiagnosticFront(), BorderLayout.CENTER);
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                } catch (InterruptedException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
                 contentPane.repaint();
                 contentPane.revalidate();
@@ -138,13 +138,13 @@ public class FenetreMedecin extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                 contentPane.removeAll();
-//                try {
+                try {
                     contentPane.add(new TraitementFront(), BorderLayout.CENTER);
-//                } catch (IOException ex) {
-//                    throw new RuntimeException(ex);
-//                } catch (InterruptedException ex) {
-//                    throw new RuntimeException(ex);
-//                }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 contentPane.add(PanelGauche(), BorderLayout.WEST);
                 contentPane.repaint();
                 contentPane.revalidate();

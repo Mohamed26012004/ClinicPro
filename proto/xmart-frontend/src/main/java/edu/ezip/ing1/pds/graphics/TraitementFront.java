@@ -1,7 +1,6 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -36,7 +35,7 @@ public class TraitementFront extends JPanel {
         setLayout(new BorderLayout());
 
 
-        JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
+        JPanel panelNord = new JPanel(new GridLayout(5, 5, 5, 5));
 
         planificationExamenComboBox = new JComboBox<>();
         planificationExamensListe = new ArrayList<>();
@@ -57,13 +56,13 @@ public class TraitementFront extends JPanel {
         finTraitementChamp = new JTextField();
 
 
-        panelNord.add(new JLabel("Type de traitement:"));
+        panelNord.add(new JLabel("Traitement :"));
         panelNord.add(typeTraitementChamp);
         panelNord.add(new JLabel("Description :"));
         panelNord.add(descriptionTraitementChamp);
-        panelNord.add(new JLabel("Début:"));
+        panelNord.add(new JLabel("Début :"));
         panelNord.add(debutTraitementChamp);
-        panelNord.add(new JLabel("Fin:"));
+        panelNord.add(new JLabel("Fin :"));
         panelNord.add(finTraitementChamp);
         panelNord.add(new JLabel("Planification :"));
         panelNord.add(planificationExamenComboBox);
@@ -71,7 +70,7 @@ public class TraitementFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Traitement", "Id Planification", "Type de traitement", "Description", "Début", "Fin"};
+        String[] columns = {"ID Traitement", "Id Planification", "Traitement", "Description", "Début", "Fin"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -107,7 +106,7 @@ public class TraitementFront extends JPanel {
                 traitement.setDescription_Traitement(descriptionTraitement);
                 traitement.setDebut_Traitement(debutTraitement);
                 traitement.setFin_Traitement(finTraitement);
-
+                traitement.setIdPlanification(selectedPlanification.getIdPlanification());
 
                 TraitementService.insertTraitement(traitement);
                 chargerTraitements();

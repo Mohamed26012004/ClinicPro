@@ -81,7 +81,7 @@ public class CompteRenduFront extends JPanel {
                 PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
 
                 if (typeSymptome.isEmpty() || descriptionSymptome.isEmpty() || selectedPlanification == null) {
-                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez svp remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
