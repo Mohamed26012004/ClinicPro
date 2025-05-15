@@ -14,8 +14,8 @@ public class FrameCommune extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JButton bouton1 = new JButton("Secrétaire");
-        JButton bouton2 = new JButton("Médecin");
+        JButton boutonSecretaire = new JButton("Secrétaire");
+        JButton boutonMedecin = new JButton("Médecin");
 
         setLayout(new BorderLayout());
 
@@ -32,11 +32,12 @@ public class FrameCommune extends JFrame {
         panelCenter.add(jLabel);
 
 
-        bouton1.addMouseListener(new MouseAdapter() {
+        boutonSecretaire.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
                     Fenetre f = new Fenetre();
+                    f.setVisible(true);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 } catch (InterruptedException ex) {
@@ -44,17 +45,18 @@ public class FrameCommune extends JFrame {
                 }
             }
         });
-        bouton1.setMaximumSize(new Dimension(400, 50)); // taille maximale
-        bouton1.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelCenter.add(Box.createRigidArea(new Dimension(0, 20))); // espace vertical
-        panelCenter.add(bouton1);
+        boutonSecretaire.setMaximumSize(new Dimension(400, 50));
+        boutonSecretaire.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelCenter.add(Box.createRigidArea(new Dimension(0, 20)));
+        panelCenter.add(boutonSecretaire);
 
 
-        bouton2.addMouseListener(new MouseAdapter() {
+        boutonMedecin.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
                     FenetreMedecin fm = new FenetreMedecin();
+                    fm.setVisible(true);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 } catch (InterruptedException ex) {
@@ -62,15 +64,16 @@ public class FrameCommune extends JFrame {
                 }
             }
         });
-        bouton2.setMaximumSize(new Dimension(400, 50)); // taille maximale
-        bouton2.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelCenter.add(Box.createRigidArea(new Dimension(0, 20))); // espace vertical
-        panelCenter.add(bouton2);
+        boutonMedecin.setMaximumSize(new Dimension(400, 50));
+        boutonMedecin.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panelCenter.add(Box.createRigidArea(new Dimension(0, 20)));
+        panelCenter.add(boutonMedecin);
 
 
         add(panelCenter, BorderLayout.CENTER);
 
         setVisible(true);
     }
+
 
 }

@@ -9,6 +9,7 @@ import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.*;
+import edu.ezip.ing1.pds.graphics.FrameCommune;
 import edu.ezip.ing1.pds.services.FactureService;
 
 
@@ -34,8 +35,11 @@ public class MainFrontEnd {
 //        Fenetre fene = new Fenetre();
 //        fene.setVisible(true);
 
-        FenetreMedecin fm = new FenetreMedecin();
-        fm.setVisible(true);
+//        FenetreMedecin fm = new FenetreMedecin();
+//        fm.setVisible(true);
+
+        FrameCommune fc = new FrameCommune();
+        fc.setVisible(true);
 
 
     }
