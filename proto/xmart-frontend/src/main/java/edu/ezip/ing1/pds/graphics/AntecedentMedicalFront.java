@@ -1,61 +1,66 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.io.IOException;
-
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
-
 import edu.ezip.ing1.pds.business.dto.AntecedentMedical;
 import edu.ezip.ing1.pds.business.dto.AntecedentMedicals;
+import edu.ezip.ing1.pds.business.dto.Patient;
+import edu.ezip.ing1.pds.business.dto.Patients;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
+import edu.ezip.ing1.pds.services.planning.PatientService;
 import edu.ezip.ing1.pds.servicesdpi.AntecedentMedicalService;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class AntecedentMedicalFront extends JPanel {
-    private JTextField id_AntecedentMedicalChamp, idPatientChamp, type_antecedentMedicalChamp, description_antecedentMedicalChamp;
+
+    private JTextField typeChamp, descriptionChamp;
+    private JComboBox<Patient> patientComboBox;
     private DefaultTableModel model;
     private JTable table;
     private final AntecedentMedicalService antecedentMedicalService;
+    private ArrayList<Patient> patientsListe;
 
-
-    public AntecedentMedicalFront(){
+    public AntecedentMedicalFront() throws IOException, InterruptedException {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-        this.antecedentMedicalService = new AntecedentMedicalService (networkConfig);
+        final PatientService patientService = new PatientService(networkConfig);
+        this.antecedentMedicalService = new AntecedentMedicalService(networkConfig);
+
+        setSize(700, 400);
+
+
         setLayout(new BorderLayout());
 
+        JPanel panelNord = new JPanel(new GridLayout(3, 2, 5, 5));
 
-//        Jthis this = new Jthis("Gestion des antécédents médicaux");
-//        this.setSize(700, 400);
-//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
-//        this.setLocationRelativeTo(null);
+        patientComboBox = new JComboBox<>();
+        patientsListe = new ArrayList<>();
+        Patients patients = patientService.selectPatients();
 
-        JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
+        if (patients != null && patients.getPatients() != null) {
+            patientsListe = new ArrayList<>(patients.getPatients());
+            for (Patient p : patientsListe) {
+                patientComboBox.addItem(p);
+            }
+        }
 
+        typeChamp = new JTextField();
+        descriptionChamp = new JTextField();
 
-        type_antecedentMedicalChamp = new JTextField();
-        description_antecedentMedicalChamp= new JTextField();
-
-
-        panelNord.add(new JLabel("Type d'antécédent médical :"));
-        panelNord.add(type_antecedentMedicalChamp);
-        panelNord.add(new JLabel("Description antécédent médical :"));
-        panelNord.add(description_antecedentMedicalChamp);
-
+        panelNord.add(new JLabel("Type :"));
+        panelNord.add(typeChamp);
+        panelNord.add(new JLabel("Description :"));
+        panelNord.add(descriptionChamp);
+        panelNord.add(new JLabel("Patient :"));
+        panelNord.add(patientComboBox);
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID AntecedentMedical", "Id Patient", "Type antécédent médical", "Description antécédent médical"};
+        String[] columns = {"ID", "ID Patient", "Type", "Description",};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -71,39 +76,43 @@ public class AntecedentMedicalFront extends JPanel {
 
         add(panelSud, BorderLayout.SOUTH);
 
-
-
-
-
-
         boutonAjouter.addActionListener(e -> {
             try {
+                String type = typeChamp.getText().trim();
+                String description = descriptionChamp.getText().trim();
+                Patient selectedPatient = (Patient) patientComboBox.getSelectedItem();
 
-                String typeAntecedentMedical = type_antecedentMedicalChamp.getText().trim();
-                String description_AntecedentMedical = description_antecedentMedicalChamp.getText().trim();
+                if (type.isEmpty() || description.isEmpty() || selectedPatient == null) {
+                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
+                AntecedentMedical antecedent = new AntecedentMedical();
+                antecedent.setType_antecedentMedical(type);
+                antecedent.setDescription_antecedentMedical(description);
+                antecedent.setIdPatient(selectedPatient.getIdPatient());
 
-
-                AntecedentMedical AntecedentMedical = new AntecedentMedical();
-                AntecedentMedical.setType_antecedentMedical(typeAntecedentMedical);
-                AntecedentMedical.setDescription_antecedentMedical(description_AntecedentMedical);
-
-
-                antecedentMedicalService.insertAntecedentMedical(AntecedentMedical);
-                chargerAntecedentMedicals();
+                antecedentMedicalService.insertAntecedentMedical(antecedent);
+                chargerAntecedents();
                 viderChamps();
-
-            }catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
-                type_antecedentMedicalChamp.setText(model.getValueAt(i, 3).toString());
-                description_antecedentMedicalChamp.setText(model.getValueAt(i, 4).toString());
+                typeChamp.setText(model.getValueAt(i, 1).toString());
+                descriptionChamp.setText(model.getValueAt(i, 2).toString());
+                int idPatient = Integer.parseInt(model.getValueAt(i, 3).toString());
+
+                for (int j = 0; j < patientComboBox.getItemCount(); j++) {
+                    if (patientComboBox.getItemAt(j).getIdPatient() == idPatient) {
+                        patientComboBox.setSelectedIndex(j);
+                        break;
+                    }
+                }
             }
         });
 
@@ -111,18 +120,22 @@ public class AntecedentMedicalFront extends JPanel {
             try {
                 int i = table.getSelectedRow();
                 if (i >= 0) {
-                    AntecedentMedical AntecedentMedical = new AntecedentMedical();
-                    AntecedentMedical.setId_antecedentMedical(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    AntecedentMedical.setType_antecedentMedical(type_antecedentMedicalChamp.getText().trim());
-                    AntecedentMedical.setDescription_antecedentMedical(description_antecedentMedicalChamp.getText().trim());
+                    AntecedentMedical antecedent = new AntecedentMedical();
+                    antecedent.setId_antecedentMedical(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                    antecedent.setType_antecedentMedical(typeChamp.getText().trim());
+                    antecedent.setDescription_antecedentMedical(descriptionChamp.getText().trim());
 
-                    antecedentMedicalService.updateAntecedentMedical(AntecedentMedical);
-                    chargerAntecedentMedicals();
+                    Patient selectedPatient = (Patient) patientComboBox.getSelectedItem();
+                    if (selectedPatient != null) {
+                        antecedent.setIdPatient(selectedPatient.getIdPatient());
+                    }
+
+                    antecedentMedicalService.updateAntecedentMedical(antecedent);
+                    chargerAntecedents();
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erreur lors de la modification: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la modification : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -130,54 +143,38 @@ public class AntecedentMedicalFront extends JPanel {
             try {
                 int i = table.getSelectedRow();
                 if (i >= 0) {
-                    AntecedentMedical AntecedentMedical = new AntecedentMedical();
-                    AntecedentMedical.setId_antecedentMedical(Integer.parseInt(model.getValueAt(i, 0).toString()));
-
-
-                    antecedentMedicalService.deleteAntecedentMedical(AntecedentMedical);
-                    chargerAntecedentMedicals();
+                    AntecedentMedical antecedent = new AntecedentMedical();
+                    antecedent.setId_antecedentMedical(Integer.parseInt(model.getValueAt(i, 0).toString()));
+                    antecedentMedicalService.deleteAntecedentMedical(antecedent);
+                    chargerAntecedents();
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        try {
-            chargerAntecedentMedicals();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des AntecedentMedicals: " + ex.getMessage(),
-                    "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
-
-//        this.setVisible(true);
+        chargerAntecedents();
     }
 
-    private void chargerAntecedentMedicals() throws IOException, InterruptedException {
+    private void chargerAntecedents() throws IOException, InterruptedException {
         model.setRowCount(0);
-        AntecedentMedicals antecedentMedicals = antecedentMedicalService.selectantecedentMedicals();
-        if (antecedentMedicals != null && antecedentMedicals.getAntecedentMedicals() != null) {
-            for (AntecedentMedical a : antecedentMedicals.getAntecedentMedicals()) {
+        AntecedentMedicals antecedents = antecedentMedicalService.selectantecedentMedicals();
+        if (antecedents != null && antecedents.getAntecedentMedicals() != null) {
+            for (AntecedentMedical a : antecedents.getAntecedentMedicals()) {
                 model.addRow(new Object[]{
                         a.getId_antecedentMedical(),
                         a.getIdPatient(),
                         a.getType_antecedentMedical(),
-                        a.getDescription_antecedentMedical()
+                        a.getDescription_antecedentMedical(),
+
                 });
             }
         }
     }
 
     private void viderChamps() {
-        id_AntecedentMedicalChamp.setText("");
-        idPatientChamp.setText("");
-        type_antecedentMedicalChamp.setText("");
-        description_antecedentMedicalChamp.setText("");
-
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(AntecedentMedicalFront::new);
+        typeChamp.setText("");
+        descriptionChamp.setText("");
     }
 }

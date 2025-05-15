@@ -3,44 +3,52 @@ package edu.ezip.ing1.pds.graphics;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
+import java.util.ArrayList;
 
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
+import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
 import edu.ezip.ing1.pds.business.dto.Traitement;
 import edu.ezip.ing1.pds.business.dto.Traitements;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
+import edu.ezip.ing1.pds.services.planning.PlanificationService;
 import edu.ezip.ing1.pds.servicesdpi.TraitementService;
 
 public class TraitementFront extends JPanel {
-    private JTextField id_TraitementChamp, idPlanificationChamp, numeroADELIChamp, typeTraitementChamp, descriptionTraitementChamp, debutTraitementChamp, finTraitementChamp;
+    private JTextField typeTraitementChamp, descriptionTraitementChamp, debutTraitementChamp, finTraitementChamp;
+    private JComboBox<PlanificationExamen> planificationExamenComboBox;
     private DefaultTableModel model;
     private JTable table;
     private final TraitementService TraitementService;
+    private final PlanificationService planificationService;
+    private ArrayList<PlanificationExamen> planificationExamensListe;
 
 
-    public TraitementFront() {
+    public TraitementFront() throws IOException, InterruptedException {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.TraitementService = new TraitementService (networkConfig);
+        this.planificationService = new PlanificationService(networkConfig);
         setLayout(new BorderLayout());
 
 
-//        Jthis this = new Jthis("Gestion des traitements");
-//        this.setSize(700, 400);
-//        this.setDefaultCloseOperation(Jthis.DISPOSE_ON_CLOSE);
-//        this.setLocationRelativeTo(null);
-
         JPanel panelNord = new JPanel(new GridLayout(2, 2, 5, 5));
+
+        planificationExamenComboBox = new JComboBox<>();
+        planificationExamensListe = new ArrayList<>();
+        PlanificationExamens planificationExamens = planificationService.selectPlanifications();
+
+
+        if (planificationExamens != null && planificationExamens.getPlanifications() != null) {
+            planificationExamensListe = new ArrayList<>(planificationExamens.getPlanifications());
+            for (PlanificationExamen pe : planificationExamensListe) {
+                planificationExamenComboBox.addItem(pe);
+            }
+        }
 
 
         typeTraitementChamp = new JTextField();
@@ -57,11 +65,13 @@ public class TraitementFront extends JPanel {
         panelNord.add(debutTraitementChamp);
         panelNord.add(new JLabel("Fin:"));
         panelNord.add(finTraitementChamp);
+        panelNord.add(new JLabel("Planification :"));
+        panelNord.add(planificationExamenComboBox);
 
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Traitement", "Id Planification", "Numéro ADELI", "Type de traitement", "Description", "Début", "Fin"};
+        String[] columns = {"ID Traitement", "Id Planification", "Type de traitement", "Description", "Début", "Fin"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -84,9 +94,19 @@ public class TraitementFront extends JPanel {
                 String descriptionTraitement = descriptionTraitementChamp.getText().trim();
                 String debutTraitement = debutTraitementChamp.getText().trim();
                 String finTraitement = finTraitementChamp.getText().trim();
+                PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
+
+
+                if (selectedPlanification == null) {
+                    JOptionPane.showMessageDialog(null, "Veuillez associer le traitement à un idPlanification svp", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
                 Traitement traitement = new Traitement();
                 traitement.setType_Traitement(typeTraitement);
                 traitement.setDescription_Traitement(descriptionTraitement);
+                traitement.setDebut_Traitement(debutTraitement);
+                traitement.setFin_Traitement(finTraitement);
 
 
                 TraitementService.insertTraitement(traitement);
@@ -102,10 +122,19 @@ public class TraitementFront extends JPanel {
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
+                int idPlanification = Integer.parseInt(model.getValueAt(i, 1).toString());
                 typeTraitementChamp.setText(model.getValueAt(i, 1).toString());
                 descriptionTraitementChamp.setText(model.getValueAt(i, 2).toString());
                 debutTraitementChamp.setText(model.getValueAt(i, 3).toString());
                 finTraitementChamp.setText(model.getValueAt(i, 3).toString());
+
+
+                for (int j = 0; j < planificationExamenComboBox.getItemCount(); j++) {
+                    if (planificationExamenComboBox.getItemAt(j).getIdPlanification() == idPlanification) {
+                        planificationExamenComboBox.setSelectedIndex(j);
+                        break;
+                    }
+                }
 
             }
         });
@@ -116,11 +145,14 @@ public class TraitementFront extends JPanel {
                 if (i >= 0) {
                     Traitement Traitement = new Traitement();
                     Traitement.setId_Traitement(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    Traitement.setIdPlanification(Integer.parseInt(model.getValueAt(i, 0).toString()));
                     Traitement.setType_Traitement(typeTraitementChamp.getText().trim());
                     Traitement.setDebut_Traitement(debutTraitementChamp.getText().trim());
                     Traitement.setFin_Traitement(finTraitementChamp.getText().trim());
 
+                    PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
+                    if (selectedPlanification != null) {
+                        Traitement.setIdPlanification(selectedPlanification.getIdPlanification());
+                    }
 
                     TraitementService.updateTraitement(Traitement);
                     chargerTraitements();
@@ -156,7 +188,6 @@ public class TraitementFront extends JPanel {
                     "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-//        this.setVisible(true);
     }
 
     private void chargerTraitements() throws IOException, InterruptedException {
@@ -179,9 +210,6 @@ public class TraitementFront extends JPanel {
     }
 
     private void viderChamps() {
-        id_TraitementChamp.setText("");
-        idPlanificationChamp.setText("");
-        numeroADELIChamp.setText("");
         typeTraitementChamp.setText("");
         descriptionTraitementChamp.setText("");
         debutTraitementChamp.setText("");
@@ -190,7 +218,5 @@ public class TraitementFront extends JPanel {
 
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(TraitementFront::new);
-    }
+
 }
