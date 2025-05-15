@@ -99,7 +99,7 @@ CREATE TABLE antecedentMedical(
    description_antecedentMedical VARCHAR(50),
    idPatient INT NOT NULL,
    PRIMARY KEY(id_antecedentMedical),
-   FOREIGN KEY(idPatient) REFERENCES Patient(idPatient)
+   FOREIGN KEY(idPatient) REFERENCES patient(idPatient)
 );
 
 CREATE TABLE compteRendu(

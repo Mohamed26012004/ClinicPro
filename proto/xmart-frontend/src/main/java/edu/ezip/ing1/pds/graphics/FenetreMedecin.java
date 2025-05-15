@@ -23,14 +23,13 @@ public class FenetreMedecin extends JFrame{
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-//        UIManager.put("Label.font", new Font("Impact", Font.PLAIN, 14));
-//        UIManager.put("Button.font", new Font("Impact", Font.BOLD, 14));
-
         contentPane = (JPanel)getContentPane();
         contentPane.setLayout(new BorderLayout());
-//            contentPane.add(menuBar(), BorderLayout.NORTH);
         contentPane.add(PanelGauche(), BorderLayout.WEST);
-        contentPane.add(new JLabel("Sélectionnez un sous-dossier à traiter"), BorderLayout.CENTER);
+
+        JLabel texteaccueil = new JLabel("Sélectionnez un sous-dossier à traiter");
+        texteaccueil.setFont(new Font("Arial",Font.BOLD,15));
+        contentPane.add(texteaccueil, BorderLayout.CENTER);
 
 
     }
@@ -176,15 +175,11 @@ public class FenetreMedecin extends JFrame{
 
     public static JLabel createLabel(String text){
         JLabel label = new JLabel(java.lang.String.valueOf(text));
-        label.setFont(new Font("Arial", Font.PLAIN, 16));
+        label.setFont(new Font("Arial", Font.PLAIN, 20));
         return label;
     }
 
-    public static JTextField createTextField(String text){
-        JTextField t = new JTextField(text);
-        t.setFont(new Font("Arial", Font.PLAIN, 14));
-        return t;
-    }
+
 
 
 
