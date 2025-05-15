@@ -22,23 +22,25 @@ public class Paiement {
     private final DateTimeFormatter formatDate = DateTimeFormatter.ofPattern("yyyy-MM-dd");
  
     private  String moyenDePaiement;
+    private int idFacture;
  
     public Paiement() {
     }
     public final Paiement build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "idPaiement", "montant", "datePaiement", "moyenDePaiement");
+        setFieldsFromResulset(resultSet, "idPaiement", "montant", "datePaiement", "moyenDePaiement", "idFacture");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(idPaiement), String.valueOf(montant), datePaiement.format(formatDate), moyenDePaiement);
+        return buildPreparedStatement(preparedStatement, String.valueOf(idPaiement), String.valueOf(montant), datePaiement.format(formatDate), moyenDePaiement, String.valueOf(idFacture));
     }
  
-    public Paiement(double montant, LocalDate datePaiement, String moyenDePaiement) {
+    public Paiement(double montant, LocalDate datePaiement, String moyenDePaiement, int idFacture) {
         this.montant = montant;
         this.datePaiement = datePaiement;
         this.moyenDePaiement = moyenDePaiement;
+        this.idFacture = idFacture;
     }
  
     public int getidPaiement() {
@@ -52,6 +54,10 @@ public class Paiement {
     }
     public String getmoyenDePaiement() {
         return moyenDePaiement;
+    }
+
+    public int getidFacture() {
+        return idFacture;
     }
    
     @JsonProperty("idPaiement")
@@ -72,6 +78,11 @@ public class Paiement {
     @JsonProperty("moyenDePaiement")
     public void setmoyenDePaiement(String moyenDePaiement) {
         this.moyenDePaiement = moyenDePaiement;
+    }
+
+    @JsonProperty("idFacture")
+    public void setidFacture(int idFacture) {
+        this.idFacture = idFacture;
     }
  
  
@@ -98,6 +109,7 @@ public class Paiement {
                 ", montant='" + montant + '\'' +
                 ", datePaiement='" + datePaiement + '\'' +
                 ", moyenDePaiement='" + moyenDePaiement + '\'' +
+                ", idFacture='" + idFacture +
                 '}';
     }
 }
