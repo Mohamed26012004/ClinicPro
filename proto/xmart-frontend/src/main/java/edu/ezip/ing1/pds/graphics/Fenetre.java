@@ -68,8 +68,8 @@ public class Fenetre extends JFrame{
         pane.add(panelBoutonFacture());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        pane.add(panelBoutonDiagnostic());
-        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+//        pane.add(panelBoutonDiagnostic());
+//        pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
         return pane;
     }
@@ -138,20 +138,20 @@ public class Fenetre extends JFrame{
         return panel;
     }
 
-    public JPanel panelBoutonDiagnostic(){
-        boutonExamem = createLabel("Diagnostic");
-        JPanel panelExamen = new JPanel();
-        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panelExamen.add(boutonExamem);
-        panelExamen.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                DiagnosticFront d = new DiagnosticFront();
-            }
-        });
-        return panelExamen;
-    }
+//    public JPanel panelBoutonDiagnostic(){
+//        boutonExamem = createLabel("Diagnostic");
+//        JPanel panelExamen = new JPanel();
+//        panelExamen.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//        panelExamen.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+//        panelExamen.add(boutonExamem);
+//        panelExamen.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                DiagnosticFront d = new DiagnosticFront();
+//            }
+//        });
+//        return panelExamen;
+//    }
 
 
     public JPanel panelBoutonMedecin(){
