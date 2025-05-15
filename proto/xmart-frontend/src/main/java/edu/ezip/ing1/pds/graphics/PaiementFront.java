@@ -179,7 +179,7 @@ public class PaiementFront extends JPanel {
             JOptionPane.showMessageDialog(null, "Erreur lors du chargement des paiements: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
    
-        Timer timer = new Timer(2000, e -> {
+        Timer timer = new Timer(25000, e -> {
             try {
                 chargerIdFactures();
             } catch (Exception ex) {
