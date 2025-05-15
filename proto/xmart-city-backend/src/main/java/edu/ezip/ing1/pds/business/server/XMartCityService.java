@@ -102,7 +102,7 @@ public class XMartCityService {
         ID_COMPTE_RENDU("SELECT id FROM compteRendu WHERE typeSymptome = ? AND descriptionSymptome = ? AND idPlanification = ?"),
 
         SELECT_ALL_DIAGNOSTICS("SELECT d.id_Diagnostic, d.codeCIM10, d.nomMaladie, d.descriptionDiagnostic, d.idPlanification  FROM Diagnostic d"),
-        INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic, idPlanification ) values (?, ?, ?, ?)"),
+        INSERT_DIAGNOSTIC("INSERT into Diagnostic (codeCIM10, nomMaladie, descriptionDiagnostic, idPlanification) values (?, ?, ?, ?)"),
         UPDATE_DIAGNOSTIC("UPDATE Diagnostic SET codeCIM10 = ?, nomMaladie = ?, descriptionDiagnostic = ?, idPlanification = ? WHERE id_Diagnostic = ?"),
         DELETE_DIAGNOSTIC("DELETE FROM Diagnostic WHERE id_Diagnostic = ?"),
         ID_DIAGNOSTIC("SELECT id FROM Diagnostic WHERE codeCIM10 = ? AND nomMaladie = ? AND descriptionDiagnostic = ? AND idPlanification = ?"),
@@ -1279,11 +1279,11 @@ public class XMartCityService {
         final Diagnostic diagnostic = objectMapper.readValue(request.getRequestBody(), Diagnostic.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_DIAGNOSTIC.query);
-        stmt.setInt(1, diagnostic.getId_Diagnostic());
-        stmt.setString(2, diagnostic.getCodeCIM10());
-        stmt.setString(3, diagnostic.getNomMaladie());
-        stmt.setString(4, diagnostic.getDescription_Diagnostic());
-        stmt.setInt(5, diagnostic.getIdPlanification());
+        stmt.setString(1, diagnostic.getCodeCIM10());
+        stmt.setString(2, diagnostic.getNomMaladie());
+        stmt.setString(3, diagnostic.getDescription_Diagnostic());
+        stmt.setInt(4, diagnostic.getIdPlanification());
+        stmt.setInt(5, diagnostic.getId_Diagnostic());
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(diagnostic));
@@ -1349,6 +1349,7 @@ public class XMartCityService {
         stmt.setString(4, traitement.getFin_Traitement());
         stmt.setInt(5, traitement.getIdPlanification());
         stmt.setInt(6, traitement.getId_Traitement());
+
 
         stmt.executeUpdate();
 

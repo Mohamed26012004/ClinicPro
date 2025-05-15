@@ -122,10 +122,10 @@ public class TraitementFront extends JPanel {
             int i = table.getSelectedRow();
             if (i >= 0) {
                 int idPlanification = Integer.parseInt(model.getValueAt(i, 1).toString());
-                typeTraitementChamp.setText(model.getValueAt(i, 1).toString());
-                descriptionTraitementChamp.setText(model.getValueAt(i, 2).toString());
-                debutTraitementChamp.setText(model.getValueAt(i, 3).toString());
-                finTraitementChamp.setText(model.getValueAt(i, 3).toString());
+                typeTraitementChamp.setText(model.getValueAt(i, 2).toString());
+                descriptionTraitementChamp.setText(model.getValueAt(i, 3).toString());
+                debutTraitementChamp.setText(model.getValueAt(i, 4).toString());
+                finTraitementChamp.setText(model.getValueAt(i, 5).toString());
 
 
                 for (int j = 0; j < planificationExamenComboBox.getItemCount(); j++) {
@@ -147,6 +147,8 @@ public class TraitementFront extends JPanel {
                     Traitement.setType_Traitement(typeTraitementChamp.getText().trim());
                     Traitement.setDebut_Traitement(debutTraitementChamp.getText().trim());
                     Traitement.setFin_Traitement(finTraitementChamp.getText().trim());
+                    Traitement.setDescription_Traitement(descriptionTraitementChamp.getText().trim());
+
 
                     PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
                     if (selectedPlanification != null) {
@@ -213,6 +215,8 @@ public class TraitementFront extends JPanel {
         descriptionTraitementChamp.setText("");
         debutTraitementChamp.setText("");
         finTraitementChamp.setText("");
+        planificationExamenComboBox.setSelectedIndex(-1);
+
 
 
     }

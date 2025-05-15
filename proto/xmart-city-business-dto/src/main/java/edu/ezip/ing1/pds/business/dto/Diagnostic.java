@@ -31,7 +31,7 @@ public class Diagnostic {
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic), String.valueOf(idPlanification), codeCIM10, nomMaladie, description_Diagnostic);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic), codeCIM10, nomMaladie, description_Diagnostic, String.valueOf(idPlanification));
     }
 
     public Diagnostic(String codeCIM10, String nomMaladie, String description_Diagnostic, int idPlanification) {
