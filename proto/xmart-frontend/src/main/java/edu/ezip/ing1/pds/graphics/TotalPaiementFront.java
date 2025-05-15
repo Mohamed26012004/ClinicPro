@@ -30,8 +30,9 @@ public class TotalPaiementFront extends  JPanel {
         this.paiementService = new PaiementService(networkConfig);
         setLayout(new BorderLayout());
 
-
-
+        JPanel p = new JPanel(new FlowLayout());
+        p.add(Fenetre.createLabel("Les Revenus Qutidiens"));
+        add(p, BorderLayout.NORTH);
         String[] colonnes = {"Date de Paiement", "Montant Total"};
         model = new DefaultTableModel(colonnes, 0);
         table = new JTable(model);

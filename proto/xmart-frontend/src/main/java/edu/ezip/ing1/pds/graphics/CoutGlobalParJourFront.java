@@ -35,7 +35,9 @@ public class CoutGlobalParJourFront extends JPanel {
         this.maintenanceService = new MaintenanceService(networkConfig);
         setLayout(new BorderLayout());
 
-
+        JPanel j = new JPanel(new FlowLayout());
+        j.add(Fenetre.createLabel("Les Coûts Globaux Quotidiens"));
+        add(j, BorderLayout.NORTH);
 
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);

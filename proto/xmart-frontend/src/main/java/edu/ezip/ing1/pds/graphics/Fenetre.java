@@ -43,7 +43,7 @@ public class Fenetre extends JFrame{
 
 
         // Panneau Statistiques  (6 cases)
-        JPanel panelStatistiques = new JPanel(new GridLayout(3, 3));
+        JPanel panelStatistiques = new JPanel(new GridLayout(4, 3));
         panelStatistiques.add(new TotalPaiementFront());
         panelStatistiques.add(new CoutGlobalParJourFront());
         panelStatistiques.add(new CoutGlobalParMoisFront());

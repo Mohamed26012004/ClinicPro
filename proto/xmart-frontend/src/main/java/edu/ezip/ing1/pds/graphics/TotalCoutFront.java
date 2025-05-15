@@ -1,7 +1,6 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +29,9 @@ public class TotalCoutFront extends JPanel{
         setLayout((new BorderLayout()));
 
 
-
+        JPanel p = new JPanel(new FlowLayout());
+        p.add(Fenetre.createLabel("Les Equipements Quotidiens"));
+        add(p, BorderLayout.NORTH);
         String[] columns = {"Date Achat", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);

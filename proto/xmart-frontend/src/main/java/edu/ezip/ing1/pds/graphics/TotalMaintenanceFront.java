@@ -1,7 +1,6 @@
 package edu.ezip.ing1.pds.graphics;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +28,9 @@ public class TotalMaintenanceFront extends JPanel {
         this.maintenanceService = new MaintenanceService(networkConfig);
         setLayout(new BorderLayout());
 
-
+        JPanel j = new JPanel(new FlowLayout());
+        j.add(Fenetre.createLabel("Les Maintenances Quotidiens"));
+        add(j, BorderLayout.NORTH);
         String[] columns = {"Date Maintenance", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);

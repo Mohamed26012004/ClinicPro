@@ -44,10 +44,10 @@ public class MainFrontEnd {
         }
         Fenetre fene = new Fenetre();
         fene.setVisible(true);
-        TotalCoutFront rcf = new TotalCoutFront();
-        TotalMaintenanceFront tmf = new TotalMaintenanceFront();
-        CoutGlobalParJourFront cgp = new CoutGlobalParJourFront();
-        CoutGlobalParMoisFront tcf = new CoutGlobalParMoisFront();
+        //TotalCoutFront rcf = new TotalCoutFront();
+        //TotalMaintenanceFront tmf = new TotalMaintenanceFront();
+        //CoutGlobalParJourFront cgp = new CoutGlobalParJourFront();
+        //CoutGlobalParMoisFront tcf = new CoutGlobalParMoisFront();
 
 
     }

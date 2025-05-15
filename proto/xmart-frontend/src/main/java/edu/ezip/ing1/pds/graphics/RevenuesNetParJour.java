@@ -37,7 +37,9 @@ public class RevenuesNetParJour extends JPanel {
         setLayout(new BorderLayout());
 
 
-
+        JPanel j = new JPanel(new FlowLayout());
+        j.add(Fenetre.createLabel("Les Revenus Nets Quotidiens"));
+        add(j, BorderLayout.NORTH);
         String[] columns = {"Date", "Total Paiements", "Coût Total", "Revenu Net"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
