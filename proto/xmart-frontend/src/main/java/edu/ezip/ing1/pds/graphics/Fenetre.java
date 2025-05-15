@@ -85,7 +85,6 @@ public class Fenetre extends JFrame{
         pane.add(panelBoutonStatistiques());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        pane.add(panelBoutonDiagnostic());
         pane.add(panelBoutonFacture());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonMaintenance());
@@ -173,11 +172,10 @@ public class Fenetre extends JFrame{
             @Override
             public void mouseClicked(MouseEvent e) {
                card.show(cartePanel, "Paiement");
-                DiagnosticFront d = new DiagnosticFront();
 
             }
         });
-        return panelExamen;
+        return panel;
     }
 
     public JPanel panelBoutonMaintenance(){
@@ -193,7 +191,7 @@ public class Fenetre extends JFrame{
                 card.show(cartePanel, "Maintenance");
             }
         });
-        return panel;
+        return panelExamen;
     }
 
 //    public JPanel panelBoutonDiagnostic(){

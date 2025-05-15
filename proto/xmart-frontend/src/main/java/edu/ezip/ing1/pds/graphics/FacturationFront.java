@@ -225,7 +225,8 @@ public class FacturationFront extends JPanel {
     private void chargerFactures() throws IOException, InterruptedException {
         model.setRowCount(0);
         Factures factures = factureService.selectFactures();
-        ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
+        if (factures != null && factures.getFactures() != null){
+            ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
             list.sort(Comparator.comparing(Facture::getDateFacture));
             for (Facture f : list) {
                 String nomExamen = "";
@@ -253,6 +254,8 @@ public class FacturationFront extends JPanel {
                 });
             }
         }
+
+    }
 
     private void viderChamps() {
         montantChamp.setText("");
