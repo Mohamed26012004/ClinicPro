@@ -6,13 +6,11 @@ import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.Consulte;
 import edu.ezip.ing1.pds.business.dto.Medecin;
 import edu.ezip.ing1.pds.business.dto.Medecins;
+import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.medecin.InsertConsulteClientRequest;
-import edu.ezip.ing1.pds.requests.medecin.InsertMedecinClientRequest;
-import edu.ezip.ing1.pds.requests.medecin.SelectAllMedecinsClientRequest;
-import edu.ezip.ing1.pds.requests.medecin.SelectInfoMedecinClientRequest;
+import edu.ezip.ing1.pds.requests.medecin.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -36,6 +34,7 @@ public class MedecinService {
     final String selectMedecinParSpecialiteRequestOrder = "SELECT_MEDECIN_PAR_SPECIALITE";
     final String insertConsulteRequestOrder = "INSERT_CONSULTE";
     final String deleteConsulteRequestOrder = "DELETE_CONSULTE";
+    final String selectMedecinDisponibleByDateAndCreneau = "SELECT_MEDECIN_DISPONIBLE_BY_DATE_AND_CRENEAU";
 
 
 
@@ -207,6 +206,35 @@ public class MedecinService {
 
     public void deleteConsulte(Consulte consulte) throws IOException, InterruptedException {
         insertDeleteConsulte(consulte, deleteConsulteRequestOrder);
+    }
+
+    public Medecins selectMedecinDisponibleByDateAndCreneau(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
+        int birthdate = 0;
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
+        final String requestId = UUID.randomUUID().toString();
+        final Request request = new Request();
+        request.setRequestId(requestId);
+        request.setRequestOrder(selectMedecinDisponibleByDateAndCreneau);
+        request.setRequestContent(jsonifiedGuy);
+        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+        final SelectMedecinDisponibleByDateAndCreneauClientRequest clientRequest = new SelectMedecinDisponibleByDateAndCreneauClientRequest(
+                networkConfig,
+                birthdate++, request, planificationExamen, requestBytes);
+        clientRequests.push(clientRequest);
+
+        if (!clientRequests.isEmpty()) {
+            final ClientRequest joinedClientRequest = clientRequests.pop();
+            joinedClientRequest.join();
+            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
+            return (Medecins) joinedClientRequest.getResult();
+        } else {
+            logger.error("No medecins found");
+            return null;
+        }
     }
 
 

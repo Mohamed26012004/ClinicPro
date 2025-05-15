@@ -27,13 +27,6 @@ public class PanelManipulationSalle extends JPanel {
     private final String statutReserve = "Réservé";
     private final String msgImposSupprime = "Salle Réservée !!!!!\nImpossiblle de la supprimer\nSupprimer le rendez-vous ou la planification qui a réservé la salle.";
 
-    private static JButton addButton;
-    private static JButton update;
-    private static JButton delete;
-    private static JScrollPane scrollPane;
-    private static JPanel panneau = new JPanel(new BorderLayout());
-
-
     private static DefaultTableModel model;
     private JTable table;
 
