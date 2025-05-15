@@ -81,11 +81,11 @@ public class XMartCityService {
 
         ID_PATIENT("SELECT idPatient FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
 
-        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement FROM paiement p"),
-        INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement) values (?, ?, ?)"),
-        UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ? WHERE idPaiement = ?"),
+        SELECT_ALL_PAIEMENTS("SELECT p.idPaiement, p.montant, p.datePaiement, p.moyenDePaiement, p.idFacture FROM paiement p"),
+        INSERT_PAIEMENT("INSERT into paiement (montant, datePaiement, moyenDePaiement, idFacture) values (?, ?, ?, ?)"),
+        UPDATE_PAIEMENT("UPDATE paiement SET montant = ?, datePaiement = ?, moyenDePaiement = ?, idFacture = ? WHERE idPaiement = ?"),
         DELETE_PAIEMENT("DELETE FROM paiement WHERE idPaiement = ?"),
-        ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ?"),
+        ID_PAIEMENT("SELECT idPaiement FROM paiement WHERE montant = ? AND datePaiement = ? AND moyenDePaiement = ? AND idFacture = ?"),
         TOTAL_PAIEMENT_PAR_JOUR("SELECT datePaiement, SUM(montant) AS totalPaiement FROM paiement GROUP BY datePaiement ORDER BY datePaiement"),
 
 
@@ -1044,6 +1044,7 @@ public class XMartCityService {
         stmt.setDouble(1, paiement.getmontant());
         stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
+        stmt.setInt(4, paiement.getidFacture());
         stmt.executeUpdate();
  
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
@@ -1061,6 +1062,7 @@ public class XMartCityService {
             paiement.setmontant(res.getDouble(2));
             paiement.setdatePaiement(res.getDate(3).toLocalDate());
             paiement.setmoyenDePaiement(res.getString(4));
+            paiement.setidFacture(res.getInt(5));
             paiements.add(paiement);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiements));
@@ -1075,7 +1077,8 @@ public class XMartCityService {
         stmt.setDouble(1, paiement.getmontant());
         stmt.setDate(2, Date.valueOf(paiement.getdatePaiement()));
         stmt.setString(3, paiement.getmoyenDePaiement());
-        stmt.setInt(4, paiement.getidPaiement());
+        stmt.setInt(4, paiement.getidFacture());
+        stmt.setInt(5, paiement.getidPaiement());
         stmt.executeUpdate();
  
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
@@ -1092,6 +1095,7 @@ public class XMartCityService {
  
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(paiement));
     }
+ 
     private Response TotalPaiementParJour (final Request request, final Connection connection) throws SQLException, JsonProcessingException {
 
         final ObjectMapper objectMapper = new ObjectMapper();
