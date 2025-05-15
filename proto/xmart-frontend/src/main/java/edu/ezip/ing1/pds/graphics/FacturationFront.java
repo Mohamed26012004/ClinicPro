@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
+import edu.ezip.ing1.pds.business.dto.Paiement;
 import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.business.dto.Patient;
@@ -19,8 +20,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.ArrayList;
+import java.util.Comparator;
 
-public class FacturationFront {
+public class FacturationFront extends JPanel {
 
     private JTextField montantChamp, dateFactureChamp;
     private JCheckBox regleCheckBox;
@@ -39,10 +42,10 @@ public class FacturationFront {
         final PatientService patientService = new PatientService(networkConfig);
         this.factureService = new FactureService(networkConfig);
 
-        JFrame frame = new JFrame("Gestion des Factures");
-        frame.setSize(700, 400);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        
+        setSize(700, 400);
+        
+        setLayout(new BorderLayout());
 
         JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
@@ -88,25 +91,23 @@ public class FacturationFront {
         panelNord.add(new JLabel("Réglée :"));
         panelNord.add(regleCheckBox);
 
-        frame.add(panelNord, BorderLayout.NORTH);
+        add(panelNord, BorderLayout.NORTH);
 
         String[] columns = {"ID", "Date", "Montant", "Réglée", "Examen", "Patient"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
         JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
-        JButton boutonPaiement = new JButton("Paiement");
 
         panelSud.add(boutonAjouter);
         panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
-        panelSud.add(boutonPaiement);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         boutonAjouter.addActionListener(e -> {
             try {
@@ -115,7 +116,7 @@ public class FacturationFront {
                 boolean regle = regleCheckBox.isSelected();
 
                 if (montantText.isEmpty() || dateText.isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -124,13 +125,13 @@ public class FacturationFront {
 
                 int selectedIndex = examenCombobox.getSelectedIndex();
                 if (selectedIndex == -1) {
-                    JOptionPane.showMessageDialog(frame, "Veuillez sélectionner un examen", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un examen", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 int patientIndex = patientCombobox.getSelectedIndex();
                 if (patientIndex == -1) {
-                    JOptionPane.showMessageDialog(frame, "Veuillez sélectionner un patient", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un patient", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -145,11 +146,11 @@ public class FacturationFront {
                 viderChamps();
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(frame, "Date invalide (format AAAA-MM-JJ)", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Date invalide (format AAAA-MM-JJ)", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -199,7 +200,7 @@ public class FacturationFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la modification : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -214,21 +215,19 @@ public class FacturationFront {
                     viderChamps();
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        boutonPaiement.addActionListener(e -> new PaiementFront());
-
         chargerFactures();
-        frame.setVisible(true);
     }
 
     private void chargerFactures() throws IOException, InterruptedException {
         model.setRowCount(0);
         Factures factures = factureService.selectFactures();
-        if (factures != null && factures.getFactures() != null) {
-            for (Facture f : factures.getFactures()) {
+        ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
+            list.sort(Comparator.comparing(Facture::getDateFacture));
+            for (Facture f : list) {
                 String nomExamen = "";
                 for (Examen e : examensListe) {
                     if (e.getId() == f.getIdExamen()) {
@@ -254,7 +253,6 @@ public class FacturationFront {
                 });
             }
         }
-    }
 
     private void viderChamps() {
         montantChamp.setText("");
@@ -263,13 +261,5 @@ public class FacturationFront {
         regleCheckBox.setEnabled(false);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                new FacturationFront();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
+    
 }

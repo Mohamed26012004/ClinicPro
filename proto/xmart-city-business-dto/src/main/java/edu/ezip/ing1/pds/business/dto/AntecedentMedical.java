@@ -77,9 +77,9 @@ public class AntecedentMedical {
     public String toString() {
         return "AntecedentMedical{" +
                 "id_antecedentMedical='" + id_antecedentMedical + '\'' +
-                ", idPatient='" + idPatient + '\'' +
                 ", type_antecedentMedical='" + type_antecedentMedical + '\'' +
                 ", description_antecedentMedical='" + description_antecedentMedical + '\'' +
+                ", idPatient='" + idPatient + '\'' +
                 '}';
     }
 }

@@ -41,15 +41,6 @@ CREATE TABLE examen(
    PRIMARY KEY(id)
 );
 
-CREATE TABLE antecedentMedical(
-   id_antecedentMedical INT AUTO_INCREMENT,
-   type_antecedentMedical VARCHAR(50),
-   description_antecedentMedical VARCHAR(50),
-   idPatient INT NOT NULL,
-   PRIMARY KEY(id_antecedentMedical),
-   FOREIGN KEY(idPatient) REFERENCES patient(idPatient)
-);
-
 CREATE TABLE salle(
    id INT AUTO_INCREMENT,
    numeroSalle VARCHAR(10) NOT NULL,
@@ -99,4 +90,45 @@ CREATE TABLE disponibilite(
    numeroADELI INT NOT NULL,
    PRIMARY KEY(idDisponiblilite),
    FOREIGN KEY(numeroADELI) REFERENCES Medecin(numeroADELI)
+);
+
+
+CREATE TABLE antecedentMedical(
+   id_antecedentMedical INT AUTO_INCREMENT,
+   type_antecedentMedical VARCHAR(50),
+   description_antecedentMedical VARCHAR(50),
+   idPatient INT NOT NULL,
+   PRIMARY KEY(id_antecedentMedical),
+   FOREIGN KEY(idPatient) REFERENCES Patient(idPatient)
+);
+
+CREATE TABLE compteRendu(
+   id_compteRendu INT AUTO_INCREMENT,
+   typeSymptome VARCHAR(50) NOT NULL,
+   descriptionSymptome VARCHAR(50) NOT NULL,
+   idPlanification INT NOT NULL,
+   PRIMARY KEY(id_compteRendu),
+   FOREIGN KEY(idPlanification) REFERENCES planification(idPlanification)
+
+);
+
+CREATE TABLE Diagnostic(
+   id_Diagnostic INT AUTO_INCREMENT,
+   codeCIM10 VARCHAR(50),
+   nomMaladie VARCHAR(50),
+   descriptionDiagnostic VARCHAR(50) NOT NULL,
+   idPlanification INT NOT NULL,
+   PRIMARY KEY(id_Diagnostic),
+   FOREIGN KEY(idPlanification) REFERENCES planification(idPlanification)
+);
+
+CREATE TABLE Traitement(
+   Id_Traitement INT AUTO_INCREMENT,
+   typeTraitement VARCHAR(50),
+   descriptionTraitement VARCHAR(50),
+   debutTraitement VARCHAR(50),
+   finTraitement VARCHAR(50),
+   idPlanification INT NOT NULL,
+   PRIMARY KEY(Id_Traitement),
+   FOREIGN KEY(idPlanification) REFERENCES planification(idPlanification)
 );

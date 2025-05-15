@@ -15,8 +15,7 @@ public class Diagnostic {
     private  String codeCIM10;
     private  String nomMaladie;
     private  String description_Diagnostic;
-    private int idPatient;
-    private int numeroADELI;
+    private int idPlanification;
 
 
 
@@ -25,22 +24,21 @@ public class Diagnostic {
 
     public final Diagnostic build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "id_Diagnostic", "idPatient", "numeroADELI", "codeCIM10", "nomMaladie", "description_Diagnostic");
+        setFieldsFromResulset(resultSet, "id_Diagnostic", "codeCIM10", "nomMaladie", "description_Diagnostic", "idPlanification");
         return this;
 
     }
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic), String.valueOf(idPatient), String.valueOf(numeroADELI), codeCIM10, nomMaladie, description_Diagnostic);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id_Diagnostic), String.valueOf(idPlanification), codeCIM10, nomMaladie, description_Diagnostic);
     }
 
-    public Diagnostic(String codeCIM10, String nomMaladie, String description_Diagnostic, int idPatient, int numeroADELI) {
+    public Diagnostic(String codeCIM10, String nomMaladie, String description_Diagnostic, int idPlanification) {
         this.codeCIM10 = codeCIM10;
         this.nomMaladie = nomMaladie;
         this.description_Diagnostic = description_Diagnostic;
-        this.idPatient = idPatient;
-        this.numeroADELI = numeroADELI;
+        this.idPlanification = idPlanification;
 
     }
 
@@ -49,8 +47,7 @@ public class Diagnostic {
     public String getCodeCIM10() {return codeCIM10;}
     public String getNomMaladie() {return nomMaladie;}
     public String getDescription_Diagnostic() {return description_Diagnostic;}
-    public int getIdPatient() {return idPatient;}
-    public int getNumeroADELI() {return numeroADELI;}
+    public int getIdPlanification() {return idPlanification;}
 
 
     @JsonProperty("Diagnostic_codeCIM10")
@@ -61,10 +58,9 @@ public class Diagnostic {
     public void setId_Diagnostic(int id_Diagnostic) {this.id_Diagnostic = id_Diagnostic;}
     @JsonProperty("Diagnostic_description_Diagnostic")
     public void setDescription_Diagnostic(String description_Diagnostic) {this.description_Diagnostic = description_Diagnostic;}
-    @JsonProperty("Diagnostic_idPatient")
-    public void setIdPatient(int idPatient) {this.idPatient = idPatient;}
-    @JsonProperty("Diagnostic_numeroADELI")
-    public void setNumeroADELI(int numeroADELI) {this.numeroADELI = numeroADELI;}
+    @JsonProperty("Diagnostic_idPlanification")
+    public void setIdPlanification(int idPlanification) {this.idPlanification = idPlanification;}
+
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
@@ -87,11 +83,10 @@ public class Diagnostic {
     public String toString() {
         return "Diagnostic{" +
                 "id_Diagnostic='" + id_Diagnostic + '\'' +
-                "idPatient='" + idPatient + '\'' +
-                "numeroADELI='" + numeroADELI + '\'' +
                 ", codeCIM10='" + codeCIM10 + '\'' +
                 ", nomMaladie='" + nomMaladie + '\'' +
                 ", description_Diagnostic='" + description_Diagnostic + '\'' +
+                "idPlanification='" + idPlanification + '\'' +
                 '}';
     }
 

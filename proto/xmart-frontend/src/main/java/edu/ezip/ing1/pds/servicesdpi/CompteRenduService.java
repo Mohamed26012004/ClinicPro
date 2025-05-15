@@ -80,7 +80,7 @@ public class CompteRenduService {
             final CompteRendu cr = (CompteRendu)clientRequest2.getInfo();
             logger.debug("Thread {} complete : {} {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    cr.getIdPatient(), cr.getNumeroADELI(), cr.getTypeSymptome(), cr.getDescriptionSymptome(),
+                    cr.getIdPlanification(), cr.getTypeSymptome(), cr.getDescriptionSymptome(), cr.getIdPlanification(),
                     clientRequest2.getResult());
         }
     }

@@ -59,7 +59,7 @@ public class TraitementService {
 
         final ObjectMapper objectMapper = new ObjectMapper();
         final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(traitement);
-        logger.trace("Examen with its JSON face : {}", jsonifiedGuy);
+        logger.info("Examen with its JSON face : {}", jsonifiedGuy);
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
@@ -78,9 +78,9 @@ public class TraitementService {
             final ClientRequest clientRequest2 = clientRequests.pop();
             clientRequest2.join();
             final Traitement t = (Traitement)clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {} {} {} {}  --> {}",
+            logger.debug("Thread {} complete : {} {} {} {} {}  --> {}",
                     clientRequest2.getThreadName(),
-                    t.getIdPatient(), t.getNumeroADELI(), t.getType_Traitement(), t.getDescription_Traitement(), t.getDebut_Traitement(), t.getFin_Traitement(),
+                    t.getType_Traitement(), t.getDescription_Traitement(), t.getDebut_Traitement(), t.getFin_Traitement(), t.getIdPlanification(),
                     clientRequest2.getResult());
         }
     }
