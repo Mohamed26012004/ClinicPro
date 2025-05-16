@@ -120,7 +120,7 @@ public class MaintenanceFront extends JPanel{
                 chargerMaintenances();
                 viderChamps();
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Le coût doit être un nombre valide", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Veuillez entrer des nombres valides pour l'ID et le coût", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
