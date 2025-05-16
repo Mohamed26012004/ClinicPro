@@ -118,7 +118,7 @@ public class EquipementFront extends JPanel{
                 viderChamps();
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Le coût doit être un nombre valide",
+                JOptionPane.showMessageDialog(frame, "Veuillez entrer des nombres valides pour l'ID et le coût",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),

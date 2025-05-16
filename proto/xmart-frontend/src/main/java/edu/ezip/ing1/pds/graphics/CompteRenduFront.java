@@ -58,7 +58,7 @@ public class CompteRenduFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID CompteRendu", "Id Planification", "Symptôme", "Description"};
+        String[] columns = {"ID ", "ID Planification", "Symptôme", "Description"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -81,7 +81,7 @@ public class CompteRenduFront extends JPanel {
                 PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
 
                 if (typeSymptome.isEmpty() || descriptionSymptome.isEmpty() || selectedPlanification == null) {
-                    JOptionPane.showMessageDialog(null, "Veuillez svp remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez s'il vous plaît remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

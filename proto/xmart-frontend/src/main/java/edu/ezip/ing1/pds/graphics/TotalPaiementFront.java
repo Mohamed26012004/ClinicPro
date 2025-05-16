@@ -31,7 +31,7 @@ public class TotalPaiementFront extends  JPanel {
         setLayout(new BorderLayout());
 
         JPanel p = new JPanel(new FlowLayout());
-        p.add(Fenetre.createLabel("Les Revenus Qutidiens"));
+        p.add(Fenetre.createLabel("Les Revenus Quotidiens"));
         add(p, BorderLayout.NORTH);
         String[] colonnes = {"Date de Paiement", "Montant Total"};
         model = new DefaultTableModel(colonnes, 0);
