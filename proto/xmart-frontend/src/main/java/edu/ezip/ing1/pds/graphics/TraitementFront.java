@@ -70,7 +70,7 @@ public class TraitementFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Traitement", "Id Planification", "Traitement", "Description", "Début", "Fin"};
+        String[] columns = {"ID", "ID Planification", "Traitement", "Description", "Début", "Fin"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -97,7 +97,7 @@ public class TraitementFront extends JPanel {
 
 
                 if (selectedPlanification == null) {
-                    JOptionPane.showMessageDialog(null, "Veuillez associer le traitement à un idPlanification svp", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez s'il vous plaît associer le traitement à une Planification", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
