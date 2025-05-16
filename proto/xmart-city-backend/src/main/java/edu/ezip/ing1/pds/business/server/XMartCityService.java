@@ -194,7 +194,7 @@ public class XMartCityService {
         UPDATE_PLANIFICATION("UPDATE planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ? WHERE idPlanification = ?"),
         SELECT_ONE_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p WHERE p.idPlanification = ?"),
 
-        SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT idPlanification FROM planification WHERE idExamen = ?"),
+        SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT p.idPlanification FROM planification p WHERE p.idExamen = ?"),
         SELECT_ID_PLANIFICATION_PAR_MEDECIN("SELECT idPlanification FROM planification WHERE numeroADELI = ?"),
 
 
@@ -1830,7 +1830,7 @@ public class XMartCityService {
         final PreparedStatement stmt = connection.prepareStatement(Queries.SELECT_ID_PLANIFICATION_PAR_EXAMEN.query);
         final PlanificationExamen planificationExamen = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
 
-        stmt.setInt(1, planificationExamen.getNumeroADELI());
+        stmt.setInt(1, planificationExamen.getIdExamen());
         final ResultSet res = stmt.executeQuery();
 
         PlanificationExamens planificationExamens = new PlanificationExamens();
