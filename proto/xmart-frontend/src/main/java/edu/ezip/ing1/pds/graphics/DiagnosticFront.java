@@ -61,7 +61,7 @@ public class DiagnosticFront extends JPanel {
 
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID Diagnostic", "ID Planification", "Code CIM10", "Maladie", "Description"};
+        String[] columns = {"ID", "ID Planification", "Code CIM10", "Maladie", "Description"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         add(new JScrollPane(table), BorderLayout.CENTER);
@@ -85,7 +85,7 @@ public class DiagnosticFront extends JPanel {
                 PlanificationExamen selectedPlanification = (PlanificationExamen) planificationExamenComboBox.getSelectedItem();
 
                 if (nomMaladie.isEmpty() || descriptionDiagnostic.isEmpty() || selectedPlanification == null ) {
-                    JOptionPane.showMessageDialog(this, "Veuillez svp les champs nécessaires", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Veuillez s'il vous plaît compléter les champs nécessaires (Maladie, Description, Planification) ", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

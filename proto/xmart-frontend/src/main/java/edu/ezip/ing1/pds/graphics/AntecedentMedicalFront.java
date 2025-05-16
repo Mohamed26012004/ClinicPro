@@ -83,7 +83,7 @@ public class AntecedentMedicalFront extends JPanel {
                 Patient selectedPatient = (Patient) patientComboBox.getSelectedItem();
 
                 if (type.isEmpty() || description.isEmpty() || selectedPatient == null) {
-                    JOptionPane.showMessageDialog(null, "Veuillez svp remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez s'il vous plaît remplir tous les champs", "Erreur", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
@@ -176,5 +176,6 @@ public class AntecedentMedicalFront extends JPanel {
     private void viderChamps() {
         typeChamp.setText("");
         descriptionChamp.setText("");
+        patientComboBox.setSelectedIndex(-1);
     }
 }
