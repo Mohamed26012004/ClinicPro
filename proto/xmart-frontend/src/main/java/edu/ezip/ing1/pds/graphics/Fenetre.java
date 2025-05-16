@@ -77,6 +77,8 @@ public class Fenetre extends JFrame{
         JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
+        pane.add(menu());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonRendezVous());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonMedecin());
@@ -85,20 +87,16 @@ public class Fenetre extends JFrame{
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonSalle());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonPaiement());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
+        pane.add(panelBoutonFacture());
+        pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonEquipement());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
-        pane.add(panelBoutonPaiement());
+        pane.add(panelBoutonMaintenance());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
         pane.add(panelBoutonStatistiques());
         pane.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        pane.add(panelBoutonFacture());
-        pane.add(Box.createRigidArea(new Dimension(0, 15)));
-        pane.add(panelBoutonDiagnostic());
-        pane.add(panelBoutonMaintenance());
-        pane.add(Box.createRigidArea(new Dimension(0, 15)));
-        pane.add(Box.createRigidArea(new Dimension(0, 15)));
-
 //        pane.add(panelBoutonDiagnostic());
 //        pane.add(Box.createRigidArea(new Dimension(0, 15)));
 
@@ -296,6 +294,18 @@ public class Fenetre extends JFrame{
         JTextField t = new JTextField(text);
         t.setFont(new Font("Arial", Font.PLAIN, 14));
         return t;
+    }
+
+    public JPanel menu(){
+        JLabel bouton = new JLabel("Menu");
+        bouton.setFont(new Font("Arial", Font.PLAIN, 20));
+        JPanel panelStatistiques = new JPanel();
+        panelStatistiques.setBackground(new Color(117, 117, 117));
+        bouton.setBackground(new Color(117, 117, 117));
+        panelStatistiques.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        panelStatistiques.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        panelStatistiques.add(bouton);
+        return panelStatistiques;
     }
 
 

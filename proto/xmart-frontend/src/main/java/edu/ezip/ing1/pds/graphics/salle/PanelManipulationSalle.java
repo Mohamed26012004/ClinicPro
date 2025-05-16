@@ -131,9 +131,13 @@ public class PanelManipulationSalle extends JPanel {
                         salle.setNumeroSalle(model.getValueAt(i, 1).toString());
                         salle.setTypeSalle(model.getValueAt(i, 2).toString());
                         salle.setStatut(model.getValueAt(i, 3).toString());
+                        if (salle.getStatut().equals(statutReserve)){
+                            JOptionPane.showMessageDialog(null, "Salle Réservée, impossible de modifier", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        }else {
+                            FrameCreationSalle f = new FrameCreationSalle(salle);
+                            chargerSalles();
+                        }
 
-                        FrameCreationSalle f = new FrameCreationSalle(salle);
-                        chargerSalles();
                     }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);

@@ -10,26 +10,18 @@ public class FrameCommune extends JFrame {
 
     public FrameCommune() {
         super("Menu principal - ClinicPro");
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(new Dimension(300, 200));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JButton boutonSecretaire = new JButton("Secrétaire");
         JButton boutonMedecin = new JButton("Médecin");
 
-        setLayout(new BorderLayout());
 
-        JPanel panelCenter = new JPanel();
-        panelCenter.setLayout(new BoxLayout(panelCenter, BoxLayout.Y_AXIS));
-        panelCenter.setBorder(BorderFactory.createEmptyBorder(100, 300, 100, 300));
-        panelCenter.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-        JLabel jLabel = new JLabel("Sélectionnez votre interface");
-        jLabel.setFont(new Font("Arial", Font.PLAIN, 24));
-        jLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelCenter.add(Box.createRigidArea(new Dimension(0, 20)));
-        panelCenter.add(jLabel);
+        JPanel content = (JPanel) getContentPane();
+        content.setLayout(new GridLayout(1, 2));
+        content.add(boutonMedecin, BorderLayout.NORTH);
+        content.add(boutonSecretaire, BorderLayout.SOUTH);
 
 
         boutonSecretaire.addMouseListener(new MouseAdapter() {
@@ -38,6 +30,7 @@ public class FrameCommune extends JFrame {
                 try {
                     Fenetre f = new Fenetre();
                     f.setVisible(true);
+                    dispose();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 } catch (InterruptedException ex) {
@@ -45,10 +38,7 @@ public class FrameCommune extends JFrame {
                 }
             }
         });
-        boutonSecretaire.setMaximumSize(new Dimension(400, 50));
-        boutonSecretaire.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelCenter.add(Box.createRigidArea(new Dimension(0, 20)));
-        panelCenter.add(boutonSecretaire);
+
 
 
         boutonMedecin.addMouseListener(new MouseAdapter() {
@@ -57,6 +47,7 @@ public class FrameCommune extends JFrame {
                 try {
                     FenetreMedecin fm = new FenetreMedecin();
                     fm.setVisible(true);
+                    dispose();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 } catch (InterruptedException ex) {
@@ -64,13 +55,7 @@ public class FrameCommune extends JFrame {
                 }
             }
         });
-        boutonMedecin.setMaximumSize(new Dimension(400, 50));
-        boutonMedecin.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelCenter.add(Box.createRigidArea(new Dimension(0, 20)));
-        panelCenter.add(boutonMedecin);
 
-
-        add(panelCenter, BorderLayout.CENTER);
 
         setVisible(true);
     }

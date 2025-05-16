@@ -27,10 +27,6 @@ public class PanelManipulationExamen extends JPanel {
 
     private static DefaultTableModel model;
     private JTable table;
-    private static JButton ajouter;
-    private static JButton modifier;
-    private static JButton supprimer;
-    private static JScrollPane scrollPane;
     private static JPanel panneau = new JPanel(new BorderLayout());
 
 

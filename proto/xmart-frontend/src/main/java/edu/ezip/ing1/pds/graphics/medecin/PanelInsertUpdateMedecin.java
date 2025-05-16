@@ -74,7 +74,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         this.medecinToUpdate = medecin;
         //Vider la liste car c'est une variable statique, afin qu'elle ne contienne pas les éléments d'une précédentes instanciation
         listHoraireAajouter.clear();
-        String[] columns = {"Jour", "Heure de début", "Heure de Fin"};
+        String[] columns = {"Id", "Jour", "Heure de début", "Heure de Fin"};
         modelHoraireExistant = new DefaultTableModel(columns, 0){
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -95,6 +95,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         tableHoraireExistant.setFont(new Font("Arial", Font.PLAIN, 15));
         tableHoraireAajouter.setRowHeight(30);
         tableHoraireAajouter.setFont(new Font("Arial", Font.PLAIN, 15));
+        tableHoraireExistant.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         horaireMedecin = horaireService.selectHoraireMedecin(medecin);
 
@@ -204,10 +205,10 @@ public class PanelInsertUpdateMedecin extends JFrame{
                     try {
                         medecinService.insertMedecin(medecin);
                         for(Horaire horaire  : listHoraireAajouter){
-                            Horaire h = horaireService.selectOneHoraire(horaire);
-                            Consulte c = new Consulte(medecin.getNumeroADELI(), h.getId());
+                            Consulte c = new Consulte(medecin.getNumeroADELI(), horaire.getId());
                             medecinService.insertConsulte(c);
                             PanelInsertUpdateMedecin.this.dispose();
+                            PanelAfficheMedecin.chargerMedecins();
                         }
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
@@ -241,7 +242,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         JPanel ajouter = new JPanel();
-        ajouter.add(Fenetre.createLabel("Sélectionner Horaire"));
+        ajouter.add(Fenetre.createLabel("Sélectionner"));
         JPanel supprimer = new JPanel();
         supprimer.add(Fenetre.createLabel("Supprimer"));
         JPanel creer = new JPanel();
@@ -287,6 +288,14 @@ public class PanelInsertUpdateMedecin extends JFrame{
             }
         });
 
+        JButton afficher = new JButton("Afficher");
+        afficher.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FrameDeSelectionHoraire f = new FrameDeSelectionHoraire(listHoraireAajouter);
+            }
+        });
+
         ajouter.setPreferredSize(ajouter.getMinimumSize());
         creer.setPreferredSize(creer.getMinimumSize());
         supprimer.setPreferredSize(supprimer.getMinimumSize());
@@ -296,6 +305,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(supprimer);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(afficher);
         return panel;
     }
 
@@ -387,7 +397,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
             list.sort(Comparator.comparing(Horaire :: getJour));
             for (Horaire h : list){
                 modelHoraireExistant.addRow(new Object[]{
-                        h.getJour(), h.getHeureDebut(), h.getHeureFin()
+                        h.getId(), h.getJour(), h.getHeureDebut(), h.getHeureFin()
                 });
             }
         }
@@ -409,12 +419,13 @@ public class PanelInsertUpdateMedecin extends JFrame{
         ajouter.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int i = tableHoraireExistant.getSelectedRow();
-                if(i >= 0){
+                int [] lignes = new int[]{tableHoraireExistant.getSelectedRow()};
+                for (int i : lignes){
                     Horaire h = new Horaire();
-                    h.setJour(modelHoraireExistant.getValueAt(i, 0).toString());
-                    h.setHeureDebut(LocalTime.parse(modelHoraireExistant.getValueAt(i, 1).toString(), formatter));
-                    h.setHeureFin(LocalTime.parse(modelHoraireExistant.getValueAt(i, 2).toString(), formatter));
+                    h.setId(Integer.parseInt(modelHoraireExistant.getValueAt(i, 0).toString()));
+                    h.setJour(modelHoraireExistant.getValueAt(i, 1).toString());
+                    h.setHeureDebut(LocalTime.parse(modelHoraireExistant.getValueAt(i, 2).toString(), formatter));
+                    h.setHeureFin(LocalTime.parse(modelHoraireExistant.getValueAt(i, 3).toString(), formatter));
                     if(!getListHoraireAajouter().contains(h)){
                         ArrayList <Horaire> list = getListHoraireAajouter();
                         list.add(h);
@@ -442,17 +453,17 @@ public class PanelInsertUpdateMedecin extends JFrame{
             Horaires horaires = horaireService.selectHoraireMedecin(medecin);
             ArrayList<Horaire> listHoraire = new ArrayList<>(horaires.getHoraires());
             setListHoraireAajouter(listHoraire);
-            listHoraire.sort(Comparator.comparing(Horaire :: getJour));
+            listHoraire.sort(Comparator.comparing(Horaire :: getJour).thenComparing(Horaire::getHeureDebut));
             if (!listHoraire.isEmpty()){
                 for (Horaire h : listHoraire){
                     modelHoraireAajouter.addRow(new Object[]{
-                            h.getJour(), h.getHeureDebut(), h.getHeureFin()
+                            h.getId(), h.getJour(), h.getHeureDebut(), h.getHeureFin()
                     });
                 }
             }
         }else {
             ArrayList<Horaire> list = new ArrayList<>(getListHoraireAajouter());
-            list.sort(Comparator.comparing(Horaire :: getJour));
+            list.sort(Comparator.comparing(Horaire :: getJour).thenComparing(Horaire::getHeureDebut));
             if (!list.isEmpty()){
                 for (Horaire h : list){
                     modelHoraireAajouter.addRow(new Object[]{
@@ -467,6 +478,7 @@ public class PanelInsertUpdateMedecin extends JFrame{
         pane.add(scrollPane, BorderLayout.CENTER);
         return pane;
     }
+
 
     public static ArrayList<Horaire> getListHoraireAajouter() {
         return listHoraireAajouter;
