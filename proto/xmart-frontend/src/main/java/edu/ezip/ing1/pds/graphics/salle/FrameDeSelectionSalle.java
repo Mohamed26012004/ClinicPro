@@ -26,7 +26,7 @@ public class FrameDeSelectionSalle extends JFrame {
     private static DefaultTableModel modelSalle;
     private static JTable tableSalle;
     private static JPanel contentPane;
-    private static final String libre = "Disponible";
+    private static final String libre = "Libre";
 
     public FrameDeSelectionSalle(){
         super("Sélectionner Salle");
@@ -59,13 +59,14 @@ public class FrameDeSelectionSalle extends JFrame {
 
         JPanel pane = new JPanel(new FlowLayout());
         JButton selectionner = new JButton("Sélectionner");
+        selectionner.setFont(new Font("Arial", Font.BOLD, 16));
         selectionner.setBackground(new Color(115, 91, 255));
         selectionner.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 int i = tableSalle.getSelectedRow();
-                if (i > 0){
+                if (i >= 0){
                     FrameInsertUpdatePlanification.modelSalle.setRowCount(0);
                     FrameInsertUpdatePlanification.modelSalle.addRow(new Object[]{
                             modelSalle.getValueAt(i, 0),

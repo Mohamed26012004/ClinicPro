@@ -16,7 +16,6 @@ public class PanelManipulationMedecin extends JPanel {
     public static JPanel cardPanel = new JPanel(cardLayout);
     private JLabel boutonMedecin;
     private JLabel boutonPlanning;
-    private JLabel boutonDisponibilite;
     private static Medecin medecinToUpdate;
 
 
@@ -26,40 +25,6 @@ public class PanelManipulationMedecin extends JPanel {
 
         panelNord.add(panelBoutonMedecin());
         panelNord.add(panelBoutonPlanning());
-        panelNord.add(panelBoutonDisponibilite());
-
-//        Component tabPanel [] = panelNord.getComponents();
-//        for (int i = 0; i<tabPanel.length; i++){
-//            int finalI = i;
-//            tabPanel[i].addMouseListener(new MouseAdapter() {
-//                @Override
-//                public void mouseClicked(MouseEvent e) {
-//                    JPanel p = (JPanel) e.getSource();
-//                    if(tabPanel[finalI] == p){
-//                        p.setBackground(new Color(123, 123, 213));
-//                    }else{
-//                        p.setBackground(null);
-//                    }
-//                }
-//
-//                @Override
-//                public void mouseExited(MouseEvent e) {
-//                    JPanel p = (JPanel) e.getSource();
-//                    if(tabPanel[finalI] != p){
-//                        p.setBackground(null);
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void mouseEntered(MouseEvent e) {
-//                    JPanel p = (JPanel) e.getSource();
-//                    if(tabPanel[finalI] == p){
-//                        p.setBackground(new Color(149, 149, 207));
-//                    }
-//                }
-//            });
-//        }
 
         cardPanel.add(new PanelAfficheMedecin(), "AfficheMedecin");
         cardPanel.add(new PanelPlanningMedecin(), "PlanningMedecin");
@@ -97,14 +62,6 @@ public class PanelManipulationMedecin extends JPanel {
                 cardLayout.show(cardPanel, "PlanningMedecin");
             }
         });
-        return panel;
-    }
-    public JPanel panelBoutonDisponibilite(){
-        JPanel panel = new JPanel();
-        panel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        boutonDisponibilite = Fenetre.createLabel("Disponibilité");
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-        panel.add(boutonDisponibilite);
         return panel;
     }
 

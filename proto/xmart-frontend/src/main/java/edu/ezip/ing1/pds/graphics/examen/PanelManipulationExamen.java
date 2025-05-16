@@ -25,17 +25,8 @@ public class PanelManipulationExamen extends JPanel {
     final PlanificationService planificationService = new PlanificationService(networkConfig);
     private final DateTimeFormatter formattage = DateTimeFormatter.ofPattern("HH:mm");
 
-    private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
-    private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
-    private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
-
-
     private static DefaultTableModel model;
     private JTable table;
-    private static JButton ajouter;
-    private static JButton modifier;
-    private static JButton supprimer;
-    private static JScrollPane scrollPane;
     private static JPanel panneau = new JPanel(new BorderLayout());
 
 
@@ -88,20 +79,16 @@ public class PanelManipulationExamen extends JPanel {
     public JToolBar toolBar(){
         JToolBar bar = new JToolBar();
 
-        ImageIcon addImage = new ImageIcon(addFileNameButton);
-        Image i = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        addImage = new ImageIcon(i);
-        JButton addButton = new JButton("Nouvel examen", addImage);
+        JButton addButton = new JButton("Nouvel Examen");
+        addButton.setFont(new Font("Arial", Font.BOLD, 16));
+        addButton.setBackground(new Color(151, 255, 110));
+        JButton update = new JButton("Modifier");
+        update.setFont(new Font("Arial", Font.PLAIN, 16));
+        update.setBackground(new Color(127, 91, 255));
+        JButton delete = new JButton("Supprimer");
+        delete.setFont(new Font("Arial", Font.PLAIN, 16));
+        delete.setBackground(new Color(255, 65, 65));
 
-        ImageIcon updateImage = new ImageIcon(updateFileNameButton);
-        Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        updateImage = new ImageIcon(u);
-        JButton update = new JButton(updateImage);
-
-        ImageIcon deleteImage = new ImageIcon(deleteFileNameButton);
-        Image d = deleteImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        deleteImage = new ImageIcon(d);
-        JButton delete = new JButton(deleteImage);
 
 
         delete.addActionListener(new ActionListener() {

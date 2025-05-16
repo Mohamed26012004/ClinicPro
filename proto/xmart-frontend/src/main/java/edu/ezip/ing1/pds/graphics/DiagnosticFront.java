@@ -107,11 +107,11 @@ public class DiagnosticFront extends JPanel {
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
+                int idPlanification = Integer.parseInt(model.getValueAt(i, 1).toString());
                 codeCIM10Champ.setText(model.getValueAt(i, 2).toString());
                 nomMaladieChamp.setText(model.getValueAt(i, 3).toString());
                 descriptionDiagnosticChamp.setText(model.getValueAt(i, 4).toString());
 
-                int idPlanification = Integer.parseInt(model.getValueAt(i, 1).toString());
                 for (int j = 0; j < planificationExamenComboBox.getItemCount(); j++) {
                     if (planificationExamenComboBox.getItemAt(j).getIdPlanification() == idPlanification) {
                         planificationExamenComboBox.setSelectedIndex(j);
@@ -177,7 +177,8 @@ public class DiagnosticFront extends JPanel {
                         d.getIdPlanification(),
                         d.getCodeCIM10(),
                         d.getNomMaladie(),
-                        d.getDescription_Diagnostic()
+                        d.getDescription_Diagnostic(),
+
                 });
             }
         }

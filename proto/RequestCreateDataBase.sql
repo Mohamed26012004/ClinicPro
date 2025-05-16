@@ -89,7 +89,7 @@ CREATE TABLE disponibilite(
    statut VARCHAR(50) NOT NULL,
    numeroADELI INT NOT NULL,
    PRIMARY KEY(idDisponiblilite),
-   FOREIGN KEY(numeroADELI) REFERENCES Medecin(numeroADELI)
+   FOREIGN KEY(numeroADELI) REFERENCES medecin(numeroADELI)
 );
 
 

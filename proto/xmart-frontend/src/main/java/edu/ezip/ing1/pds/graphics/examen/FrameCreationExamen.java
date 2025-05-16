@@ -88,7 +88,9 @@ public class FrameCreationExamen extends JFrame {
         annuler = new JButton("Annuler");
 
         enregistrer.setBackground(new Color(72, 255, 0));
+        enregistrer.setFont(new Font("Arial", Font.PLAIN, 16));
         annuler.setBackground(new Color(255, 65, 65));
+        annuler.setFont(new Font("Arial", Font.PLAIN, 16));
 
         panel.add(enregistrer);
         panel.add(annuler);

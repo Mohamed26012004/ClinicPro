@@ -57,13 +57,14 @@ public class FrameDeSelectionExamen extends JFrame {
 
         JPanel pane = new JPanel(new FlowLayout());
         JButton selectionner = new JButton("Sélectionner");
+        selectionner.setFont(new Font("Arial", Font.BOLD, 16));
         selectionner.setBackground(new Color(115, 91, 255));
         selectionner.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 int i = tableExamen.getSelectedRow();
-                if (i > 0){
+                if (i >= 0){
                     FrameInsertUpdatePlanification.modelExamen.setRowCount(0);
                     FrameInsertUpdatePlanification.modelExamen.addRow(new Object[]{
                             modelExamen.getValueAt(i, 0),

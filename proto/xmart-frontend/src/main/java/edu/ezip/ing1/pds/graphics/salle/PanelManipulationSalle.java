@@ -21,9 +21,6 @@ public class PanelManipulationSalle extends JPanel {
     final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
     final static SalleService salleService = new SalleService(networkConfig);
 
-    private final String deleteFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\delete_button.png";
-    private final String addFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\add_button.png";
-    private final String updateFileNameButton = "C:\\Users\\Maxime\\Documents\\apprendmaven\\ClinicPro\\proto\\xmart-frontend\\src\\main\\resources\\update_button.png";
     private final String statutReserve = "Réservé";
     private final String msgImposSupprime = "Salle Réservée !!!!!\nImpossiblle de la supprimer\nSupprimer le rendez-vous ou la planification qui a réservé la salle.";
 
@@ -82,21 +79,15 @@ public class PanelManipulationSalle extends JPanel {
     public JToolBar toolBar(){
         JToolBar bar = new JToolBar();
 
-        ImageIcon addImage = new ImageIcon(addFileNameButton);
-        Image i = addImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        addImage = new ImageIcon(i);
-        JButton addButton = new JButton("Nouvelle Salle", addImage);
-
-        ImageIcon updateImage = new ImageIcon(updateFileNameButton);
-        Image u = updateImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        updateImage = new ImageIcon(u);
-        JButton update = new JButton(updateImage);
-
-        ImageIcon deleteImage = new ImageIcon(deleteFileNameButton);
-        Image d = deleteImage.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        deleteImage = new ImageIcon(d);
-        JButton delete = new JButton(deleteImage);
-
+        JButton addButton = new JButton("Nouvelle Salle");
+        addButton.setFont(new Font("Arial", Font.BOLD, 16));
+        addButton.setBackground(new Color(151, 255, 110));
+        JButton update = new JButton("Modifier");
+        update.setFont(new Font("Arial", Font.PLAIN, 16));
+        update.setBackground(new Color(127, 91, 255));
+        JButton delete = new JButton("Supprimer");
+        delete.setFont(new Font("Arial", Font.PLAIN, 16));
+        delete.setBackground(new Color(255, 65, 65));
 
         delete.addActionListener(new ActionListener() {
             @Override
@@ -140,9 +131,13 @@ public class PanelManipulationSalle extends JPanel {
                         salle.setNumeroSalle(model.getValueAt(i, 1).toString());
                         salle.setTypeSalle(model.getValueAt(i, 2).toString());
                         salle.setStatut(model.getValueAt(i, 3).toString());
+                        if (salle.getStatut().equals(statutReserve)){
+                            JOptionPane.showMessageDialog(null, "Salle Réservée, impossible de modifier", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        }else {
+                            FrameCreationSalle f = new FrameCreationSalle(salle);
+                            chargerSalles();
+                        }
 
-                        FrameCreationSalle f = new FrameCreationSalle(salle);
-                        chargerSalles();
                     }
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);

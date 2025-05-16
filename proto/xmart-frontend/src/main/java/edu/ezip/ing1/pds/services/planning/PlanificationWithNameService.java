@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
 import edu.ezip.ing1.pds.business.dto.PlanificationExamen;
-import edu.ezip.ing1.pds.business.dto.PlanificationExamens;
 import edu.ezip.ing1.pds.business.dto.PlanificationWithNames;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.planning.SelectPlanificationClientRequest;
 import edu.ezip.ing1.pds.requests.planning.SelectPlanificationWithNameClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,20 +32,22 @@ public class PlanificationWithNameService {
         this.networkConfig = networkConfig;
     }
 
-    public PlanificationWithNames selectPlanificationWithNames() throws InterruptedException, IOException {
+    public PlanificationWithNames selectPlanificationWithNames(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
         int birthdate = 0;
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
         final ObjectMapper objectMapper = new ObjectMapper();
+        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(planificationExamen);
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestOrder(selectRequestOrder);
+        request.setRequestContent(jsonifiedGuy);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
         final SelectPlanificationWithNameClientRequest clientRequest = new SelectPlanificationWithNameClientRequest(
                 networkConfig,
-                birthdate++, request, null, requestBytes);
+                birthdate++, request, planificationExamen, requestBytes);
         clientRequests.push(clientRequest);
 
         if (!clientRequests.isEmpty()) {
