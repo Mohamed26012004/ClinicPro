@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.Comparator;
 
 public class FacturationFront extends JPanel {
@@ -42,38 +41,20 @@ public class FacturationFront extends JPanel {
         final PatientService patientService = new PatientService(networkConfig);
         this.factureService = new FactureService(networkConfig);
 
-        
         setSize(700, 400);
-        
+
         setLayout(new BorderLayout());
 
         JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
 
         examensListe = new ArrayList<>();
-        Examens examens = examenService.selectExamens();
-        String[] nomsExamens = new String[0];
-        if (examens != null && examens.getExamens() != null) {
-        examensListe = new ArrayList<>(examens.getExamens());
-        nomsExamens = new String[examensListe.size()];
-        for (int i = 0; i < nomsExamens.length; i++) {
-        nomsExamens[i] = examensListe.get(i).getNom();
-    }
-    }
-        examenCombobox = new JComboBox<>(nomsExamens);
-
         patientsListe = new ArrayList<>();
-        Patients patients = patientService.selectPatients();
-        String[] nomsPatients = new String[0];
-        if (patients != null && patients.getPatients() != null) {
-        patientsListe = new ArrayList<>(patients.getPatients());
-        nomsPatients = new String[patientsListe.size()];
-        for (int i = 0; i < nomsPatients.length; i++) {
-        nomsPatients[i] = patientsListe.get(i).getNom();
-    }
-    }
-    patientCombobox = new JComboBox<>(nomsPatients);
 
+        examenCombobox = new JComboBox<>();
+        patientCombobox = new JComboBox<>();
 
+        chargerNomsExamens();
+        chargerNomsPatients();
 
         montantChamp = new JTextField();
         dateFactureChamp = new JTextField();
@@ -159,8 +140,9 @@ public class FacturationFront extends JPanel {
             if (i >= 0) {
                 montantChamp.setText(model.getValueAt(i, 2).toString());
                 dateFactureChamp.setText(model.getValueAt(i, 1).toString());
-                regleCheckBox.setSelected((Boolean) model.getValueAt(i, 3));
-                regleCheckBox.setEnabled(true); // revoir si s'active bien lors de selection de ligne
+                String regleText = model.getValueAt(i, 3).toString();
+                regleCheckBox.setSelected("Oui".equalsIgnoreCase(regleText));
+                regleCheckBox.setEnabled(true);
 
                 String nomExamen = model.getValueAt(i, 4).toString();
                 for (int j = 0; j < examenCombobox.getItemCount(); j++) {
@@ -220,42 +202,84 @@ public class FacturationFront extends JPanel {
         });
 
         chargerFactures();
+
+        Timer timer = new Timer(40000, e -> {
+            try {
+                chargerNomsExamens();
+                chargerNomsPatients();
+            } catch (Exception ex) {
+                System.err.println("Erreur dans le timer : " + ex.getMessage());
+            }
+        });
+        timer.start();
     }
 
     private void chargerFactures() throws IOException, InterruptedException {
         model.setRowCount(0);
 
         Factures factures = factureService.selectFactures();
-        if (factures != null && factures.getFactures()!= null){
-            ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
-            list.sort(Comparator.comparing(Facture::getDateFacture));
-            for (Facture f : list) {
-                String nomExamen = "";
-                for (Examen e : examensListe) {
-                    if (e.getId() == f.getIdExamen()) {
-                        nomExamen = e.getNom();
-                        break;
-                    }
-                }
-                String nomPatient = "";
-                for (Patient p : patientsListe) {
-                    if (p.getIdPatient() == f.getIdPatient()) {
-                        nomPatient = p.getNom();
-                        break;
-                    }
-                }
+        ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
+        list.sort(Comparator.comparing(Facture::getIdFacture).thenComparing(Facture::getDateFacture));
 
-                model.addRow(new Object[]{
-                        f.getIdFacture(),
-                        f.getDateFacture(),
-                        f.getMontantFacture(),
-                        f.getRegle(),
-                        nomExamen,
-                        nomPatient
-                });
+        for (Facture f : list) {
+            String nomExamen = "";
+            for (Examen e : examensListe) {
+                if (e.getId() == f.getIdExamen()) {
+                    nomExamen = e.getNom();
+                    break;
+                }
             }
-        }
+            String nomPatient = "";
+            for (Patient p : patientsListe) {
+                if (p.getIdPatient() == f.getIdPatient()) {
+                    nomPatient = p.getNom();
+                    break;
+                }
+            }
 
+            model.addRow(new Object[]{
+                    f.getIdFacture(),
+                    f.getDateFacture(),
+                    f.getMontantFacture(),
+                    f.getRegle() ? "Oui" : "Non",
+                    nomExamen,
+                    nomPatient
+            });
+        }
+    }
+
+    private void chargerNomsExamens() {
+        try {
+            final ExamenService examenService = new ExamenService(ConfigLoader.loadConfig(NetworkConfig.class, "network.yaml"));
+            Examens examens = examenService.selectExamens();
+            if (examens != null && examens.getExamens() != null) {
+                examensListe = new ArrayList<>(examens.getExamens());
+                String[] nomsExamens = new String[examensListe.size()];
+                for (int i = 0; i < nomsExamens.length; i++) {
+                    nomsExamens[i] = examensListe.get(i).getNom();
+                }
+                examenCombobox.setModel(new DefaultComboBoxModel<>(nomsExamens));
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Erreur lors du chargement des examens: " + e.getMessage());
+        }
+    }
+
+    private void chargerNomsPatients() {
+        try {
+            final PatientService patientService = new PatientService(ConfigLoader.loadConfig(NetworkConfig.class, "network.yaml"));
+            Patients patients = patientService.selectPatients();
+            if (patients != null && patients.getPatients() != null) {
+                patientsListe = new ArrayList<>(patients.getPatients());
+                String[] nomsPatients = new String[patientsListe.size()];
+                for (int i = 0; i < nomsPatients.length; i++) {
+                    nomsPatients[i] = patientsListe.get(i).getNom();
+                }
+                patientCombobox.setModel(new DefaultComboBoxModel<>(nomsPatients));
+            }
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Erreur lors du chargement des patients: " + e.getMessage());
+        }
     }
 
     private void viderChamps() {
@@ -264,6 +288,4 @@ public class FacturationFront extends JPanel {
         regleCheckBox.setSelected(false);
         regleCheckBox.setEnabled(false);
     }
-
-    
 }

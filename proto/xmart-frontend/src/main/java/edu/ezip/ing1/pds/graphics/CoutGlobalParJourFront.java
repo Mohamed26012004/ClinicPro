@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
@@ -18,29 +19,40 @@ import edu.ezip.ing1.pds.business.dto.TotalCout;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenances;
 import edu.ezip.ing1.pds.business.dto.TotalMaintenance;
 
-public class CoutGlobalParJourFront {
+public class CoutGlobalParJourFront extends JPanel {
     private DefaultTableModel model;
     private JTable table;
     private final EquipementService equipementService;
     private final MaintenanceService maintenanceService;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private JTextField dateField;
+    private int ligneSimulation = -1;
 
     public CoutGlobalParJourFront() {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
         this.equipementService = new EquipementService(networkConfig);
         this.maintenanceService = new MaintenanceService(networkConfig);
+        setLayout(new BorderLayout());
 
-        JFrame frame = new JFrame("Coût Global (Équipements + Maintenances) par Jour");
-        frame.setSize(700, 450);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
+        JPanel j = new JPanel(new FlowLayout());
+        j.add(Fenetre.createLabel("Les Coûts Globaux Quotidiens"));
+        add(j, BorderLayout.NORTH);
 
         String[] columns = {"Date", "Coût Équipements", "Coût Maintenances", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
-        table = new JTable(model);
-        frame.add(new JScrollPane(table), BorderLayout.CENTER);
+        table = new JTable(model) {
+            public Component prepareRenderer(javax.swing.table.TableCellRenderer renderer, int row, int column) {
+                Component c = super.prepareRenderer(renderer, row, column);
+                if (row == ligneSimulation) {
+                    c.setBackground(Color.CYAN);
+                } else {
+                    c.setBackground(Color.WHITE);
+                }
+                return c;
+            }
+        };
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         dateField = new JTextField(10);
 
@@ -50,9 +62,9 @@ public class CoutGlobalParJourFront {
                 LocalDate selectedDate = LocalDate.parse(dateField.getText(), formatter);
                 chargerCoutsPourDate(selectedDate);
             } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(frame, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Format de date invalide. Utilisez yyyy-MM-dd.", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du filtrage: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -62,7 +74,7 @@ public class CoutGlobalParJourFront {
                 chargerCoutsGlobaux();
                 dateField.setText("");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors du rechargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Erreur lors du rechargement: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -72,19 +84,19 @@ public class CoutGlobalParJourFront {
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReinitialiser);
 
-        frame.add(panelSud, BorderLayout.SOUTH);
+        add(panelSud, BorderLayout.SOUTH);
 
         try {
             chargerCoutsGlobaux();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(frame, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Erreur initiale: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
 
-        frame.setVisible(true);
     }
 
     private void chargerCoutsGlobaux() throws IOException, InterruptedException {
         model.setRowCount(0);
+        ligneSimulation = -1;
 
         Map<LocalDate, Double> coutEquipementParJour = new HashMap<>();
         Map<LocalDate, Double> coutMaintenanceParJour = new HashMap<>();
@@ -108,10 +120,18 @@ public class CoutGlobalParJourFront {
             }
         }
 
+        double sommeEq = 0.0;
+        double sommeMaint = 0.0;
+        int count = 0;
+
         for (LocalDate date : toutesLesDates) {
             double coutEq = coutEquipementParJour.getOrDefault(date, 0.0);
             double coutMaint = coutMaintenanceParJour.getOrDefault(date, 0.0);
             double total = coutEq + coutMaint;
+
+            sommeEq += coutEq;
+            sommeMaint += coutMaint;
+            count++;
 
             model.addRow(new Object[]{
                     date.format(formatter),
@@ -120,10 +140,28 @@ public class CoutGlobalParJourFront {
                     total
             });
         }
+
+        if (count > 0) {
+            double moyenneEq = sommeEq / count;
+            double moyenneMaint = sommeMaint / count;
+            double total = moyenneEq + moyenneMaint;
+
+            LocalDate maxDate = ((TreeSet<LocalDate>) toutesLesDates).last();
+            LocalDate dateSimulation = maxDate.plusDays(1);
+
+            ligneSimulation = model.getRowCount();
+            model.addRow(new Object[]{
+                    dateSimulation.format(formatter),
+                    moyenneEq,
+                    moyenneMaint,
+                    total
+            });
+        }
     }
 
     private void chargerCoutsPourDate(LocalDate date) throws IOException, InterruptedException {
         model.setRowCount(0);
+        ligneSimulation = -1;
 
         double coutEq = 0.0;
         double coutMaint = 0.0;
