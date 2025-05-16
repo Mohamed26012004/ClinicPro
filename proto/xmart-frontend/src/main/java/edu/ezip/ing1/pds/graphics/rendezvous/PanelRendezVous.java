@@ -7,10 +7,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
 import edu.ezip.ing1.pds.graphics.medecin.FrameInsertUpdatePlanification;
-import edu.ezip.ing1.pds.services.planning.CreneauService;
-import edu.ezip.ing1.pds.services.planning.MedecinService;
-import edu.ezip.ing1.pds.services.planning.PlanificationService;
-import edu.ezip.ing1.pds.services.planning.PlanificationWithNameService;
+import edu.ezip.ing1.pds.services.planning.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +22,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.concurrent.*;
 
 public class PanelRendezVous extends JPanel {
 
@@ -33,10 +31,10 @@ public class PanelRendezVous extends JPanel {
 
     final static String networkConfigFile = "network.yaml";
     final static NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-    final static MedecinService medecinService = new MedecinService(networkConfig);
     final static PlanificationWithNameService planificationWithNameService = new PlanificationWithNameService(networkConfig);
     final static CreneauService creneauService = new CreneauService(networkConfig);
     final static PlanificationService planificationService = new PlanificationService(networkConfig);
+
 
     public static PlanificationExamen planificationDuMedecin = new PlanificationExamen();
     public static DefaultTableModel modelPlanification;
@@ -286,7 +284,30 @@ public class PanelRendezVous extends JPanel {
         update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                int i = tablePlanification.getSelectedRow();
+                if (i >= 0){
+                    PlanificationExamen plan = new PlanificationExamen();
+                    plan.setIdPlanification(Integer.parseInt(modelPlanification.getValueAt(i, 0).toString()));
+                    plan.setIdPlanification(Integer.parseInt(modelPlanification.getValueAt(i, 0).toString()));
+                    plan.setHeureDebut(LocalTime.parse(modelPlanification.getValueAt(i, 1).toString(), formatter));
+                    plan.setHeureFin(LocalTime.parse(modelPlanification.getValueAt(i, 2).toString(), formatter));
+                    plan.setNumeroADELI(planificationDuMedecin.getNumeroADELI());
+                    plan.setDatePlanification(planificationDuMedecin.getDatePlanification());
+                    try {
+                        PlanificationExamen p = planificationService.selectOnePlanifications(plan);
+                        FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(p, 3);
+                        chargerPlanification(planificationDuMedecin);
+                        Salle s = new Salle();
+                        s.setId(plan.getIdSalle());
+                        final SalleService salleService = new SalleService(networkConfig);
+                        salleService.updateSalle(s);
+                        planificationService.deleteDisponibilite(plan);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
 
@@ -333,6 +354,8 @@ public class PanelRendezVous extends JPanel {
         bar.add(addButton);
         return bar;
     }
+
+
 
 
 

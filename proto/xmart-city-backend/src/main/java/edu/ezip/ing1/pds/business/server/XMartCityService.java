@@ -63,16 +63,15 @@ public class XMartCityService {
         SELECT_ALL_SALLES("SELECT s.id, s.numeroSalle, s.typeSalle, s.statut FROM salle s ORDER BY s.typeSalle"),
         INSERT_SALLE("INSERT into salle (numeroSalle, typeSalle, statut) values (?, ?, ?)"),
         UPDATE_SALLE("UPDATE salle SET numeroSalle = ?, typeSalle = ?, statut = ? WHERE id = ?"),
+        UPDATE_SALLE_P("UPDATE salle SET statut = 'Libre' WHERE id = ?"),
         DELETE_SALLE("DELETE FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
         UPDATE_SALLE_RESERVATION("UPDATE salle SET statut = 'Réservé' WHERE id = ?"),
         UPDATE_SALLE_DELETE_RESERVATION("UPDATE salle SET statut = 'Libre' WHERE id = ? "),
-        ID_SALLE("SELECT id FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
 
         SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p ORDER BY p.nom, p.prenom "),
         INSERT_PATIENT("INSERT into patient (nom, prenom, telephone, adresse) values (?, ?, ?, ?)"),
         UPDATE_PATIENT("UPDATE patient SET nom = ?, prenom = ?, telephone = ?, adresse = ? WHERE idPatient = ?"),
         DELETE_PATIENT("DELETE FROM patient WHERE nom = ? AND prenom = ? AND telephone = ? AND adresse = ?"),
-
 
         INSERT_CONSULTE("INSERT into consulte (numeroADELI, id) values (?, ?)"),
         DELETE_CONSULTE("DELETE FROM consulte WHERE numeroADELI = ?"),
@@ -190,7 +189,7 @@ public class XMartCityService {
         SELECT_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p"),
         INSERT_PLANIFICATION("INSERT INTO planification(numeroADELI, idPatient, idExamen, idSalle, datePlanification, heureDebut, heureFin) values (?, ?, ?, ?, ?, ?, ?) "),
         DELETE_PLANIFICATION("DELETE FROM planification WHERE numeroADELI = ? AND idPatient = ? AND idExamen = ? AND idSalle = ? AND datePlanification = ? AND heureDebut = ? AND heureFin = ?"),
-        UPDATE_PLANIFICATION("UPDATE FROM planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ?"),
+        UPDATE_PLANIFICATION("UPDATE planification SET numeroADELI = ?, idPatient = ?, idExamen = ?, idSalle = ?, datePlanification = ?, heureDebut = ?, heureFin = ? WHERE idPlanification = ?"),
         SELECT_ONE_PLANIFICATION("SELECT p.idPlanification, p.numeroADELI, p.idPatient,  p.idExamen, p.idSalle, p.datePlanification, p.heureDebut, p.heureFin FROM planification p WHERE p.idPlanification = ?"),
 
         SELECT_ID_PLANIFICATION_PAR_EXAMEN("SELECT idPlanification FROM planification WHERE idExamen = ?"),
@@ -462,8 +461,14 @@ public class XMartCityService {
             case SELECT_PLANIFICATION:
                 response = SelectAllPlanifications(request, connection);
                 break;
+            case UPDATE_PLANIFICATION:
+                response = UpdatePlanification(request, connection);
+                break;
             case SELECT_ONE_PLANIFICATION:
                 response = SelectOnePlanifications(request, connection);
+                break;
+            case DELETE_DISPONIBILITE:
+                response = DeleteDisponibilite(request, connection);
                 break;
 
             case SELECT_ID_PLANIFICATION_PAR_EXAMEN:
@@ -938,12 +943,17 @@ public class XMartCityService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Salle salle = objectMapper.readValue(request.getRequestBody(), Salle.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_SALLE.query);
+        PreparedStatement stmt = null;
 
-        stmt.setString(1, salle.getNumeroSalle());
-        stmt.setString(2, salle.getTypeSalle());
-        stmt.setString(3, salle.getStatut());
-        stmt.setInt(4, salle.getId());
+        if (salle.getStatut() == null || salle.getNumeroSalle() == null || salle.getTypeSalle() == null){
+            stmt = connection.prepareStatement(Queries.UPDATE_SALLE_P.query);
+        }else {
+            stmt = connection.prepareStatement(Queries.UPDATE_SALLE.query);
+            stmt.setString(1, salle.getNumeroSalle());
+            stmt.setString(2, salle.getTypeSalle());
+            stmt.setString(3, salle.getStatut());
+            stmt.setInt(4, salle.getId());
+        }
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(salle));
@@ -1891,6 +1901,80 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(medecins));
     }
 
+    private Response UpdatePlanification(final Request request, final Connection connection) throws IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+
+        final PreparedStatement stmt;
+        final PreparedStatement stmt2;
+        final PreparedStatement stmt3;
+        try {
+            stmt = connection.prepareStatement(Queries.UPDATE_PLANIFICATION.query);
+            Time debut = Time.valueOf(planification.getHeureDebut());
+            Time fin = Time.valueOf(planification.getHeureFin());
+            Date date = Date.valueOf(planification.getDatePlanification());
+
+            stmt.setInt(1, planification.getNumeroADELI());
+            stmt.setInt(2, planification.getIdPatient());
+            stmt.setInt(3, planification.getIdExamen());
+            stmt.setInt(4, planification.getIdSalle());
+            stmt.setDate(5,date);
+            stmt.setTime(6, debut);
+            stmt.setTime(7, fin);
+            stmt.setInt(8, planification.getIdPlanification());
+
+
+            stmt.executeUpdate();
+
+            stmt2 = connection.prepareStatement(Queries.INSERT_DISPONIBILITE.query);
+            stmt2.setInt(1, planification.getNumeroADELI());
+            stmt2.setDate(2, date);
+            stmt2.setTime(3, debut);
+            stmt2.setTime(4, fin);
+            stmt2.setString(5, indisponible);
+            stmt2.executeUpdate();
+
+            stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_RESERVATION.query);
+            stmt3.setInt(1, planification.getIdSalle());
+            stmt3.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planification));
+    }
+
+    private Response DeleteDisponibilite(final Request request, final Connection connection) throws IOException {
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final PlanificationExamen planification = objectMapper.readValue(request.getRequestBody(), PlanificationExamen.class);
+
+        final PreparedStatement stmt2;
+        try {
+
+            Time debut = Time.valueOf(planification.getHeureDebut());
+            Time fin = Time.valueOf(planification.getHeureFin());
+            Date date = Date.valueOf(planification.getDatePlanification());
+
+            stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
+            stmt2.setInt(1, planification.getNumeroADELI());
+            stmt2.setDate(2, date);
+            stmt2.setTime(3, debut);
+            stmt2.setTime(4, fin);
+
+            stmt2.executeUpdate();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(planification));
+    }
 }
 
 

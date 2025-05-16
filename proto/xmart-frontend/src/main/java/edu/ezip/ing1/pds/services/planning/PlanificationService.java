@@ -35,6 +35,7 @@ public class PlanificationService {
     final String selectIdPlanParMedecin = "SELECT_ID_PLANIFICATION_PAR_MEDECIN";
     final String selectIdPlanParExamen = "SELECT_ID_PLANIFICATION_PAR_EXAMEN";
     final String selectOnePlanificationRequestOrder = "SELECT_ONE_PLANIFICATION";
+    final String deleteDisponibiliteRequestOrder = "DELETE_DISPONIBILITE";
 
 
     private final NetworkConfig networkConfig;
@@ -53,6 +54,9 @@ public class PlanificationService {
 
     public void deletePlanification(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
         insertDeleteUpdatePlanification(planificationExamen, deleteRequestOrder);
+    }
+    public void deleteDisponibilite(PlanificationExamen planificationExamen) throws InterruptedException, IOException {
+        insertDeleteUpdatePlanification(planificationExamen, deleteDisponibiliteRequestOrder);
     }
 
     public void insertDeleteUpdatePlanification(PlanificationExamen planificationExamen, String requestOrder) throws InterruptedException, IOException {

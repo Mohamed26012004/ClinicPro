@@ -6,10 +6,7 @@ import edu.ezip.ing1.pds.business.dto.*;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.graphics.Fenetre;
-import edu.ezip.ing1.pds.services.planning.CreneauService;
-import edu.ezip.ing1.pds.services.planning.MedecinService;
-import edu.ezip.ing1.pds.services.planning.PlanificationService;
-import edu.ezip.ing1.pds.services.planning.PlanificationWithNameService;
+import edu.ezip.ing1.pds.services.planning.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +45,7 @@ public class PanelPlanningMedecin extends JPanel {
     public static JRadioButton disponibiliteButton = new JRadioButton("Disponibilité");
     public static DefaultTableModel modelDisponibilite;
     public static JTable tableDisponibilite;
+
 
     private static CardLayout rightCardLayout = new CardLayout();
     private static JPanel rightPanel = new JPanel(rightCardLayout);
@@ -337,7 +335,29 @@ public class PanelPlanningMedecin extends JPanel {
         update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                int i = tablePlanification.getSelectedRow();
+                if (i >= 0){
+                    PlanificationExamen plan = new PlanificationExamen();
+                    plan.setIdPlanification(Integer.parseInt(modelPlanification.getValueAt(i, 0).toString()));
+                    plan.setHeureDebut(LocalTime.parse(modelPlanification.getValueAt(i, 1).toString(), formatter));
+                    plan.setHeureFin(LocalTime.parse(modelPlanification.getValueAt(i, 2).toString(), formatter));
+                    plan.setNumeroADELI(planificationDuMedecin.getNumeroADELI());
+                    plan.setDatePlanification(planificationDuMedecin.getDatePlanification());
+                    try {
+                        PlanificationExamen p = planificationService.selectOnePlanifications(plan);
+                        FrameInsertUpdatePlanification f = new FrameInsertUpdatePlanification(p, 2);
+                        chargerPlanification(planificationDuMedecin);
+                        Salle s = new Salle();
+                        s.setId(plan.getIdSalle());
+                        final SalleService salleService = new SalleService(networkConfig);
+                        salleService.updateSalle(s);
+                        planificationService.deleteDisponibilite(plan);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
 
