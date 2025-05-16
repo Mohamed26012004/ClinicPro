@@ -29,7 +29,7 @@ public class TotalMaintenanceFront extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel j = new JPanel(new FlowLayout());
-        j.add(Fenetre.createLabel("Les Maintenances Quotidiens"));
+        j.add(Fenetre.createLabel("Les Maintenances Quotidiennes"));
         add(j, BorderLayout.NORTH);
         String[] columns = {"Date Maintenance", "Total Coût"};
         model = new DefaultTableModel(columns, 0);
