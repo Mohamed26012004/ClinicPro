@@ -176,6 +176,6 @@ public class AntecedentMedicalFront extends JPanel {
     private void viderChamps() {
         typeChamp.setText("");
         descriptionChamp.setText("");
-        patientComboBox.setSelectedIndex(-1);
+
     }
 }
