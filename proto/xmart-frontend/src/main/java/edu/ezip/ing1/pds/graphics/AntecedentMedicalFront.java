@@ -103,9 +103,9 @@ public class AntecedentMedicalFront extends JPanel {
         table.getSelectionModel().addListSelectionListener(e -> {
             int i = table.getSelectedRow();
             if (i >= 0) {
-                typeChamp.setText(model.getValueAt(i, 1).toString());
-                descriptionChamp.setText(model.getValueAt(i, 2).toString());
-                int idPatient = Integer.parseInt(model.getValueAt(i, 3).toString());
+                typeChamp.setText(model.getValueAt(i, 2).toString());
+                descriptionChamp.setText(model.getValueAt(i, 3).toString());
+                int idPatient = Integer.parseInt(model.getValueAt(i, 1).toString());
 
                 for (int j = 0; j < patientComboBox.getItemCount(); j++) {
                     if (patientComboBox.getItemAt(j).getIdPatient() == idPatient) {
@@ -176,6 +176,6 @@ public class AntecedentMedicalFront extends JPanel {
     private void viderChamps() {
         typeChamp.setText("");
         descriptionChamp.setText("");
-        patientComboBox.setSelectedIndex(-1);
+
     }
 }

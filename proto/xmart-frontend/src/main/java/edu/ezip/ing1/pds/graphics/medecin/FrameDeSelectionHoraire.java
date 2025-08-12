@@ -30,12 +30,11 @@ public class FrameDeSelectionHoraire extends JFrame {
 
     private static ArrayList<Horaire> listHoraire;
 
-    public FrameDeSelectionHoraire(ArrayList<Horaire> listHoraire){
+    public FrameDeSelectionHoraire(ArrayList<Horaire> list){
         super("Sélectionner Patient");
         setSize(600, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        listHoraire.clear();
         contentPane = (JPanel) getContentPane();
 
         String[] columns = {"ID", "Jour", "Heure de début", "Heure de fin"};
@@ -52,7 +51,7 @@ public class FrameDeSelectionHoraire extends JFrame {
         tableHorairee.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollPane = new JScrollPane(tableHorairee);
         try {
-
+            listHoraire = list;
             chargerPatients();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -67,11 +66,9 @@ public class FrameDeSelectionHoraire extends JFrame {
     public static void chargerPatients() throws IOException, InterruptedException {
         modelHoraire.setRowCount(0);
 
-        ArrayList<Horaire> horaires = listHoraire;
-        if (horaires != null ) {
-            ArrayList<Horaire> list = new ArrayList<>( horaires);
-            list.sort(Comparator.comparing(Horaire :: getJour).thenComparing(Horaire :: getHeureDebut));              //Order by nom
-            for (Horaire horaire: list){
+        if (listHoraire != null && !listHoraire.isEmpty() ) {
+            listHoraire.sort(Comparator.comparing(Horaire :: getJour).thenComparing(Horaire :: getHeureDebut));              //Order by nom
+            for (Horaire horaire: listHoraire){
                 modelHoraire.addRow(new Object[]{
                         horaire.getId(),
                         horaire.getJour(),
