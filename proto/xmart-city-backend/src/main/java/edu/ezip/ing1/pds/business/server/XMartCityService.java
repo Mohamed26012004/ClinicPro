@@ -114,7 +114,7 @@ public class XMartCityService {
 
 
         SELECT_ALL_EQUIPEMENTS("SELECT e.idEquipement, e.coutEquipement, e.dateAchat, e.nomEquipement FROM equipement e "),
-        INSERT_EQUIPEMENT("INSERT into equipement (idEquipement, nomEquipement, dateAchat, coutEquipement) values (?, ?, ?, ?)"),
+        INSERT_EQUIPEMENT("INSERT into equipement (nomEquipement, dateAchat, coutEquipement) values (?, ?, ?)"),
         UPDATE_EQUIPEMENT("UPDATE equipement SET coutEquipement = ?, dateAchat = ?, nomEquipement = ? WHERE idEquipement = ?"),
         DELETE_EQUIPEMENT("DELETE FROM equipement WHERE idEquipement = ? AND coutEquipement = ? AND nomEquipement = ? AND dateAchat = ? "),
         TOTAL_COUT_PAR_JOUR("SELECT dateAchat, SUM(coutEquipement) AS totalCout FROM equipement GROUP BY dateAchat ORDER BY dateAchat"),
@@ -199,7 +199,7 @@ public class XMartCityService {
 
 
         SELECT_ALL_MAINTENANCES("SELECT m.idMaintenance, m.coutMaintenance, m.dateMaintenance, m.typeMaintenance FROM maintenance m ORDER BY idMaintenance "),
-        INSERT_MAINTENANCE("INSERT into maintenance (idMaintenance, typeMaintenance, dateMaintenance, coutMaintenance) values (?, ?, ?, ?)"),
+        INSERT_MAINTENANCE("INSERT into maintenance (typeMaintenance, dateMaintenance, coutMaintenance) values (?, ?, ?)"),
         UPDATE_MAINTENANCE("UPDATE maintenance SET coutMaintenance = ?, dateMaintenance = ?, typeMaintenance = ? WHERE idMaintenance = ?"),
         DELETE_MAINTENANCE("DELETE FROM maintenance WHERE idMaintenance = ? AND coutMaintenance = ? AND typeMaintenance = ? AND dateMaintenance = ? "),
         TOTAL_MAINTENANCE_PAR_JOUR("SELECT dateMaintenance, SUM(coutMaintenance) AS totalMaintenance FROM maintenance GROUP BY dateMaintenance ORDER BY dateMaintenance"),
@@ -1482,10 +1482,9 @@ public class XMartCityService {
         final Equipement equipement = objectMapper.readValue(request.getRequestBody(), Equipement.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_EQUIPEMENT.query);
-        stmt.setInt(1,equipement.getIdEquipement());
-        stmt.setString(2, equipement.getNomEquipement());
-        stmt.setDate(3, Date.valueOf(equipement.getDateEquipement()));
-        stmt.setInt(4, equipement.getCoutEquipement());
+        stmt.setString(1, equipement.getNomEquipement());
+        stmt.setDate(2, Date.valueOf(equipement.getDateEquipement()));
+        stmt.setInt(3, equipement.getCoutEquipement());
 
         stmt.executeUpdate();
 
@@ -1576,13 +1575,11 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_MAINTENANCE.query);
 
-        stmt.setInt(1,maintenance.getIdMaintenance());
+        stmt.setString(1, maintenance.getTypeMaintenance());
 
-        stmt.setString(2, maintenance.getTypeMaintenance());
+        stmt.setDate(2, Date.valueOf(maintenance.getDateMaintenance()));
 
-        stmt.setDate(3, Date.valueOf(maintenance.getDateMaintenance()));
-
-        stmt.setInt(4, maintenance.getCoutMaintenance());
+        stmt.setInt(3, maintenance.getCoutMaintenance());
 
         stmt.executeUpdate();
 

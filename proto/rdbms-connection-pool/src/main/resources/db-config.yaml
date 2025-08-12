@@ -1,7 +1,7 @@
 #databaseName: "clinicprodatabase"
-#host: "172.31.253.249"
+#host: "127.0.0.1"
 #port: 3306
-#username : "toto"
+#username : "raslene"
 #password: "toto"
 #poolSize: 1
 

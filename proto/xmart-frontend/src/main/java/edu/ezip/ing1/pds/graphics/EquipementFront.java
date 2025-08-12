@@ -61,9 +61,6 @@ public class EquipementFront extends JPanel{
                 popupNomEquipement.setVisible(false);
             }
         });
-
-        panelNord.add(new JLabel("ID Équipement :"));
-        panelNord.add(idEquipementChamp);
         panelNord.add(new JLabel("Coût :"));
         panelNord.add(coutEquipementchamp);
         panelNord.add(new JLabel("Nom Équipement :"));
@@ -82,13 +79,11 @@ public class EquipementFront extends JPanel{
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
-        JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
         JButton boutonFiltrer = new JButton("Filtrer par date");
         JButton boutonReset = new JButton("Réinitialiser");
 
         panelSud.add(boutonAjouter);
-        panelSud.add(boutonModifier);
         panelSud.add(boutonSupprimer);
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReset);
@@ -96,7 +91,6 @@ public class EquipementFront extends JPanel{
 
         boutonAjouter.addActionListener(e -> {
             try {
-                int id = Integer.parseInt(idEquipementChamp.getText().trim());
                 int cout = Integer.parseInt(coutEquipementchamp.getText().trim());
                 String nomEquipement = nomEquipementchamp.getText().trim();
                 LocalDate dateAchat = LocalDate.parse(dateEquipementChamp.getText().trim(), formattage);
@@ -108,7 +102,6 @@ public class EquipementFront extends JPanel{
                 }
 
                 Equipement equipement = new Equipement();
-                equipement.setIdEquipement(id);
                 equipement.setCoutEquipement(cout);
                 equipement.setNomEquipement(nomEquipement);
                 equipement.setDateEquipement(dateAchat);
@@ -118,7 +111,7 @@ public class EquipementFront extends JPanel{
                 viderChamps();
 
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(frame, "Veuillez entrer des nombres valides pour l'ID et le coût",
+                JOptionPane.showMessageDialog(frame, "Merci de saisir un montant valide pour le coût",
                         "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Erreur lors de l'ajout: " + ex.getMessage(),
@@ -136,25 +129,6 @@ public class EquipementFront extends JPanel{
             }
         });
 
-        boutonModifier.addActionListener(e -> {
-            try {
-                int i = table.getSelectedRow();
-                if (i >= 0) {
-                    Equipement equipement = new Equipement();
-                    equipement.setIdEquipement(Integer.parseInt(idEquipementChamp.getText().trim()));
-                    equipement.setCoutEquipement(Integer.parseInt(coutEquipementchamp.getText().trim()));
-                    equipement.setNomEquipement(nomEquipementchamp.getText().trim());
-                    equipement.setDateEquipement(LocalDate.parse(dateEquipementChamp.getText().trim(), formattage));
-
-                    equipementService.updateEquipement(equipement);
-                    chargerEquipements();
-                    viderChamps();
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification: " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        });
 
         boutonSupprimer.addActionListener(e -> {
             try {

@@ -144,19 +144,19 @@ public class TotalPaiementFront extends  JPanel {
 
     // calculer le montant moyen
     private double calculerMontantMoyen(Paiements paiements) {
-        double total = 0;
-        int count = 0;
+        Map<LocalDate, Double> montantParDate = new HashMap<>();
 
         for (Paiement p : paiements.getPaiements()) {
-            total += p.getmontant();
-            count++;
+            LocalDate date = p.getdatePaiement();
+            montantParDate.merge(date, p.getmontant(), Double::sum);
         }
 
-        return count > 0 ? total / count : 0;
+        double total = 0;
+        for (double montant : montantParDate.values()) {
+            total += montant;
+        }
+
+        return montantParDate.size() > 0 ? total / montantParDate.size() : 0;
     }
 
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(TotalPaiementFront::new);
-    }
 }
