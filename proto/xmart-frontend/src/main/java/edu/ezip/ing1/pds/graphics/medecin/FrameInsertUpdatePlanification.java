@@ -38,8 +38,9 @@ public class FrameInsertUpdatePlanification extends JFrame {
     public static JTable tableSalle;
     public static DefaultTableModel modelMedecin;
     public static JTable tableMedecin;
-    protected int choix;
-    public FrameInsertUpdatePlanification(PlanificationExamen planificationExamen, int k){
+    protected static int choix;
+
+    public FrameInsertUpdatePlanification(PlanificationExamen planificationExamen, int k) {
 
         super("Programmer un examen");
         setSize(600, 500);
@@ -49,18 +50,18 @@ public class FrameInsertUpdatePlanification extends JFrame {
         this.choix = k;
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        if (this.choix == 1 || this.choix == 3){
+        if (this.choix == 1 || this.choix == 3) {
             contentPane.add(panelMedecin());
-            contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
+            contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
             setSize(600, 650);
             setLocationRelativeTo(null);
         }
         contentPane.add(panelPatient());
-        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
+        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         contentPane.add(panelExamen());
-        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
+        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         contentPane.add(panelSalle());
-        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
+        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 30, 10));
         contentPane.add(southButton());
         try {
             modification(planificationExamen, k);
@@ -68,12 +69,14 @@ public class FrameInsertUpdatePlanification extends JFrame {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         setVisible(true);
     }
-    
-    public static JPanel panelPatient(){
+
+    public static JPanel panelPatient() {
         JPanel panel = new JPanel();
         Border titre = BorderFactory.createTitledBorder("PATIENT");
         Border espaceVide = BorderFactory.createEmptyBorder(10, 10, 10, 10);
@@ -94,7 +97,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         panel.add(panelBouton);
 
         String[] columns = {"ID", "Nom", "Prénom", "Téléphone", "Adresse"};
-        modelPatient = new DefaultTableModel(columns, 0){
+        modelPatient = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -107,11 +110,11 @@ public class FrameInsertUpdatePlanification extends JFrame {
         JScrollPane scrollPane = new JScrollPane(tablePatient);
 
         panel.add(scrollPane, BorderLayout.CENTER);
-        
+
         return panel;
     }
 
-    public static JPanel panelExamen(){
+    public static JPanel panelExamen() {
         JPanel panel = new JPanel();
 
         Border titre = BorderFactory.createTitledBorder("EXAMEN");
@@ -134,9 +137,9 @@ public class FrameInsertUpdatePlanification extends JFrame {
         panel.add(panelBouton);
 
         String[] columns = {"ID", "Nom", "Coût", "Durée"};
-        modelExamen = new DefaultTableModel(columns, 0){
+        modelExamen = new DefaultTableModel(columns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column){
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
 
@@ -151,7 +154,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         return panel;
     }
 
-    public static JPanel panelSalle(){
+    public static JPanel panelSalle() {
         JPanel panel = new JPanel();
 
         Border titre = BorderFactory.createTitledBorder("SALLE");
@@ -174,7 +177,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         panel.add(panelBouton);
 
         String[] columns = {"ID", "Numero de Salle", "Type", "Statut"};
-        modelSalle = new DefaultTableModel(columns, 0){
+        modelSalle = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -190,7 +193,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         return panel;
     }
 
-    public JPanel southButton(){
+    public JPanel southButton() {
         JPanel panel = new JPanel(new FlowLayout());
         JButton enregistrer = new JButton("Enregistrer");
         JButton annuler = new JButton("Annuler");
@@ -210,22 +213,27 @@ public class FrameInsertUpdatePlanification extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (choix == 1 || choix == 3){
+                tableMedecin.setRowSelectionInterval(0, 0);
+                tableExamen.setRowSelectionInterval(0, 0);
+                tableSalle.setRowSelectionInterval(0, 0);
+                tablePatient.setRowSelectionInterval(0, 0);
+                if (choix == 1 || choix == 3) {
                     int i = tableExamen.getSelectedRow();
                     int j = tablePatient.getSelectedRow();
                     int k = tableSalle.getSelectedRow();
                     int t = tableMedecin.getSelectedRow();
 
-                    if (i >= 0 && j >= 0 && k >= 0 && t >= 0){
+                    if (i >= 0 && j >= 0 && k >= 0 && t >= 0) {
                         getPlanificationToInsert().setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(t, 0).toString()));
                         getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
                         getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
                         getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
                         try {
-                            if (choix == 1){
+                            if (choix == 1) {
                                 planificationService.insertPlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Créneau Réservé.", "Information", JOptionPane.INFORMATION_MESSAGE);
-                            }else{
+                            } else {
+
                                 planificationService.updatePlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Mis à jour éffectuée.", "Information", JOptionPane.INFORMATION_MESSAGE);
                             }
@@ -237,23 +245,23 @@ public class FrameInsertUpdatePlanification extends JFrame {
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
-                    }else{
+                    } else {
                         JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
-                }else{
+                } else {
                     int i = tableExamen.getSelectedRow();
                     int j = tablePatient.getSelectedRow();
                     int k = tableSalle.getSelectedRow();
 
-                    if (i >= 0 && j >= 0 && k >= 0){
+                    if (i >= 0 && j >= 0 && k >= 0) {
                         getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
                         getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
                         getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
                         try {
-                            if (choix == 0){
+                            if (choix == 0) {
                                 planificationService.insertPlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
-                            }else {
+                            } else {
                                 planificationService.updatePlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Réservation Mis à jour", "Information", JOptionPane.INFORMATION_MESSAGE);
                             }
@@ -264,7 +272,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
                         }
-                    }else{
+                    } else {
                         JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -276,7 +284,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         return panel;
     }
 
-    public static JPanel panelMedecin(){
+    public static JPanel panelMedecin() {
         JPanel panel = new JPanel();
 
         Border titre = BorderFactory.createTitledBorder("MEDECIN");
@@ -299,7 +307,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         panel.add(panelBouton);
 
         String[] columns = {"Numéro ADELI", "Nom", "Prénom", "Téléphone", "Spécialité", "Salaire"};
-        modelMedecin = new DefaultTableModel(columns, 0){
+        modelMedecin = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -320,52 +328,46 @@ public class FrameInsertUpdatePlanification extends JFrame {
         return planificationToInsert;
     }
 
-    public static void modification(PlanificationExamen planificationExamen, int k) throws ExecutionException, InterruptedException {
+    public static void modification(PlanificationExamen planificationExamen, int k) throws ExecutionException, InterruptedException, IOException {
 
-        if (k == 3){
-            ExecutorService exec = Executors.newFixedThreadPool(4);
+        if (k == 3) {
+            Medecin medecin = new Medecin();
+            Patient patient = new Patient();
+            Examen examen = new Examen();
+            Salle salle = new Salle();
 
-            Callable<Medecin> callMedecin = () -> {
-                Medecins medecins = medecinService.selectAllMedecins();
-                for (Medecin m : medecins.getMedecins()) {
-                    if (m.getNumeroADELI() == planificationExamen.getNumeroADELI()) return m;
+            Medecins medecins = medecinService.selectAllMedecins();
+            for (Medecin m : medecins.getMedecins()) {
+                if (m.getNumeroADELI() == planificationExamen.getNumeroADELI()) {
+                    medecin = m;
+                    break;
                 }
-                return null;
-            };
+            }
 
-            Callable<Patient> callPatient = () -> {
-                Patients patients = patientService.selectPatients();
-                for (Patient p : patients.getPatients()) {
-                    if (p.getIdPatient() == planificationExamen.getIdPatient()) return p;
+
+            Patients patients = patientService.selectPatients();
+            for (Patient p : patients.getPatients()) {
+                if (p.getIdPatient() == planificationExamen.getIdPatient()) {
+                    patient = p;
+                    break;
                 }
-                return null;
-            };
+            }
 
-            Callable<Examen> callExamen = () -> {
-                Examens examens = examenService.selectExamens();
-                for (Examen examen : examens.getExamens()){
-                    if (examen.getId() == planificationExamen.getIdExamen()) return examen;
+            Examens examens = examenService.selectExamens();
+            for (Examen e : examens.getExamens()) {
+                if (e.getId() == planificationExamen.getIdExamen()) {
+                    examen = e;
+                    break;
                 }
-                return null;
-            };
+            }
 
-            Callable<Salle> callSalle = () -> {
-                Salles salles = salleService.selectSalles();
-                for (Salle salle : salles.getSalles()){
-                    if (salle.getId() == planificationExamen.getIdSalle()) return salle;
+            Salles salles = salleService.selectSalles();
+            for (Salle s : salles.getSalles()) {
+                if (s.getId() == planificationExamen.getIdSalle()) {
+                    salle = s;
+                    break;
                 }
-                return null;
-            };
-
-            Future<Medecin> futurMedecin = exec.submit(callMedecin);
-            Future<Patient> futurPatient = exec.submit(callPatient);
-            Future<Examen> futurExamen = exec.submit(callExamen);
-            Future<Salle> futurSalle = exec.submit(callSalle);
-
-            Medecin medecin = futurMedecin.get();
-            Patient patient = futurPatient.get();
-            Examen examen = futurExamen.get();
-            Salle salle = futurSalle.get();
+            }
 
             modelMedecin.addRow(new Object[]{
                     medecin.getNumeroADELI(),
@@ -400,72 +402,60 @@ public class FrameInsertUpdatePlanification extends JFrame {
             });
             tablePatient.setRowSelectionInterval(0, 0);
 
-        }else if (k == 2){
-            ExecutorService exec = Executors.newFixedThreadPool(3);
+        } else if (k == 2) {
 
-            Callable<Patient> callPatient = () -> {
-                Patients patients = patientService.selectPatients();
-                for (Patient p : patients.getPatients()) {
-                    if (p.getIdPatient() == planificationExamen.getIdPatient()) return p;
+            Patient patient = new Patient();
+            Examen examen = new Examen();
+            Salle salle = new Salle();
+
+            Patients patients = patientService.selectPatients();
+            for (Patient p : patients.getPatients()) {
+                if (p.getIdPatient() == planificationExamen.getIdPatient()) {
+                    patient = p;
+                    break;
                 }
-                return null;
-            };
 
-            Callable<Examen> callExamen = () -> {
                 Examens examens = examenService.selectExamens();
-                for (Examen examen : examens.getExamens()){
-                    if (examen.getId() == planificationExamen.getIdExamen()) return examen;
+                for (Examen e : examens.getExamens()) {
+                    if (e.getId() == planificationExamen.getIdExamen()) {
+                        examen = e;
+                        break;
+                    }
                 }
-                return null;
-            };
 
-            Callable<Salle> callSalle = () -> {
                 Salles salles = salleService.selectSalles();
-                for (Salle salle : salles.getSalles()){
-                    if (salle.getId() == planificationExamen.getIdSalle()) return salle;
+                for (Salle s : salles.getSalles()) {
+                    if (s.getId() == planificationExamen.getIdSalle()) {
+                        salle = s;
+                        break;
+                    }
                 }
-                return null;
-            };
 
-            Future<Patient> futurPatient = exec.submit(callPatient);
-            Future<Examen> futurExamen = exec.submit(callExamen);
-            Future<Salle> futurSalle = exec.submit(callSalle);
+                modelExamen.addRow(new Object[]{
+                        examen.getId(),
+                        examen.getNom(),
+                        examen.getCout(),
+                        examen.getDuree(),
+                });
+                tableExamen.setRowSelectionInterval(0, 0);
 
-            Patient patient = futurPatient.get();
-            Examen examen = futurExamen.get();
-            Salle salle = futurSalle.get();
+                modelSalle.addRow(new Object[]{
+                        salle.getId(),
+                        salle.getNumeroSalle(),
+                        salle.getTypeSalle(),
+                        salle.getStatut()
+                });
+                tableExamen.setRowSelectionInterval(0, 0);
+                modelPatient.addRow(new Object[]{
+                        patient.getIdPatient(),
+                        patient.getNom(),
+                        patient.getPrenom(),
+                        patient.getTelephone(),
+                        patient.getAdresse()
+                });
+                tablePatient.setRowSelectionInterval(0, 0);
+            }
 
-            modelExamen.addRow(new Object[]{
-                    examen.getId(),
-                    examen.getNom(),
-                    examen.getCout(),
-                    examen.getDuree(),
-            });
-            tableExamen.setRowSelectionInterval(0, 0);
-
-            modelSalle.addRow(new Object[]{
-                    salle.getId(),
-                    salle.getNumeroSalle(),
-                    salle.getTypeSalle(),
-                    salle.getStatut()
-            });
-            tableExamen.setRowSelectionInterval(0, 0);
-            modelPatient.addRow(new Object[]{
-                    patient.getIdPatient(),
-                    patient.getNom(),
-                    patient.getPrenom(),
-                    patient.getTelephone(),
-                    patient.getAdresse()
-            });
-            tablePatient.setRowSelectionInterval(0, 0);
         }
-
-    }
-    public int getChoix() {
-        return choix;
-    }
-
-    public void setChoix(int choix) {
-        this.choix = choix;
     }
 }

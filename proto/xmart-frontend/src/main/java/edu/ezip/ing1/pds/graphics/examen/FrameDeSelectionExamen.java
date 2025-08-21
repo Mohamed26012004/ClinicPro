@@ -90,7 +90,15 @@ public class FrameDeSelectionExamen extends JFrame {
         Examens examens = examenService.selectExamens();
         if (examens != null && examens.getExamens() != null) {
             ArrayList<Examen> list = new ArrayList<>(examens.getExamens());
-            list.sort(Comparator.comparing(Examen::getNom));              //Order by nom
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = 0; j < list.size() - i - 1; j++) {
+                    if (list.get(j).getNom().compareTo(list.get(j + 1).getNom()) > 0) {
+                        Examen temporaire = list.get(j);
+                        list.set(j, list.get(j + 1));
+                        list.set(j + 1, temporaire);
+                    }
+                }
+            }             //Order by nom
             for (Examen examen : list){
                 modelExamen.addRow(new Object[]{
                         examen.getId(),

@@ -1,5 +1,6 @@
 package edu.ezip.ing1.pds.graphics.salle;
 
+import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Salle;
 import edu.ezip.ing1.pds.business.dto.Salles;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
@@ -99,7 +100,15 @@ public class FrameDeSelectionSalle extends JFrame {
                     secondList.add(list.get(i));
                 }
             }
-            secondList.sort(Comparator.comparing(Salle::getNumeroSalle));              //Order by nom
+            for (int i = 0; i < secondList.size() - 1; i++) {
+                for (int j = 0; j < secondList.size() - i - 1; j++) {
+                    if (secondList.get(j).getNumeroSalle().compareTo(secondList.get(j + 1).getNumeroSalle()) > 0) {
+                        Salle temporaire = secondList.get(j);
+                        secondList.set(j, secondList.get(j + 1));
+                        secondList.set(j + 1, temporaire);
+                    }
+                }
+            }                  //Order by nom
             for (Salle salle : secondList){
                 modelSalle.addRow(new Object[]{
                         salle.getId(),
