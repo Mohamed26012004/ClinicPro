@@ -66,8 +66,7 @@ public class MaintenanceFront extends JPanel{
             }
         });
 
-        panelNord.add(new JLabel("ID Maintenance :"));
-        panelNord.add(idMaintenanceChamp);
+
         panelNord.add(new JLabel("Cout Maintenance :"));
         panelNord.add(coutMaintenancechamp);
         panelNord.add(new JLabel("Type Maintenance :"));
@@ -86,13 +85,12 @@ public class MaintenanceFront extends JPanel{
 
         JPanel panelSud = new JPanel();
         JButton boutonAjouter = new JButton("Ajouter");
-        JButton boutonModifier = new JButton("Modifier");
         JButton boutonSupprimer = new JButton("Supprimer");
         JButton boutonFiltrer = new JButton("Filtrer par date");
         JButton boutonReset = new JButton("Réinitialiser");
 
         panelSud.add(boutonAjouter);
-        panelSud.add(boutonModifier);
+
         panelSud.add(boutonSupprimer);
         panelSud.add(boutonFiltrer);
         panelSud.add(boutonReset);
@@ -100,7 +98,7 @@ public class MaintenanceFront extends JPanel{
 
         boutonAjouter.addActionListener(e -> {
             try {
-                int id = Integer.parseInt(idMaintenanceChamp.getText().trim());
+
                 int cout = Integer.parseInt(coutMaintenancechamp.getText().trim());
                 String type = typeMaintenancechamp.getText().trim();
                 LocalDate date = LocalDate.parse(dateMaintenanceChamp.getText().trim(), formattage);
@@ -111,7 +109,7 @@ public class MaintenanceFront extends JPanel{
                 }
 
                 Maintenance maintenance = new Maintenance();
-                maintenance.setIdMaintenance(id);
+
                 maintenance.setCoutMaintenance(cout);
                 maintenance.setTypeMaintenance(type);
                 maintenance.setDateMaintenance(date);
@@ -120,7 +118,7 @@ public class MaintenanceFront extends JPanel{
                 chargerMaintenances();
                 viderChamps();
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Veuillez entrer des nombres valides pour l'ID et le coût", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Merci de saisir un montant valide pour le coût", "Erreur", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
@@ -136,31 +134,7 @@ public class MaintenanceFront extends JPanel{
             }
         });
 
-        boutonModifier.addActionListener(e -> {
-            try {
-                int i = table.getSelectedRow();
-                if (i >= 0) {
-                    int id = Integer.parseInt(idMaintenanceChamp.getText().trim());
-                    int cout = Integer.parseInt(coutMaintenancechamp.getText().trim());
-                    String type = typeMaintenancechamp.getText().trim();
-                    LocalDate date = LocalDate.parse(dateMaintenanceChamp.getText().trim(), formattage);
 
-                    Maintenance maintenance = new Maintenance();
-                    maintenance.setIdMaintenance(id);
-                    maintenance.setCoutMaintenance(cout);
-                    maintenance.setTypeMaintenance(type);
-                    maintenance.setDateMaintenance(date);
-
-                    maintenanceService.updateMaintenance(maintenance);
-                    chargerMaintenances();
-                    viderChamps();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner une ligne à modifier.", "Information", JOptionPane.INFORMATION_MESSAGE);
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Erreur lors de la modification: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        });
 
         boutonSupprimer.addActionListener(e -> {
             try {
