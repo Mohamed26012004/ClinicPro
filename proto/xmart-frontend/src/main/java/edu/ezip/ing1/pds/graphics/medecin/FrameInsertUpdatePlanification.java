@@ -38,6 +38,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
     public static JTable tableSalle;
     public static DefaultTableModel modelMedecin;
     public static JTable tableMedecin;
+    public static int idPreventSalle;
     protected static int choix;
 
     public FrameInsertUpdatePlanification(PlanificationExamen planificationExamen, int k) {
@@ -47,6 +48,7 @@ public class FrameInsertUpdatePlanification extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         planificationToInsert = planificationExamen;
+        idPreventSalle = planificationExamen.getIdSalle();
         this.choix = k;
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -213,11 +215,12 @@ public class FrameInsertUpdatePlanification extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                tableMedecin.setRowSelectionInterval(0, 0);
+
                 tableExamen.setRowSelectionInterval(0, 0);
                 tableSalle.setRowSelectionInterval(0, 0);
                 tablePatient.setRowSelectionInterval(0, 0);
                 if (choix == 1 || choix == 3) {
+                    tableMedecin.setRowSelectionInterval(0, 0);
                     int i = tableExamen.getSelectedRow();
                     int j = tablePatient.getSelectedRow();
                     int k = tableSalle.getSelectedRow();
@@ -227,13 +230,18 @@ public class FrameInsertUpdatePlanification extends JFrame {
                         getPlanificationToInsert().setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(t, 0).toString()));
                         getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
                         getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
-                        getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
+                        int idUpdate = Integer.parseInt(modelSalle.getValueAt(k, 0).toString());
+                        getPlanificationToInsert().setIdSalle(idUpdate);
                         try {
                             if (choix == 1) {
                                 planificationService.insertPlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Créneau Réservé.", "Information", JOptionPane.INFORMATION_MESSAGE);
                             } else {
-
+                                if (idPreventSalle != idUpdate ){
+                                    Salle salle = new Salle();
+                                    salle.setId(idPreventSalle);
+                                    salleService.updateSalle(salle);
+                                }
                                 planificationService.updatePlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Mis à jour éffectuée.", "Information", JOptionPane.INFORMATION_MESSAGE);
                             }
@@ -256,12 +264,18 @@ public class FrameInsertUpdatePlanification extends JFrame {
                     if (i >= 0 && j >= 0 && k >= 0) {
                         getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
                         getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
-                        getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
+                        int idUpdate = Integer.parseInt(modelSalle.getValueAt(k, 0).toString());
+                        getPlanificationToInsert().setIdSalle(idUpdate);
                         try {
                             if (choix == 0) {
                                 planificationService.insertPlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
                             } else {
+                                if (idPreventSalle != idUpdate ){
+                                    Salle salle = new Salle();
+                                    salle.setId(idPreventSalle);
+                                    salleService.updateSalle(salle);
+                                }
                                 planificationService.updatePlanification(getPlanificationToInsert());
                                 JOptionPane.showMessageDialog(null, "Réservation Mis à jour", "Information", JOptionPane.INFORMATION_MESSAGE);
                             }

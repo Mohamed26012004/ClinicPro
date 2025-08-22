@@ -35,21 +35,19 @@ public class FrameUpdateRendezVous extends JFrame {
     public static DefaultTableModel modelMedecin;
     public static JTable tableMedecin;
     protected int choix;
-    public FrameUpdateRendezVous(PlanificationExamen planificationExamen, int k){
+    public FrameUpdateRendezVous(PlanificationExamen planificationExamen){
 
         super("Programmer un examen");
         setSize(600, 500);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         planificationToInsert = planificationExamen;
-        this.choix = k;
         contentPane = (JPanel) getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        if (this.choix != 0){
-            contentPane.add(panelMedecin());
-            contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
-            setSize(600, 650);
-        }
+        contentPane.add(panelMedecin());
+        contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
+        setSize(600, 650);
+
         contentPane.add(panelPatient());
         contentPane.setBorder(BorderFactory.createEmptyBorder(10, 10,30, 10));
         contentPane.add(panelExamen());
@@ -197,53 +195,35 @@ public class FrameUpdateRendezVous extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (choix != 0){
-                    int i = tableExamen.getSelectedRow();
-                    int j = tablePatient.getSelectedRow();
-                    int k = tableSalle.getSelectedRow();
-                    int t = tableMedecin.getSelectedRow();
+                tableExamen.setRowSelectionInterval(0, 0);
+                tableSalle.setRowSelectionInterval(0, 0);
+                tablePatient.setRowSelectionInterval(0, 0);
+                tableMedecin.setRowSelectionInterval(0, 0);
 
-                    if (i >= 0 && j >= 0 && k >= 0 && t >= 0){
-                        getPlanificationToInsert().setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(t, 0).toString()));
-                        getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
-                        getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
-                        getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
-                        try {
-                            planificationService.insertPlanification(getPlanificationToInsert());
-                            JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
-                            dispose();
-                            PanelRendezVous.chargerDisponibilite(PanelRendezVous.planificationDuMedecin);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
+                int i = tableExamen.getSelectedRow();
+                int j = tablePatient.getSelectedRow();
+                int k = tableSalle.getSelectedRow();
+                int t = tableMedecin.getSelectedRow();
+
+                if (i >= 0 && j >= 0 && k >= 0 && t >= 0){
+                    getPlanificationToInsert().setNumeroADELI(Integer.parseInt(modelMedecin.getValueAt(t, 0).toString()));
+                    getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
+                    getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
+                    getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
+                    try {
+                        planificationService.insertPlanification(getPlanificationToInsert());
+                        JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        PanelRendezVous.chargerDisponibilite(PanelRendezVous.planificationDuMedecin);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
                 }else{
-                    int i = tableExamen.getSelectedRow();
-                    int j = tablePatient.getSelectedRow();
-                    int k = tableSalle.getSelectedRow();
-
-                    if (i >= 0 && j >= 0 && k >= 0){
-                        getPlanificationToInsert().setIdExamen(Integer.parseInt(modelExamen.getValueAt(i, 0).toString()));
-                        getPlanificationToInsert().setIdPatient(Integer.parseInt(modelPatient.getValueAt(j, 0).toString()));
-                        getPlanificationToInsert().setIdSalle(Integer.parseInt(modelSalle.getValueAt(k, 0).toString()));
-                        try {
-                            planificationService.insertPlanification(getPlanificationToInsert());
-                            JOptionPane.showMessageDialog(null, "Créneau Réservé", "Information", JOptionPane.INFORMATION_MESSAGE);
-                            dispose();
-                            PanelPlanningMedecin.chargerDisponibilite(PanelPlanningMedecin.planificationDuMedecin);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }else{
-                        JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    }
+                    JOptionPane.showMessageDialog(null, "Merci de renseigner tous les éléments demandés", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
+
             }
         });
 

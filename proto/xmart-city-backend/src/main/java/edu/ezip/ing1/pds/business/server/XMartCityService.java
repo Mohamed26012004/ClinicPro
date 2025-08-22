@@ -66,7 +66,7 @@ public class XMartCityService {
         UPDATE_SALLE_P("UPDATE salle SET statut = 'Libre' WHERE id = ?"),
         DELETE_SALLE("DELETE FROM salle WHERE numeroSalle = ? AND typeSalle = ?"),
         UPDATE_SALLE_RESERVATION("UPDATE salle SET statut = 'Réservé' WHERE id = ?"),
-        UPDATE_SALLE_DELETE_RESERVATION("UPDATE salle SET statut = 'Libre' WHERE id = ? "),
+
 
         SELECT_ALL_PATIENTS("SELECT p.idPatient, p.nom, p.prenom, p.telephone, p.adresse  FROM patient p ORDER BY p.nom, p.prenom "),
         INSERT_PATIENT("INSERT into patient (nom, prenom, telephone, adresse) values (?, ?, ?, ?)"),
@@ -952,6 +952,7 @@ public class XMartCityService {
 
         if (salle.getStatut() == null || salle.getNumeroSalle() == null || salle.getTypeSalle() == null){
             stmt = connection.prepareStatement(Queries.UPDATE_SALLE_P.query);
+            stmt.setInt(1, salle.getId());
         }else {
             stmt = connection.prepareStatement(Queries.UPDATE_SALLE.query);
             stmt.setString(1, salle.getNumeroSalle());
@@ -1755,7 +1756,7 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_PLANIFICATION.query);
         final PreparedStatement stmt2 = connection.prepareStatement(Queries.DELETE_DISPONIBILITE.query);
-        final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_DELETE_RESERVATION.query);
+        final PreparedStatement stmt3 = connection.prepareStatement(Queries.UPDATE_SALLE_P.query);
 
         stmt.setInt(1, planification.getNumeroADELI());
         stmt.setInt(2, planification.getIdPatient());
