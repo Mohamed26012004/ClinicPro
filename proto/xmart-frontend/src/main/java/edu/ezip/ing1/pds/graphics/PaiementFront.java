@@ -1,17 +1,14 @@
 package edu.ezip.ing1.pds.graphics;
- 
+
 import edu.ezip.ing1.pds.business.dto.Paiement;
 import edu.ezip.ing1.pds.business.dto.Paiements;
-import edu.ezip.ing1.pds.business.dto.Examen;
-import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.PaiementService;
-import edu.ezip.ing1.pds.services.planning.PatientService;
 import edu.ezip.ing1.pds.services.FactureService;
- 
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -20,19 +17,24 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
- 
+
+
+// déclaration des composants de l'ihm
 public class PaiementFront extends JPanel {
-    private JTextField montantChamp, datePaiementChamp;
-    private JRadioButton cartebancaireRadio, especesRadio, chequeRadio, tierspayantRadio;
+    private JTextField montantField, datePaiementField;
+    private JRadioButton carteBancaireRadio, especesRadio, chequeRadio, tiersPayantRadio;
     private ButtonGroup moyenDePaiementGroup;
-    private JComboBox<Integer> idFactureCombobox;
-    private DefaultTableModel model;
-    private JTable table;
+    private JComboBox<Integer> idFactureComboBox;
+    private DefaultTableModel tableModel;
+    private JTable paiementsTable;
+
+    // Services
     private final PaiementService paiementService;
     private final FactureService factureService;
-    private ArrayList<Facture> idFacturesListe;
- 
+
+        // Données
+    private ArrayList<Facture> listeFactures;
+
     public PaiementFront() throws InterruptedException, IOException {
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
@@ -43,189 +45,180 @@ public class PaiementFront extends JPanel {
         setSize(700, 400);
  
         JPanel panelNord = new JPanel(new GridLayout(4, 2, 5, 5));
- 
-        idFacturesListe = new ArrayList<>();
-        idFactureCombobox = new JComboBox<>();
-        chargerIdFactures();
- 
-        montantChamp = new JTextField();
-        datePaiementChamp = new JTextField();
+
+        // Initialisation des composants
+        listeFactures = new ArrayList<>();
+        idFactureComboBox = new JComboBox<>();
+        montantField = new JTextField();
+        datePaiementField = new JTextField();
        
-        cartebancaireRadio = new JRadioButton("Carte Bancaire");
+        // Radio-boutons pour le moyen de paiement
+        carteBancaireRadio = new JRadioButton("Carte Bancaire");
         especesRadio = new JRadioButton("Espèces");
         chequeRadio = new JRadioButton("Chèque");
-        tierspayantRadio = new JRadioButton("Tiers-Payant");
- 
+        tiersPayantRadio = new JRadioButton("Tiers-Payant");
+
         moyenDePaiementGroup = new ButtonGroup();
-        moyenDePaiementGroup.add(cartebancaireRadio);
+        moyenDePaiementGroup.add(carteBancaireRadio);
         moyenDePaiementGroup.add(especesRadio);
         moyenDePaiementGroup.add(chequeRadio);
-        moyenDePaiementGroup.add(tierspayantRadio);
+        moyenDePaiementGroup.add(tiersPayantRadio);
+
+        JPanel radioPanel = new JPanel(new GridLayout(2, 2));
+        radioPanel.add(carteBancaireRadio);
+        radioPanel.add(especesRadio);
+        radioPanel.add(chequeRadio);
+        radioPanel.add(tiersPayantRadio);
  
         panelNord.add(new JLabel("ID Facture :"));
-        panelNord.add(idFactureCombobox);
+        panelNord.add(idFactureComboBox);
         panelNord.add(new JLabel("Montant :"));
-        panelNord.add(montantChamp);
+        panelNord.add(montantField);
         panelNord.add(new JLabel("Date de paiement (AAAA-MM-DD) :"));
-        panelNord.add(datePaiementChamp);
+        panelNord.add(datePaiementField);
         panelNord.add(new JLabel("Moyen de Paiement :"));
- 
-        JPanel panelRadio = new JPanel(new GridLayout(2, 2));
-        panelRadio.add(cartebancaireRadio);
-        panelRadio.add(especesRadio);
-        panelRadio.add(chequeRadio);
-        panelRadio.add(tierspayantRadio);
-        panelNord.add(panelRadio);
+        panelNord.add(radioPanel);
  
         add(panelNord, BorderLayout.NORTH);
- 
+
+
+        // tableau des paiements
         String[] columns = {"ID", "Montant", "Date de paiement", "Moyen de Paiement", "ID Facture"};
-        model = new DefaultTableModel(columns, 0);
-        table = new JTable(model);
-        add(new JScrollPane(table), BorderLayout.CENTER);
- 
+        tableModel = new DefaultTableModel(columns, 0);
+        paiementsTable = new JTable(tableModel);
+        add(new JScrollPane(paiementsTable), BorderLayout.CENTER);
+
+        // bouton soumettre
         JPanel panelSud = new JPanel();
         JButton boutonSoumettre = new JButton("Soumettre");
- 
         panelSud.add(boutonSoumettre);
- 
         add(panelSud, BorderLayout.SOUTH);
+
+        boutonSoumettre.addActionListener(e -> soumettrePaiement());
  
-        boutonSoumettre.addActionListener(e -> {
+        // Chargement  des données
+        chargerDonnees();
+
+
+        // Maj liste des factures
+        Timer timer = new Timer(30000, e -> {
             try {
-                String montantText = montantChamp.getText();
-                String dateText = datePaiementChamp.getText();
-               
-                String moyen = "";
-                if (cartebancaireRadio.isSelected()) {
-                    moyen = "Carte Bancaire";
-                } else if (especesRadio.isSelected()) {
-                    moyen = "Espèces";
-                } else if (chequeRadio.isSelected()) {
-                    moyen = "Chèque";
-                } else if (tierspayantRadio.isSelected()) {
-                    moyen = "Tiers-Payant";
-                }
- 
-                if (montantText.isEmpty() && dateText.isEmpty() && moyen.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
- 
- 
-                if (moyen.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Vous devez sélectionner un moyen de paiement", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
- 
-                double montant = Double.parseDouble(montantText);
- 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate datePaiement = LocalDate.parse(dateText, formatter);
- 
-                int selectedIndexIdFac = idFactureCombobox.getSelectedIndex();
-                if (selectedIndexIdFac == -1) {
-                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un numéro de facture", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
- 
-                int idFac = idFacturesListe.get(selectedIndexIdFac).getIdFacture();
- 
-                int confirmation = JOptionPane.showConfirmDialog(null, "Êtes-vous sûr de vouloir confirmer ce paiement ?", "Confirmation", JOptionPane.YES_NO_OPTION);
-               
-                if (confirmation == JOptionPane.YES_OPTION) {
- 
+                chargerFactures();
+            } catch (Exception ex) {
+                System.err.println("Erreur de mise à jour : " + ex.getMessage());
+            }});
+
+        timer.start();
+    }
+
+    // chargement factures 
+    private void chargerDonnees() {
+            chargerFactures();
+            chargerPaiements();
+    }
+    
+
+    // Nouveau paiement
+
+    private void soumettrePaiement() {
+        try {
+            // il faut remplir les champs
+            if (montantField.getText().isEmpty() && datePaiementField.getText().isEmpty() && getMoyenDePaiementSelectionne() == null) {
+                JOptionPane.showMessageDialog(this, "Tous les champs doivent être remplis.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            double montant = Double.parseDouble(montantField.getText());
+            LocalDate datePaiement = LocalDate.parse(datePaiementField.getText(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            String moyen = getMoyenDePaiementSelectionne();
+            int idFacture = (int) idFactureComboBox.getSelectedItem();
+
+            // Confirmation de paiement
+            int confirmation = JOptionPane.showConfirmDialog(this, "Confirmer ce paiement ?", "Confirmation", JOptionPane.YES_NO_OPTION);
+            if (confirmation == JOptionPane.YES_OPTION) {
                 Paiement paiement = new Paiement();
                 paiement.setmontant(montant);
                 paiement.setdatePaiement(datePaiement);
                 paiement.setmoyenDePaiement(moyen);
-                paiement.setidFacture(idFac);
- 
+                paiement.setidFacture(idFacture);
+
                 paiementService.insertPaiement(paiement);
                 chargerPaiements();
                 viderChamps();
- 
-                JOptionPane.showMessageDialog(null, "Paiement ajouté avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
-                }
- 
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(null, "Format de date invalide. Utilisez le format AAAA-MM-DD", "Erreur", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Paiement ajouté avec succès.", "Succès", JOptionPane.INFORMATION_MESSAGE);
             }
-        });
- 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            int i = table.getSelectedRow();
-            if (i >= 0) {
-                montantChamp.setText(model.getValueAt(i, 1).toString());
-                datePaiementChamp.setText(model.getValueAt(i, 2).toString());
-                int numFac = (int) model.getValueAt(i, 4);
-                for (int j = 0; j < idFactureCombobox.getItemCount(); j++) {
-                if (idFactureCombobox.getItemAt(j) == numFac) {
-                idFactureCombobox.setSelectedIndex(j);
-                break;
-                }
-                }
- 
-            }
-        });
- 
-        try {
-            chargerPaiements();
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Le montant doit être un nombre.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        } catch (DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, "Format de date invalide (AAAA-MM-DD).", "Erreur", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, "Erreur lors du chargement des paiements: " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
-   
-        Timer timer = new Timer(25000, e -> {
-            try {
-                chargerIdFactures();
-            } catch (Exception ex) {
-                System.err.println("Erreur timer : " + ex.getMessage());
-            }
-        });
-        timer.start();
     }
- 
- 
-    private void chargerPaiements() throws IOException, InterruptedException {
-        model.setRowCount(0);
+
+    // récupère le moyen de pauement selectionné
+    private String getMoyenDePaiementSelectionne() {
+        if (carteBancaireRadio.isSelected()) 
+        return "Carte Bancaire";
+        if (especesRadio.isSelected()) 
+        return "Espèces";
+        if (chequeRadio.isSelected()) 
+        return "Chèque";
+        if (tiersPayantRadio.isSelected()) 
+        return "Tiers-Payant";
+        
+        return null;
+    }
+
+    // charger la liste des paiements
+         private void chargerPaiements() {
+          try {
+        tableModel.setRowCount(0);
         Paiements paiements = paiementService.selectPaiements();
         if (paiements != null && paiements.getPaiements() != null) {
-            ArrayList<Paiement> list = new ArrayList<>(paiements.getPaiements());
-            list.sort(Comparator.comparing(Paiement::getdatePaiement));
-            for (Paiement p : list) {
-                model.addRow(new Object[]{
-                        p.getidPaiement(),
-                        p.getmontant(),
-                        p.getdatePaiement(),
-                        p.getmoyenDePaiement(),
-                        p.getidFacture()
+        for (Paiement p : paiements.getPaiements()) {
+            tableModel.addRow(new Object[]{
+                p.getidPaiement(),
+                p.getmontant(),
+                p.getdatePaiement(),
+                p.getmoyenDePaiement(),
+                p.getidFacture()
                 });
             }
         }
+    } catch (IOException | InterruptedException e) {
+        JOptionPane.showMessageDialog(this, "Erreur de chargement des paiements.", "Erreur", JOptionPane.ERROR_MESSAGE);
     }
- 
-    private void chargerIdFactures() throws IOException, InterruptedException {
+    }
+
+
+    // chargement des idfacture dans la JCombo 
+    private void chargerFactures() {
+        try {
         Factures factures = factureService.selectFactures();
         if (factures != null && factures.getFactures() != null) {
-            int selected = idFactureCombobox.getSelectedIndex();
-            idFacturesListe = new ArrayList<>(factures.getFactures());
-            idFacturesListe.sort(Comparator.comparingInt(Facture::getIdFacture));
-            idFactureCombobox.removeAllItems();
-            for (Facture f : idFacturesListe) {
-            idFactureCombobox.addItem(f.getIdFacture());
+            Object selectionFacture = idFactureComboBox.getSelectedItem();
+            listeFactures = new ArrayList<>(factures.getFactures());
+            
+            idFactureComboBox.removeAllItems();
+            for (Facture f : listeFactures) {
+                idFactureComboBox.addItem(f.getIdFacture());
+            }
+            if (selectionFacture != null) {
+                idFactureComboBox.setSelectedItem(selectionFacture);
+            }
         }
-        if (selected >= 0 && selected < idFactureCombobox.getItemCount()) {
-            idFactureCombobox.setSelectedIndex(selected);
-        }
+    } catch (IOException | InterruptedException e) {
+        System.err.println("Erreur de chargement des factures : " + e.getMessage());
     }
 }
- 
+
+    // réinitialise les champs
     private void viderChamps() {
-        montantChamp.setText("");
-        datePaiementChamp.setText("");
+        montantField.setText("");
+        datePaiementField.setText("");
         moyenDePaiementGroup.clearSelection();
-    }}
+        idFactureComboBox.setSelectedIndex(-1);
+    }
+}
