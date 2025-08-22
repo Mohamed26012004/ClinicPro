@@ -2,15 +2,14 @@ package edu.ezip.ing1.pds.graphics;
 
 import edu.ezip.ing1.pds.business.dto.Facture;
 import edu.ezip.ing1.pds.business.dto.Factures;
-import edu.ezip.ing1.pds.business.dto.Paiement;
 import edu.ezip.ing1.pds.business.dto.Examen;
 import edu.ezip.ing1.pds.business.dto.Examens;
 import edu.ezip.ing1.pds.business.dto.Patient;
 import edu.ezip.ing1.pds.business.dto.Patients;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.planning.ExamenService;
 import edu.ezip.ing1.pds.services.FactureService;
+import edu.ezip.ing1.pds.services.planning.ExamenService;
 import edu.ezip.ing1.pds.services.planning.PatientService;
 
 import javax.swing.*;
@@ -20,272 +19,331 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class FacturationFront extends JPanel {
 
-    private JTextField montantChamp, dateFactureChamp;
+    // Déclaration des composants de l'ihm
+    private JTextField montantField, dateFactureField;
     private JCheckBox regleCheckBox;
-    private JComboBox<String> examenCombobox;
-    private JComboBox<String> patientCombobox;
-    private DefaultTableModel model;
-    private JTable table;
-    private final FactureService factureService;
-    private ArrayList<Examen> examensListe;
-    private ArrayList<Patient> patientsListe;
+    private JComboBox<String> examenComboBox;
+    private JComboBox<String> patientComboBox;
+    private DefaultTableModel tableModel;
+    private JTable facturesTable;
 
-    public FacturationFront() throws InterruptedException, IOException {
+    // différents services pour communiquer avec le back
+    private final FactureService factureService;
+    private final ExamenService examenService;
+    private final PatientService patientService;
+
+
+    // Listes pour stocker les données récupérées
+    private ArrayList<Examen> listeExamens;
+    private ArrayList<Patient> listePatients;
+
+
+    public FacturationFront() throws IOException, InterruptedException {
+        // Configuration du réseau
         final String networkConfigFile = "network.yaml";
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-        final ExamenService examenService = new ExamenService(networkConfig);
-        final PatientService patientService = new PatientService(networkConfig);
+
+        // Initialisation des services
         this.factureService = new FactureService(networkConfig);
+        this.examenService = new ExamenService(networkConfig);
+        this.patientService = new PatientService(networkConfig);
 
-        setSize(700, 400);
 
+        // Configuration du panel
         setLayout(new BorderLayout());
+        setSize(800, 600);
 
-        JPanel panelNord = new JPanel(new GridLayout(5, 2, 5, 5));
+        // Initialisation des listes
+        listeExamens = new ArrayList<>();
+        listePatients = new ArrayList<>();
 
-        examensListe = new ArrayList<>();
-        patientsListe = new ArrayList<>();
+        // Création du panneau de formulaire pour ajouter/modifier les factures
+        JPanel panelNord = new JPanel(new GridLayout(6, 2, 10, 10));
 
-        examenCombobox = new JComboBox<>();
-        patientCombobox = new JComboBox<>();
-
-        chargerNomsExamens();
-        chargerNomsPatients();
-
-        montantChamp = new JTextField();
-        dateFactureChamp = new JTextField();
+        // initialisation des composants du formulaire
+        examenComboBox = new JComboBox<>();
+        patientComboBox = new JComboBox<>();
+        montantField = new JTextField();
+        dateFactureField = new JTextField();
         regleCheckBox = new JCheckBox("Facture réglée");
-        regleCheckBox.setEnabled(false);
+        regleCheckBox.setEnabled(false); // elle est désactivée par défaut voir pigeot cours
 
+        // Ajout des composants au panneau de formulaire
         panelNord.add(new JLabel("Examen :"));
-        panelNord.add(examenCombobox);
+        panelNord.add(examenComboBox);
         panelNord.add(new JLabel("Patient :"));
-        panelNord.add(patientCombobox);
+        panelNord.add(patientComboBox);
         panelNord.add(new JLabel("Montant :"));
-        panelNord.add(montantChamp);
+        panelNord.add(montantField);
         panelNord.add(new JLabel("Date (AAAA-MM-JJ) :"));
-        panelNord.add(dateFactureChamp);
-        panelNord.add(new JLabel("Réglée :"));
+        panelNord.add(dateFactureField);
+        panelNord.add(new JLabel("État :"));
         panelNord.add(regleCheckBox);
 
+        // ajout du panneau de formulaire en haut de la fenêtre
         add(panelNord, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "Date", "Montant", "Réglée", "Examen", "Patient"};
-        model = new DefaultTableModel(columns, 0);
-        table = new JTable(model);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        // Configuration du tableau pour afficher les factures
+        String[] columnNames = {"ID", "Date", "Montant", "Réglée", "Examen", "Patient"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        facturesTable = new JTable(tableModel);
+        add(new JScrollPane(facturesTable), BorderLayout.CENTER);
 
-        JPanel panelSud = new JPanel();
-        JButton boutonAjouter = new JButton("Ajouter");
-        JButton boutonModifier = new JButton("Modifier");
-        JButton boutonSupprimer = new JButton("Supprimer");
+        // Création du panneau pour les boutons
+        JPanel boutonsPanel = new JPanel();
+        JButton ajouterButton = new JButton("Ajouter");
+        JButton modifierButton = new JButton("Modifier");
+        JButton supprimerButton = new JButton("Supprimer");
 
-        panelSud.add(boutonAjouter);
-        panelSud.add(boutonModifier);
-        panelSud.add(boutonSupprimer);
+        boutonsPanel.add(ajouterButton);
+        boutonsPanel.add(modifierButton);
+        boutonsPanel.add(supprimerButton);
 
-        add(panelSud, BorderLayout.SOUTH);
+        // Ajout du panneau de boutons en bas de la fenêtre
+        add(boutonsPanel, BorderLayout.SOUTH);
 
-        boutonAjouter.addActionListener(e -> {
+        // Chargement initial des données
+        chargerDonneesInitiales();
+
+        // Action des différents boutons
+        ajouterButton.addActionListener(e -> ajouterFacture());
+        modifierButton.addActionListener(e -> modifierFacture());
+        supprimerButton.addActionListener(e -> supprimerFacture());
+
+
+        // champ remplit lorsqu'une ligne est sélectionnée et que la selection est closee
+        facturesTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && facturesTable.getSelectedRow() != -1) {
+                remplirChampsDepuisTableau();
+            }
+        });
+
+        // Mise à jour des listes d'examens et de patients en cas d'ajout
+        Timer timer = new Timer(30000, e -> {
             try {
-                String montantText = montantChamp.getText();
-                String dateText = dateFactureChamp.getText();
-                boolean regle = regleCheckBox.isSelected();
-
-                if (montantText.isEmpty() || dateText.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Tous les champs doivent être remplis", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                double montant = Double.parseDouble(montantText);
-                LocalDate date = LocalDate.parse(dateText);
-
-                int selectedIndex = examenCombobox.getSelectedIndex();
-                if (selectedIndex == -1) {
-                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un examen", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                int patientIndex = patientCombobox.getSelectedIndex();
-                if (patientIndex == -1) {
-                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un patient", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                int idExamen = examensListe.get(selectedIndex).getId();
-                int idPatient = patientsListe.get(patientIndex).getIdPatient();
-                Facture facture = new Facture(date, montant, regle);
-                facture.setIdExamen(idExamen);
-                facture.setIdPatient(idPatient);
-                factureService.insertFacture(facture);
-
-                chargerFactures();
-                viderChamps();
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(null, "Le montant doit être un nombre", "Erreur", JOptionPane.ERROR_MESSAGE);
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(null, "Date invalide (format AAAA-MM-JJ)", "Erreur", JOptionPane.ERROR_MESSAGE);
+                chargerExamens();
+                chargerPatients();
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+                System.err.println("Erreur de mise à jour : " + ex.getMessage());
+            }});
 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            int i = table.getSelectedRow();
-            if (i >= 0) {
-                montantChamp.setText(model.getValueAt(i, 2).toString());
-                dateFactureChamp.setText(model.getValueAt(i, 1).toString());
-                String regleText = model.getValueAt(i, 3).toString();
-                regleCheckBox.setSelected("Oui".equalsIgnoreCase(regleText));
-                regleCheckBox.setEnabled(true);
-
-                String nomExamen = model.getValueAt(i, 4).toString();
-                for (int j = 0; j < examenCombobox.getItemCount(); j++) {
-                    if (examenCombobox.getItemAt(j).equals(nomExamen)) {
-                        examenCombobox.setSelectedIndex(j);
-                        break;
-                    }
-                }
-
-                String nomPatient = model.getValueAt(i, 5).toString();
-                for (int k = 0; k < patientCombobox.getItemCount(); k++) {
-                    if (patientCombobox.getItemAt(k).equals(nomPatient)){
-                        break;
-                    }
-                }
-            }
-        });
-
-        boutonModifier.addActionListener(e -> {
-            try {
-                int i = table.getSelectedRow();
-                if (i >= 0) {
-                    int id = Integer.parseInt(model.getValueAt(i, 0).toString());
-                    double montant = Double.parseDouble(montantChamp.getText());
-                    LocalDate date = LocalDate.parse(dateFactureChamp.getText());
-                    boolean regle = regleCheckBox.isSelected();
-                    int idExamen = examensListe.get(examenCombobox.getSelectedIndex()).getId();
-                    int idPatient = patientsListe.get(patientCombobox.getSelectedIndex()).getIdPatient();
-
-                    Facture facture = new Facture(date, montant, regle);
-                    facture.setIdFacture(id);
-                    facture.setIdExamen(idExamen);
-                    facture.setIdPatient(idPatient);
-                    factureService.updateFacture(facture);
-
-                    chargerFactures();
-                    viderChamps();
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Erreur lors de la modification : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        boutonSupprimer.addActionListener(e -> {
-            try {
-                int i = table.getSelectedRow();
-                if (i >= 0) {
-                    Facture facture = new Facture();
-                    facture.setIdFacture(Integer.parseInt(model.getValueAt(i, 0).toString()));
-                    factureService.deleteFacture(facture);
-                    chargerFactures();
-                    viderChamps();
-                }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        chargerFactures();
-
-        Timer timer = new Timer(40000, e -> {
-            try {
-                chargerNomsExamens();
-                chargerNomsPatients();
-            } catch (Exception ex) {
-                System.err.println("Erreur dans le timer : " + ex.getMessage());
-            }
-        });
         timer.start();
     }
 
-    private void chargerFactures() throws IOException, InterruptedException {
-        model.setRowCount(0);
+    // chargement des données
+    private void chargerDonneesInitiales() {
+        try {
+            chargerExamens();
+            chargerPatients();
+            chargerToutesLesFactures();
+        } catch (IOException | InterruptedException e) {
+            JOptionPane.showMessageDialog(this, "Erreur de chargement initial des données.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
+
+    // Ajouter une facture
+
+    private void ajouterFacture() {
+        try {
+            // Validation des champs
+            if (montantField.getText().isEmpty() && dateFactureField.getText().isEmpty() &&
+                    examenComboBox.getSelectedIndex() == -1 && patientComboBox.getSelectedIndex() == -1) {
+                JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // récupération des données du formulaire et conversion dans le bon format
+            double montant = Double.parseDouble(montantField.getText());
+            LocalDate date = LocalDate.parse(dateFactureField.getText());
+            int idExamen = listeExamens.get(examenComboBox.getSelectedIndex()).getId();
+            int idPatient = listePatients.get(patientComboBox.getSelectedIndex()).getIdPatient();
+
+            // Création de l'objet Facture
+            Facture facture = new Facture(date, montant, regleCheckBox.isSelected()); //boolean methonde
+            facture.setIdExamen(idExamen);
+            facture.setIdPatient(idPatient);
+
+            // Insertion de la facture via le service
+            factureService.insertFacture(facture);
+
+            // refresh
+            chargerToutesLesFactures();
+            viderChamps();
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Le montant doit être un nombre.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        } catch (DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, "Format de date invalide. Utilisez AAAA-MM-JJ.", "Erreur", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+    // Modifier la facture sélectionnée
+    private void modifierFacture() {
+        int selectedRow = facturesTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            try {
+                // Récupération des données
+                int id = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
+                double montant = Double.parseDouble(montantField.getText());
+                LocalDate date = LocalDate.parse(dateFactureField.getText());
+                boolean regle = regleCheckBox.isSelected();
+                int idExamen = listeExamens.get(examenComboBox.getSelectedIndex()).getId();
+                int idPatient = listePatients.get(patientComboBox.getSelectedIndex()).getIdPatient();
+
+                // Création de l'objet Facture
+                Facture facture = new Facture(date, montant, regle);
+                facture.setIdFacture(id);
+                facture.setIdExamen(idExamen);
+                facture.setIdPatient(idPatient);
+
+                // update de la facture et refresh
+                factureService.updateFacture(facture);
+                chargerToutesLesFactures();
+                viderChamps();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner une facture à modifier.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    // Supprimer une facture
+    private void supprimerFacture() {
+        int selectedRow = facturesTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            try {
+                int idFacture = Integer.parseInt(tableModel.getValueAt(selectedRow, 0).toString());
+                Facture facture = new Facture();
+                facture.setIdFacture(idFacture);
+
+                // facture supprimée
+                factureService.deleteFacture(facture);
+                chargerToutesLesFactures();
+                viderChamps();
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de la suppression : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner une facture à supprimer.", "Information", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    // remplit champ du formulaire avec la ligne sélectionnée
+    private void remplirChampsDepuisTableau() {
+        int selectedRow = facturesTable.getSelectedRow();
+        if (selectedRow != -1) {
+            montantField.setText(tableModel.getValueAt(selectedRow, 2).toString());
+            dateFactureField.setText(tableModel.getValueAt(selectedRow, 1).toString());
+            regleCheckBox.setSelected("Oui".equalsIgnoreCase(tableModel.getValueAt(selectedRow, 3).toString()));
+            regleCheckBox.setEnabled(true);
+
+            // Sélection de l'examen et du patient dans les JComboBox
+            examenComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 4).toString());
+            patientComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 5).toString());
+        }
+    }
+
+    // récupère les différentes données et les met dans la liste
+    private void chargerToutesLesFactures() throws IOException, InterruptedException {
+        tableModel.setRowCount(0);
         Factures factures = factureService.selectFactures();
-        ArrayList<Facture> list = new ArrayList<>(factures.getFactures());
-        list.sort(Comparator.comparing(Facture::getIdFacture).thenComparing(Facture::getDateFacture));
+        ArrayList<Facture> listeFactures = new ArrayList<>(factures.getFactures());
 
-        for (Facture f : list) {
-            String nomExamen = "";
-            for (Examen e : examensListe) {
-                if (e.getId() == f.getIdExamen()) {
-                    nomExamen = e.getNom();
-                    break;
-                }
-            }
-            String nomPatient = "";
-            for (Patient p : patientsListe) {
-                if (p.getIdPatient() == f.getIdPatient()) {
-                    nomPatient = p.getNom();
-                    break;
-                }
-            }
+        for (Facture facture : listeFactures) {
+            String nomExamen = trouverNomExamen(facture.getIdExamen());
+            String nomPatient = trouverNomPatient(facture.getIdPatient());
 
-            model.addRow(new Object[]{
-                    f.getIdFacture(),
-                    f.getDateFacture(),
-                    f.getMontantFacture(),
-                    f.getRegle() ? "Oui" : "Non",
+            tableModel.addRow(new Object[]{
+                    facture.getIdFacture(),
+                    facture.getDateFacture(),
+                    facture.getMontantFacture(),
+                    facture.getRegle() ? "Oui" : "Non",
                     nomExamen,
                     nomPatient
             });
         }
     }
 
-    private void chargerNomsExamens() {
-        try {
-            final ExamenService examenService = new ExamenService(ConfigLoader.loadConfig(NetworkConfig.class, "network.yaml"));
-            Examens examens = examenService.selectExamens();
-            if (examens != null && examens.getExamens() != null) {
-                examensListe = new ArrayList<>(examens.getExamens());
-                String[] nomsExamens = new String[examensListe.size()];
-                for (int i = 0; i < nomsExamens.length; i++) {
-                    nomsExamens[i] = examensListe.get(i).getNom();
-                }
-                examenCombobox.setModel(new DefaultComboBoxModel<>(nomsExamens));
+    // charge la liste des exams depuis le service
+    private void chargerExamens() throws IOException, InterruptedException {
+    
+        Object selectionExamen = examenComboBox.getSelectedItem(); //sauvargde l'exam selectionné
+
+        Examens examens = examenService.selectExamens();
+        if (examens != null && examens.getExamens() != null) {
+            listeExamens = new ArrayList<>(examens.getExamens());
+            examenComboBox.removeAllItems();
+            for (Examen examen : listeExamens) {
+                examenComboBox.addItem(examen.getNom());
             }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Erreur lors du chargement des examens: " + e.getMessage());
+
+            // si il y'avait une selection d'un exam, la remettre
+            if (selectionExamen != null) {
+                examenComboBox.setSelectedItem(selectionExamen);
+            }
         }
     }
 
-    private void chargerNomsPatients() {
-        try {
-            final PatientService patientService = new PatientService(ConfigLoader.loadConfig(NetworkConfig.class, "network.yaml"));
-            Patients patients = patientService.selectPatients();
-            if (patients != null && patients.getPatients() != null) {
-                patientsListe = new ArrayList<>(patients.getPatients());
-                String[] nomsPatients = new String[patientsListe.size()];
-                for (int i = 0; i < nomsPatients.length; i++) {
-                    nomsPatients[i] = patientsListe.get(i).getNom();
-                }
-                patientCombobox.setModel(new DefaultComboBoxModel<>(nomsPatients));
+    
+
+    // charge la liste des patients depuis le service
+    private void chargerPatients() throws IOException, InterruptedException {
+        Object selectionPatient = patientComboBox.getSelectedItem(); //idem
+
+        Patients patients = patientService.selectPatients();
+        if (patients != null && patients.getPatients() != null) {
+            listePatients = new ArrayList<>(patients.getPatients());
+            patientComboBox.removeAllItems();
+            for (Patient patient : listePatients) {
+                patientComboBox.addItem(patient.getNom());
             }
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Erreur lors du chargement des patients: " + e.getMessage());
+
+            // idem
+            if (selectionPatient != null) {
+                patientComboBox.setSelectedItem(selectionPatient);
+            }
         }
     }
+
+    // id donné puis compare avec les id des différents patient - si les deux id correspondent, retourne le nom de l'exam
+    private String trouverNomExamen(int idExamen) {
+        for (Examen examen : listeExamens) {
+            if (examen.getId() == idExamen) {
+                return examen.getNom();
+            }
+        }
+        return "id examen non trouvé";
+    }
+
+    // id donné puis compare avec les id des différents patient - si les deux id correspondent, retourne le nom de l'exam
+    private String trouverNomPatient(int idPatient) {
+        for (Patient patient : listePatients) {
+            if (patient.getIdPatient() == idPatient) {
+                return patient.getNom();
+            }
+        }
+        return "id patient non trouvé";
+    }
+
+    // champ formulaire réinitialisé
 
     private void viderChamps() {
-        montantChamp.setText("");
-        dateFactureChamp.setText("");
+        montantField.setText("");
+        dateFactureField.setText("");
         regleCheckBox.setSelected(false);
         regleCheckBox.setEnabled(false);
+        examenComboBox.setSelectedIndex(-1);
+        patientComboBox.setSelectedIndex(-1);
+        facturesTable.clearSelection();
     }
 }
