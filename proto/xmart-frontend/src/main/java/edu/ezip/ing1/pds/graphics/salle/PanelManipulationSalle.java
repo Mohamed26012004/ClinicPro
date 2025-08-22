@@ -64,7 +64,15 @@ public class PanelManipulationSalle extends JPanel {
 
         if (salles != null && salles.getSalles() != null) {
             ArrayList<Salle> list = new ArrayList<>(salles.getSalles());
-            list.sort(Comparator.comparing(Salle::getNumeroSalle));              //Order by nom
+            for (int i = 0; i < list.size() - 1; i++) {
+                for (int j = 0; j < list.size() - i - 1; j++) {
+                    if (list.get(j).getNumeroSalle().compareTo(list.get(j + 1).getNumeroSalle()) > 0) {
+                        Salle temporaire = list.get(j);
+                        list.set(j, list.get(j + 1));
+                        list.set(j + 1, temporaire);
+                    }
+                }
+            }               //Order by nom
             for (Salle salle : list){
                 model.addRow(new Object[]{
                         salle.getId(),
